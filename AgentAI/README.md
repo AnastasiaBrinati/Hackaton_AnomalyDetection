@@ -10,13 +10,13 @@ Una dashboard interattiva per comprendere come funzionano gli agenti AI moderni,
 ## 📋 Sommario
 
 - [Introduzione](#-introduzione)
-- [Features](#features)
-- [Installazione](#installazione)
-- [Uso della Dashboard](#uso-della-dashboard)
-- [Architettura](#architettura)
-- [Esempi Pratici](#esempi-pratici)
-- [Personalizzazione](#personalizzazione)
-- [Contribuire](#contribuire)
+- [Features](#-features)
+- [Installazione](#-installazione)
+- [Uso della Dashboard](#-uso-della-dashboard)
+- [Architettura](#-architettura)
+- [Esempi Pratici](#-esempi-pratici)
+- [Personalizzazione](#-personalizzazione)
+- [Contribuire](#-contribuire)
 
 ## 🎯 Introduzione
 
