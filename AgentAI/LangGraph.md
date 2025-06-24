@@ -1,20 +1,20 @@
 # Guida Completa a LangGraph per la Creazione di Agenti
 
 ## Indice
-1. [Introduzione a LangGraph](#introduzione)
-2. [Concetti Fondamentali](#concetti-fondamentali)
-3. [Installazione e Setup](#installazione)
-4. [Il Primo Agente Semplice](#primo-agente)
-5. [Stati e Memoria](#stati-memoria)
-6. [Agenti con Tools](#agenti-tools)
-7. [Multi-Agenti e Collaborazione](#multi-agenti)
-8. [Pattern Avanzati](#pattern-avanzati)
-9. [Best Practices](#best-practices)
-10. [Esempi Pratici](#esempi-pratici)
+1. [Introduzione a LangGraph](#-introduzione)
+2. [Concetti Fondamentali](#-concetti-fondamentali)
+3. [Installazione e Setup](#-installazione)
+4. [Il Primo Agente Semplice](#-primo-agente)
+5. [Stati e Memoria](#-stati-memoria)
+6. [Agenti con Tools](#-agenti-tools)
+7. [Multi-Agenti e Collaborazione](#-multi-agenti)
+8. [Pattern Avanzati](#-pattern-avanzati)
+9. [Best Practices](#-best-practices)
+10. [Esempi Pratici](#-esempi-pratici)
 
 ---
 
-## Introduzione a LangGraph {#introduzione}
+## Introduzione a LangGraph
 
 **LangGraph** è un framework sviluppato da LangChain per costruire applicazioni **stateful** e **multi-agente** usando grafi diretti aciclici (DAG). È progettato per creare agenti intelligenti che possono:
 
@@ -34,7 +34,7 @@
 
 ---
 
-## Concetti Fondamentali {#concetti-fondamentali}
+## Concetti Fondamentali
 
 ### 1. Grafo (Graph)
 Il **grafo** è la struttura principale che definisce il flusso di esecuzione dell'agente.
@@ -93,7 +93,7 @@ I **checkpoints** permettono di salvare e ripristinare lo stato dell'agente.
 
 ---
 
-## Installazione e Setup {#installazione}
+## Installazione e Setup
 
 ```bash
 # Installazione base
@@ -128,7 +128,7 @@ class AgentState(TypedDict):
 
 ---
 
-## Il Primo Agente Semplice {#primo-agente}
+## Il Primo Agente Semplice
 
 Creiamo un agente base che elabora messaggi e risponde.
 
@@ -183,7 +183,7 @@ print(result["output"])
 
 ---
 
-## Stati e Memoria {#stati-memoria}
+## Stati e Memoria
 
 ### Gestione dello Stato Avanzata
 
@@ -285,7 +285,7 @@ result2 = agent.invoke({
 
 ---
 
-## Agenti con Tools {#agenti-tools}
+## Agenti con Tools
 
 ### Integrazione di Tools Esterni
 
@@ -400,7 +400,7 @@ def create_tool_agent():
 
 ---
 
-## Multi-Agenti e Collaborazione {#multi-agenti}
+## Multi-Agenti e Collaborazione
 
 ### Sistema di Agenti Collaborativi
 
@@ -548,7 +548,7 @@ def route_coordinator(state: CoordinatedAgentState) -> str:
 
 ---
 
-## Pattern Avanzati {#pattern-avanzati}
+## Pattern Avanzati
 
 ### 1. Human-in-the-Loop
 
@@ -703,7 +703,7 @@ def create_robust_agent():
 
 ---
 
-## Best Practices {#best-practices}
+## Best Practices
 
 ### 1. Struttura del Codice
 
