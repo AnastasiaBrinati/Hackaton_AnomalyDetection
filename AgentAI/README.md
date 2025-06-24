@@ -324,7 +324,7 @@ Questo progetto è rilasciato sotto licenza MIT. Vedi il file [LICENSE](LICENSE)
 
 ## 🙏 Ringraziamenti
 
-- Ispirato dal documento "Anomaly Detection: Una dispensa per giovani Data Scientist e ML Engineer" di Mirko Calcaterra
+- Tratto dalle lezione di Datapizza sugli Agenti AI.
 - Icone fornite da [Lucide](https://lucide.dev/)
 - Built with ❤️ per la community ML
 
