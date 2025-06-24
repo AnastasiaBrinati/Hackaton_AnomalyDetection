@@ -9,7 +9,7 @@ Una dashboard interattiva per comprendere come funzionano gli agenti AI moderni,
 
 ## 📋 Sommario
 
-- [Introduzione](#introduzione)
+- [Introduzione](#-introduzione)
 - [Features](#features)
 - [Installazione](#installazione)
 - [Uso della Dashboard](#uso-della-dashboard)
