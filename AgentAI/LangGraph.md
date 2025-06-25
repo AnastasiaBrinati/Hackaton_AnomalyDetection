@@ -1,16 +1,16 @@
 # Guida Completa a LangGraph per la Creazione di Agenti
 
 ## Indice
-1. [Introduzione a LangGraph](#-Introduzione a LangGraph)
-2. [Concetti Fondamentali](#-concetti-fondamentali)
-3. [Installazione e Setup](#-installazione)
-4. [Il Primo Agente Semplice](#-primo-agente)
-5. [Stati e Memoria](#-stati-memoria)
-6. [Agenti con Tools](#-agenti-tools)
-7. [Multi-Agenti e Collaborazione](#-multi-agenti)
-8. [Pattern Avanzati](#-pattern-avanzati)
-9. [Best Practices](#-best-practices)
-10. [Esempi Pratici](#-esempi-pratici)
+1. [Introduzione a LangGraph](#introduzione-a-langgraph)
+2. [Concetti Fondamentali](#concetti-fondamentali)
+3. [Installazione e Setup](#installazione)
+4. [Il Primo Agente Semplice](#primo-agente)
+5. [Stati e Memoria](#stati-memoria)
+6. [Agenti con Tools](#agenti-tools)
+7. [Multi-Agenti e Collaborazione](#multi-agenti)
+8. [Pattern Avanzati](#pattern-avanzati)
+9. [Best Practices](#best-practices)
+10. [Esempi Pratici](#esempi-pratici)
 
 ---
 
