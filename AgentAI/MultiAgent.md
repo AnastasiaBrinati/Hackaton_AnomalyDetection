@@ -270,3 +270,80 @@ response_python_qrcode = grand_agent_executor.invoke({"input": query_python_qrco
 2.  **Seconda Query (`query_python_qrcode`)**: Poniamo una richiesta che richiede di scrivere codice e creare file. Ci aspettiamo che il `Grand Agent` scelga `"Python_Code_Executor"`.
 
 L'opzione `verbose=True` negli executor è essenziale qui, perché ci mostrerà la "catena di pensieri" dell'agente: vedremo come analizza la domanda e quale strumento sceglie, confermando che il nostro router sta funzionando come previsto.
+
+## Cosa succede se non trova l'agente migliore?
+
+Questa è la domanda più importante da porsi quando si progetta un sistema di agenti: **cosa succede quando le cose non vanno come previsto?**
+
+La risposta breve è: **non va in crash, ma cerca di fare del suo meglio, e il suo comportamento dipende interamente da come è stato istruito.**
+
+Analizziamo nel dettaglio cosa succede quando l'agente router (`Grand Agent`) riceve una richiesta che non sa a chi reindirizzare.
+
+### Il Processo di Pensiero dell'Agente
+
+Per prima cosa, ricordiamo come "pensa" l'agente. Segue un ciclo chiamato **ReAct (Reason and Act)**:
+
+1.  **Ragionamento (Reason)**: L'agente riceve la tua domanda (es. "Disegnami una pecora") e la lista dei suoi strumenti con le loro `description`. Il suo "pensiero" è un monologo interiore in cui dice:
+    > "L'utente mi ha chiesto di disegnargli una pecora. Vediamo i miei strumenti:
+    > *   `Python_Code_Executor`: la descrizione dice che è 'Utile quando devi scrivere ed eseguire codice Python... per calcoli, generazione di file come QR code...'.
+    > *   `CSV_Data_Analyzer`: la descrizione dice che è 'Utile quando devi rispondere a domande basate sui dati contenuti nel file 'episode_info.csv'...'.
+    >
+    > Hmm, nessuno dei due sembra perfetto. L'analisi del CSV è chiaramente sbagliata. Forse potrei usare il Python Executor per *tentare* di disegnare una pecora con del testo (ASCII art)? Sembra la scelta meno sbagliata."
+
+2.  **Azione (Act)**: L'agente decide di usare lo strumento che, secondo il suo ragionamento, è il più plausibile, anche se non è una corrispondenza perfetta.
+
+Questo ci porta a diversi scenari possibili.
+
+---
+
+### Scenari Possibili quando l'Agente è Incerto
+
+#### Scenario 1: Il Tentativo "Best Effort" (Il più comune)
+
+L'agente non si arrende. Sceglie lo strumento che assomiglia di più alla richiesta e gliela inoltra.
+
+*   **Esempio 1: "Qual è la capitale della Francia?"**
+    *   **Pensiero del Grand Agent**: "Non ho uno strumento per la geografia, ma il `Python_Code_Executor` può eseguire codice. Forse sa rispondere a domande generali? Provo a passargliela."
+    *   **Risultato**: Il `Python Agent` riceve la domanda. Dato che le sue istruzioni gli dicono "You might know the answer without running any code, but you should still run the code", potrebbe provare a scrivere codice come `print("Parigi")` (se il modello LLM conosce già la risposta) oppure concludere che non può scrivere codice per verificarlo e rispondere "I don't know". Il `Grand Agent` ti riporterà questo risultato.
+
+*   **Esempio 2: "Che ore sono?"**
+    *   **Pensiero del Grand Agent**: "Il `Python_Code_Executor` sembra adatto per questo."
+    *   **Risultato**: Il `Grand Agent` inoltra la richiesta al `Python Agent`, che probabilmente scriverà ed eseguirà codice Python valido come `import datetime; print(datetime.datetime.now())` e ti darà l'ora corretta. **In questo caso, il sistema funziona anche per un compito non previsto esplicitamente!**
+
+#### Scenario 2: L'Agente si Rifiuta perché Nessun Tool Corrisponde
+
+Con modelli molto avanzati (come GPT-4) e descrizioni di strumenti molto precise, l'agente potrebbe essere abbastanza "intelligente" da capire che nessuno dei suoi strumenti è adeguato.
+
+*   **Esempio: "Qual è il senso della vita?"**
+    *   **Pensiero del Grand Agent**: "L'utente ha posto una domanda filosofica. I miei strumenti sono per eseguire codice Python e analizzare un CSV. Nessuno dei due è appropriato per questa richiesta. Non posso rispondere."
+    *   **Risultato**: L'agente potrebbe rispondere direttamente con una frase del tipo: "Mi dispiace, ma non posso rispondere a questa domanda. I miei strumenti mi permettono solo di eseguire codice Python o analizzare dati da un file specifico."
+
+Questo è un comportamento "ideale" perché l'agente riconosce i propri limiti.
+
+#### Scenario 3: L'Agente Entra in un Loop e Fallisce
+
+Questo è lo scenario peggiore. L'agente sceglie uno strumento, fallisce, riceve il messaggio di errore ("Observation"), non capisce perché ha fallito, e riprova a usare lo stesso strumento nello stesso modo.
+
+*   **Esempio**: Una query molto ambigua che confonde l'agente.
+*   **Risultato**: Fortunatamente, l'`AgentExecutor` ha delle protezioni. Ha un parametro (`max_iterations`, di default 15) che limita il numero di tentativi. Dopo un certo numero di fallimenti, l'esecutore interromperà il ciclo forzatamente e restituirà un messaggio di errore, tipo: **"Agent stopped due to max iterations."** Questo previene loop infiniti e costi API incontrollati.
+
+---
+
+### Come Possiamo Migliorare il Comportamento?
+
+Questa è la parte più importante per i tuoi ragazzi. Come possiamo rendere il nostro sistema più robusto?
+
+1.  **Migliorare le Descrizioni dei Tool**: Questa è l'arma più potente che abbiamo. Più le `description` sono precise, migliore sarà la decisione del router. Potremmo aggiungere alla fine di ogni descrizione:
+    > "...Usa questo tool solo per domande relative a X. Per tutte le altre domande, non è lo strumento adatto."
+
+2.  **Modificare il Prompt del Grand Agent**: Invece di usare il prompt di base, potremmo dargli istruzioni più specifiche nel `grand_agent_prompt`:
+    ```python
+    instructions = """Seleziona il tool appropriato per rispondere alla domanda dell'utente. Considera attentamente la descrizione di ogni tool. Se NESSUN tool sembra adatto a rispondere alla domanda, rispondi direttamente dicendo che non sei in grado di gestire quel tipo di richiesta."""
+    grand_agent_prompt = base_prompt_template.partial(instructions=instructions)
+    ```
+    Questa semplice aggiunta incoraggia esplicitamente il comportamento dello "Scenario 2".
+
+3.  **Aggiungere un Tool di "Default" o "Fallback"**:
+    Potremmo creare un terzo tool, magari un agente conversazionale generico, con una descrizione del tipo: "Usa questo strumento come ultima risorsa se nessun altro tool specializzato è adatto per la domanda dell'utente".
+
+In conclusione, l'agente non è fragile. Tenta di ragionare sulla base delle informazioni che gli diamo. La qualità del suo comportamento di fronte all'incertezza è un riflesso diretto della qualità delle nostre istruzioni e delle descrizioni degli strumenti.
