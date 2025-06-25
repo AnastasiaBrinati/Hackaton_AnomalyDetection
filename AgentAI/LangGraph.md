@@ -1,7 +1,7 @@
 # Guida Completa a LangGraph per la Creazione di Agenti
 
 ## Indice
-1. [Introduzione a LangGraph](#-introduzione)
+1. [Introduzione a LangGraph](#-Introduzione a LangGraph)
 2. [Concetti Fondamentali](#-concetti-fondamentali)
 3. [Installazione e Setup](#-installazione)
 4. [Il Primo Agente Semplice](#-primo-agente)
