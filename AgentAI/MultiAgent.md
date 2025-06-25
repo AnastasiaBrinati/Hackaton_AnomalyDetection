@@ -168,7 +168,7 @@ Il nostro `CSV Agent` ha bisogno di dati su cui lavorare! Per rendere il noteboo
 
 ---
 
-###  Definizione del Sotto-Agente Python
+### 4. Definizione del Sotto-Agente Python
 
 ```python
 python_agent_instructions = """...""" # Istruzioni per l'agente
@@ -198,7 +198,7 @@ Qui stiamo assemblando il nostro primo specialista, il programmatore Python.
 
 ---
 
-#### 5. Definizione del Sotto-Agente CSV
+### 5. Definizione del Sotto-Agente CSV
 
 ```python
 df = pd.read_csv("episode_info.csv")
@@ -221,7 +221,7 @@ Qui creiamo il nostro secondo specialista, l'analista di dati.
 
 ---
 
-#### **6. Definizione dell'Agente Router (Grand Agent)**
+### 6. Definizione dell'Agente Router (Grand Agent)
 
 ```python
 # ... (funzione wrapper) ...
@@ -254,7 +254,7 @@ Questo è il cuore del nostro sistema: la creazione del Manager.
 
 ---
 
-#### **7. Esecuzione dell'Agente Router con Esempi**
+### 7. Esecuzione dell'Agente Router con Esempi
 
 ```python
 query_csv = "which season has the most episodes?"
