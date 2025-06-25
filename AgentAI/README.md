@@ -1,6 +1,6 @@
 # 🤖 AI Agent Learning Dashboard
 
-Una dashboard interattiva per comprendere come funzionano gli agenti AI moderni, con focus su reasoning, system prompt, paradigma TAO (Thought-Action-Observation) e tool esterni.
+Una [dashboard interattiva](https://claude.ai/public/artifacts/d352d94e-5487-43c9-9888-9ea673a03a04) per comprendere come funzionano gli agenti AI moderni, con focus su reasoning, system prompt, paradigma TAO (Thought-Action-Observation) e tool esterni.
 
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 ![React](https://img.shields.io/badge/React-18.2.0-blue.svg)
