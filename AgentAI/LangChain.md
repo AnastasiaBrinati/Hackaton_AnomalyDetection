@@ -24,7 +24,7 @@
 - **Agentic**: permettono ai LLM di interagire con l'ambiente
 - **Composable**: costruite combinando componenti modulari
 
-### Componenti Principali
+### Componenti principali
 
 **🔗 Chains**: Sequenze di chiamate a LLM o altri componenti
 **💭 Prompts**: Template e gestione di prompt
@@ -33,7 +33,7 @@
 **🤖 Agents**: LLM che possono decidere azioni da intraprendere
 **📚 Retrievers**: Sistemi per recuperare informazioni rilevanti
 
-### Architettura Generale
+### Architettura generale
 
 ```python
 # Flusso tipico di una applicazione LangChain
@@ -236,7 +236,7 @@ prompt = few_shot_template.format(input="Cos'è Java?")
 print(prompt)
 ```
 
-### Template Dinamici e Condizionali
+### Template dinamici e condizionali
 
 ```python
 from langchain_core.prompts import PromptTemplate
@@ -463,7 +463,7 @@ print(result["text"])
 ## Memory
 In questa sezione analizziamo la gestione della memoria
 
-### Tipi di Memory
+### Tipi di memoria
 
 ```python
 from langchain.memory import (
@@ -502,7 +502,7 @@ summary_buffer_memory = ConversationSummaryBufferMemory(
 )
 ```
 
-### Conversational Chain con Memory
+### Conversational Chain con memoria
 
 ```python
 from langchain.chains import ConversationChain
@@ -547,7 +547,7 @@ print("\n=== Contenuto Memoria ===")
 print(buffer_memory.buffer)
 ```
 
-### Custom Memory Implementation
+### Custom Memory implementation
 
 ```python
 from langchain.schema import BaseMemory
@@ -613,7 +613,7 @@ custom_conversation = ConversationChain(
 
 ---
 
-## Tools e Agents {#tools-agents}
+## Tools e agents
 
 ### Definizione di Tools
 
@@ -663,7 +663,7 @@ calculator_tool = CalculatorTool()
 tools = [word_length_tool, search_tool, calculator_tool]
 ```
 
-### Agent Base con ReAct
+### Agent base con ReAct
 
 ```python
 from langchain.agents import create_react_agent, AgentExecutor
@@ -873,7 +873,7 @@ print(coordinator.process_query("Quanti caratteri ha la parola 'langchain'?"))
 
 ---
 
-## RAG - Retrieval Augmented Generation {#rag}
+## RAG (Retrieval Augmented Generation)
 
 ### Setup Base per RAG
 
@@ -1000,7 +1000,7 @@ class RAGSystem:
 # print("Fonti:", result["sources"])
 ```
 
-### RAG Avanzato con Self-Query
+### RAG avanzato con Self-Query
 
 ```python
 from langchain.chains.query_constructor.base import AttributeInfo
@@ -1066,7 +1066,7 @@ class ConversationalRAG:
 
 ---
 
-## Output Parsers {#output-parsers}
+## Output Parsers
 
 ### Parser Base
 
@@ -1240,7 +1240,7 @@ print("Email generata:", email)
 
 ---
 
-## Callbacks e Monitoring {#callbacks}
+## Callbacks e Monitoring
 
 ### Callback Base
 
@@ -1314,7 +1314,7 @@ monitored_chain = prompt | chat_openai.with_config(callbacks=[callback_handler])
 result = monitored_chain.invoke({"text": "Ciao", "language": "inglese"})
 ```
 
-### Logging Strutturato
+### Logging strutturato
 
 ```python
 import logging
@@ -1505,7 +1505,7 @@ monitor.stop_monitoring()
 
 ---
 
-## Pattern Avanzati {#pattern-avanzati}
+## Pattern avanzati
 
 ### 1. Caching Intelligente
 
@@ -1577,7 +1577,7 @@ result1 = cached_chain.invoke({"text": "Hello", "language": "italiano"})
 result2 = cached_chain.invoke({"text": "Hello", "language": "italiano"})
 ```
 
-### 2. Retry e Fallback Logic
+### 2. Retry e fallback logic
 
 ```python
 from functools import wraps
@@ -1807,7 +1807,7 @@ for llm_name, llm_stats in stats.items():
 
 ---
 
-## Esempi Pratici {#esempi-pratici}
+## Esempi Pratici 
 
 ### Esempio 1: Sistema di Analisi Documenti
 
@@ -1939,7 +1939,7 @@ print(f"  Date: {', '.join(results['entities'].dates)}")
 print(f"\nParole chiave: {', '.join(results['keywords'][:5])}")
 ```
 
-### Esempio 2: Assistente per Content Creation
+### Esempio 2: Assistente per content creation
 
 ```python
 class ContentCreationAssistant:
@@ -2114,7 +2114,7 @@ for platform, result in social_results.items():
     print(result["output"])
 ```
 
-### Esempio 3: Sistema di Customer Support Intelligente
+### Esempio 3: Sistema di customer support intelligente
 
 ```python
 class IntelligentCustomerSupport:
