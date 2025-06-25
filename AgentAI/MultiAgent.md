@@ -149,7 +149,7 @@ Qui importiamo tutti i "mattoni" che ci serviranno per costruire i nostri agenti
 *   `ChatOpenAI`: È il nostro accesso al "cervello" dei modelli OpenAI (come GPT-4).
 *   `create_react_agent`: È una "funzione fabbrica" di LangChain. Prende un modello, un prompt e degli strumenti e assembla la logica di pensiero di un agente (il "ragionamento").
 *   `AgentExecutor`: È l'esecutore. Prende l'agente "pensante" creato sopra e gli dà la capacità di agire, eseguendo veramente gli strumenti.
-*   `PythonREPLTool`: Lo strumento specifico che dà all'agente Python l'accesso a un interprete.
+*   `PythonREPLTool`: Lo strumento specifico che dà all'agente Python l'accesso a un interprete. In Python, un REPL (Read-Eval-Print Loop) è un ambiente interattivo che consente di eseguire codice Python direttamente e vedere i risultati immediatamente.
 *   `create_pandas_dataframe_agent`: La funzione "scorciatoia" che ci costruisce un agente specializzato per analizzare un DataFrame Pandas.
 
 ---
@@ -310,7 +310,7 @@ L'agente non si arrende. Sceglie lo strumento che assomiglia di più alla richie
     *   **Pensiero del Grand Agent**: "Il `Python_Code_Executor` sembra adatto per questo."
     *   **Risultato**: Il `Grand Agent` inoltra la richiesta al `Python Agent`, che probabilmente scriverà ed eseguirà codice Python valido come `import datetime; print(datetime.datetime.now())` e ti darà l'ora corretta. **In questo caso, il sistema funziona anche per un compito non previsto esplicitamente!**
 
-#### Scenario 2: L'Agente si Rifiuta perché Nessun Tool Corrisponde
+#### Scenario 2: L'Agente si rifiuta perché nessun tool corrisponde
 
 Con modelli molto avanzati (come GPT-4) e descrizioni di strumenti molto precise, l'agente potrebbe essere abbastanza "intelligente" da capire che nessuno dei suoi strumenti è adeguato.
 
@@ -320,7 +320,7 @@ Con modelli molto avanzati (come GPT-4) e descrizioni di strumenti molto precise
 
 Questo è un comportamento "ideale" perché l'agente riconosce i propri limiti.
 
-#### Scenario 3: L'Agente Entra in un Loop e Fallisce
+#### Scenario 3: L'Agente entra in un loop e fallisce
 
 Questo è lo scenario peggiore. L'agente sceglie uno strumento, fallisce, riceve il messaggio di errore ("Observation"), non capisce perché ha fallito, e riprova a usare lo stesso strumento nello stesso modo.
 
@@ -329,9 +329,9 @@ Questo è lo scenario peggiore. L'agente sceglie uno strumento, fallisce, riceve
 
 ---
 
-### Come Possiamo Migliorare il Comportamento?
+### Come possiamo migliorare il comportamento?
 
-Questa è la parte più importante per i tuoi ragazzi. Come possiamo rendere il nostro sistema più robusto?
+Riformulo la domanda, come possiamo rendere il nostro sistema più robusto?
 
 1.  **Migliorare le Descrizioni dei Tool**: Questa è l'arma più potente che abbiamo. Più le `description` sono precise, migliore sarà la decisione del router. Potremmo aggiungere alla fine di ogni descrizione:
     > "...Usa questo tool solo per domande relative a X. Per tutte le altre domande, non è lo strumento adatto."
