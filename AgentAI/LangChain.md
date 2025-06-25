@@ -2333,12 +2333,12 @@ print(summary_report)
 
 LangChain è un framework estremamente potente e versatile per costruire applicazioni AI avanzate. I suoi punti di forza includono:
 
-**🔧 Modularità**: Componenti riutilizzabili e intercambiabili
-**🔗 Integrazioni**: Ampio ecosistema di connettori
-**💾 Memoria**: Gestione sofisticata dello stato conversazionale  
-**🛠️ Tools**: Facile integrazione con servizi esterni
-**🤖 Agents**: Capacità di ragionamento e decisione autonoma
-**📚 RAG**: Supporto nativo per retrieval-augmented generation
+* **🔧 Modularità**: Componenti riutilizzabili e intercambiabili
+* **🔗 Integrazioni**: Ampio ecosistema di connettori
+* **💾 Memoria**: Gestione sofisticata dello stato conversazionale  
+* **🛠️ Tools**: Facile integrazione con servizi esterni
+* **🤖 Agents**: Capacità di ragionamento e decisione autonoma
+* **📚 RAG**: Supporto nativo per retrieval-augmented generation
 
 **Casi d'uso principali:**
 - Chatbot e assistenti conversazionali
