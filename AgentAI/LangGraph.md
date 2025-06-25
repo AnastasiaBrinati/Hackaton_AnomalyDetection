@@ -3,11 +3,11 @@
 ## Indice
 1. [Introduzione a LangGraph](#introduzione-a-langgraph)
 2. [Concetti Fondamentali](#concetti-fondamentali)
-3. [Installazione e Setup](#installazione)
-4. [Il Primo Agente Semplice](#primo-agente)
+3. [Installazione e Setup](#installazione-e-setup)
+4. [Il Primo Agente Semplice](#il-primo-agente-semplice)
 5. [Stati e Memoria](#stati-memoria)
-6. [Agenti con Tools](#agenti-tools)
-7. [Multi-Agenti e Collaborazione](#multi-agenti)
+6. [Agenti con Tools](#agenti-con-tools)
+7. [Multi-Agenti e Collaborazione](#multi-agenti-e-collaborazione)
 8. [Pattern Avanzati](#pattern-avanzati)
 9. [Best Practices](#best-practices)
 10. [Esempi Pratici](#esempi-pratici)
@@ -856,7 +856,7 @@ def error_recovery_node(state):
 
 ---
 
-## Esempi Pratici {#esempi-pratici}
+## Esempi Pratici
 
 ### Esempio 1: Assistente Ricerca Scientifica
 
