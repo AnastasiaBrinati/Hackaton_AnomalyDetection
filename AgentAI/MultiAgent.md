@@ -48,9 +48,76 @@ Questa è la prima cosa da fare: installare la nostra "cassetta degli attrezzi".
 *   `langchainhub`: Un "hub" online da cui possiamo scaricare facilmente componenti pronti all'uso, come i template dei prompt.
 *   `qrcode`, `pillow`: Queste sono le librerie che il nostro `Python Agent` userà per generare e salvare le immagini dei QR code. Devono essere installate nell'ambiente affinché l'agente le possa usare.
 
+
+### Spiegazione Dedicata: La Configurazione dell'API Key
+
+Prima ancora di scrivere la logica dei nostri agenti, dobbiamo affrontare un passaggio fondamentale: **come fa il nostro programma a parlare con OpenAI?**
+
+Pensate all'API di OpenAI come a un servizio esclusivo a cui si accede solo con un "pass". La nostra **API Key** è esattamente questo: una chiave segreta, personale, che dimostra che siamo noi ad avere il permesso di usare i loro modelli (come GPT-4).
+
+Poiché questa chiave è legata al vostro account (e potenzialmente alla fatturazione), è **assolutamente vitale non scriverla mai direttamente nel codice!** Se condividete il codice, chiunque potrebbe vedere la vostra chiave e usarla.
+
+Per questo motivo, abbiamo scritto un blocco di codice robusto e sicuro per gestire questa chiave. Analizziamolo nel dettaglio.
+
+#### **Il Codice per la Gestione Sicura della API Key**
+
+```python
+import os  # Per interagire con il sistema operativo, ad esempio per gestire le API key come variabili d'ambiente
+from getpass import getpass # Per inserire le API key in modo sicuro (non visibile) se non sono già variabili d'ambiente
+
+# Configurazione della OpenAI API Key
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+if not openai_api_key:
+    openai_api_key = getpass("Inserisci la tua OpenAI API Key: ")
+    os.environ["OPENAI_API_KEY"] = openai_api_key # La imposta per la sessione corrente
+else:
+    print("OpenAI API Key letta correttamente dalla variabile d'ambiente.")
+
+# ... più avanti nel codice ...
+from dotenv import load_dotenv
+load_dotenv()
+```
+
+#### **Spiegazione Riga per Riga**
+
+1.  `import os` e `from getpass import getpass`
+    *   **Perché?** Importiamo due librerie standard di Python.
+        *   `os`: Ci permette di interagire con il sistema operativo, in particolare per leggere le "variabili d'ambiente". Le variabili d'ambiente sono un posto sicuro dove memorizzare configurazioni e segreti al di fuori del codice.
+        *   `getpass`: È un'utilità per chiedere all'utente di inserire del testo (come una password o una chiave) senza che questo venga mostrato sullo schermo mentre lo digita.
+
+2.  `openai_api_key = os.environ.get("OPENAI_API_KEY")`
+    *   **Perché?** Questa è la **prima strategia, la più sicura**. Il codice cerca di trovare una variabile d'ambiente chiamata `"OPENAI_API_KEY"`. In ambienti come Google Colab, potete impostare questa variabile come "Secret", e questo codice la leggerà automaticamente. Il metodo `.get()` è sicuro: se non trova la variabile, restituisce `None` invece di causare un errore.
+
+3.  `if not openai_api_key:`
+    *   **Perché?** Questo `if` gestisce lo scenario di riserva. Se la prima strategia (leggere dall'ambiente) non ha funzionato (`openai_api_key` è vuoto o `None`), allora esegue il codice al suo interno.
+
+4.  `openai_api_key = getpass("Inserisci la tua OpenAI API Key: ")`
+    *   **Perché?** Questa è la **seconda strategia, quella interattiva**. Se la chiave non è stata trovata, la chiediamo direttamente all'utente. Usando `getpass`, quando l'utente digita la sua chiave e preme Invio, i caratteri non appaiono sullo schermo. Questo previene il rischio che qualcuno la veda sbirciando lo schermo.
+
+5.  `os.environ["OPENAI_API_KEY"] = openai_api_key`
+    *   **Perché?** Una volta che abbiamo ottenuto la chiave (tramite `getpass`), la impostiamo come variabile d'ambiente *per la sessione corrente del programma*. Questo è utile perché molte librerie, inclusa LangChain, sono programmate per cercare automaticamente la chiave in quella specifica variabile (`OPENAI_API_KEY`).
+
+6.  `else: print(...)`
+    *   **Perché?** Se la prima strategia ha avuto successo, diamo un messaggio di conferma all'utente. È una buona pratica per far sapere che tutto è a posto.
+
+### Il Ruolo di `.env` e `load_dotenv()`
+
+Nel codice c'è anche un altro meccanismo, molto comune nello sviluppo locale.
+
+*   **Il file `.env`**: È un semplice file di testo che potete creare nella stessa cartella del vostro script. Al suo interno scrivete:
+    `OPENAI_API_KEY='sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'`
+*   `load_dotenv()`: Quando questa funzione viene chiamata, la libreria `python-dotenv` apre il file `.env`, legge le variabili definite lì dentro e le carica come variabili d'ambiente per il programma.
+
+**In sintesi, il nostro codice prova 3 strategie in ordine di preferenza:**
+1.  **Cerca un Secret/Variabile d'ambiente già impostata** (es. in Colab).
+2.  **Carica la variabile da un file `.env`** (grazie a `load_dotenv()`).
+3.  **Come ultima risorsa, la chiede in modo sicuro all'utente** (con `getpass`).
+
+Questo approccio a più livelli garantisce che il nostro codice sia flessibile, sicuro e non esponga mai le nostre preziose chiavi API.
+
 ---
 
-#### **2. Importazioni e Configurazione dell'Ambiente**
+#### 2. Import e Setup dell'Ambiente
 
 ```python
 # ... (codice di gestione API key) ...
@@ -87,7 +154,8 @@ Qui importiamo tutti i "mattoni" che ci serviranno per costruire i nostri agenti
 
 ---
 
-#### **3. Creazione del File CSV di Esempio**
+### 3. Creazione del File CSV di Esempio
+Noi ve ne abbiamo fornito uno. Altrimenti qui il codice per crearlo
 
 ```python
 data = {'season': [...], 'episode_num': [...], 'title': [...], 'viewers_millions': [...]}
@@ -100,7 +168,7 @@ Il nostro `CSV Agent` ha bisogno di dati su cui lavorare! Per rendere il noteboo
 
 ---
 
-#### **4. Definizione del Sotto-Agente Python**
+###  Definizione del Sotto-Agente Python
 
 ```python
 python_agent_instructions = """...""" # Istruzioni per l'agente
@@ -130,7 +198,7 @@ Qui stiamo assemblando il nostro primo specialista, il programmatore Python.
 
 ---
 
-#### **5. Definizione del Sotto-Agente CSV**
+#### 5. Definizione del Sotto-Agente CSV
 
 ```python
 df = pd.read_csv("episode_info.csv")
