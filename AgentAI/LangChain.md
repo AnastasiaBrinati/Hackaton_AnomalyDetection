@@ -731,12 +731,11 @@ Rispondi alla domanda dell'utente nel modo migliore possibile. Hai accesso ai se
 {tools}
 
 Per utilizzare un tool, usa questo formato JSON:
-```json
 {{
     "action": "nome_del_tool",
     "action_input": "input_del_tool"
 }}
-```
+
 
 Quando hai la risposta finale, rispondi direttamente senza utilizzare tools.
 
@@ -746,8 +745,6 @@ Conversazione:
 Question: {input}
 {agent_scratchpad}
 """
-```
-``` python
 structured_prompt = ChatPromptTemplate.from_template(structured_template)
 
 # Creazione structured agent
