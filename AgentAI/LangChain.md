@@ -746,7 +746,8 @@ Conversazione:
 Question: {input}
 {agent_scratchpad}
 """
-
+```
+```
 structured_prompt = ChatPromptTemplate.from_template(structured_template)
 
 # Creazione structured agent
