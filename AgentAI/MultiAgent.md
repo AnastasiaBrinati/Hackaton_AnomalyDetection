@@ -347,3 +347,6 @@ Questa è la parte più importante per i tuoi ragazzi. Come possiamo rendere il 
     Potremmo creare un terzo tool, magari un agente conversazionale generico, con una descrizione del tipo: "Usa questo strumento come ultima risorsa se nessun altro tool specializzato è adatto per la domanda dell'utente".
 
 In conclusione, l'agente non è fragile. Tenta di ragionare sulla base delle informazioni che gli diamo. La qualità del suo comportamento di fronte all'incertezza è un riflesso diretto della qualità delle nostre istruzioni e delle descrizioni degli strumenti.
+
+Dato che siete arrivati fin qui vi meritate questo:
+![immagine](https://github.com/user-attachments/assets/e898e9d9-fccf-4c9b-8cbe-6b6f99007d8a)
