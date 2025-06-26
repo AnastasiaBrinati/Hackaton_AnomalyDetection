@@ -1,4 +1,8 @@
 # 📚 Documentazione: LLM Multi-Agent Orchestra Dashboard
+![Status](https://img.shields.io/badge/status-active-success.svg)
+![React](https://img.shields.io/badge/React-18.2.0-blue.svg)
+![Tailwind](https://img.shields.io/badge/Tailwind-3.0-blueviolet.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## 📋 Indice
 1. [Introduzione](#introduzione)
