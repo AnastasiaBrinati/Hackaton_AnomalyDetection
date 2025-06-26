@@ -402,7 +402,7 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #888;'>
     Dashboard Vendite E-commerce | Dati simulati per dimostrazione | 
-    Creato con ❤️ usando Streamlit
+    Creato con il ❤️ usando Streamlit
 </div>
 """, unsafe_allow_html=True)
 
