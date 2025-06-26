@@ -17,7 +17,7 @@
 
 ### Cos'è la LLM Multi-Agent Orchestra Dashboard?
 
-È una **dashboard interattiva educativa** che simula visivamente come funziona un sistema multi-agent basato su LLM (Large Language Models). Progettata specificamente per **junior data scientists**, permette di comprendere attraverso l'esperienza diretta come multipli LLM specializzati possano collaborare per risolvere problemi complessi.
+È una [**dashboard interattiva educativa**](https://claude.ai/public/artifacts/040f58d5-907e-484a-942a-6f570fefae57) che simula visivamente come funziona un sistema multi-agent basato su LLM (Large Language Models). Progettata specificamente per **junior data scientists**, permette di comprendere attraverso l'esperienza diretta come multipli LLM specializzati possano collaborare per risolvere problemi complessi.
 
 ### Obiettivi Didattici
 
