@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechCorp Simulator - Ethics & Governance Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f1e;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .matrix-bg::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 255, 0.03) 2px,
+                    rgba(0, 255, 255, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 255, 0.03) 2px,
+                    rgba(0, 255, 255, 0.03) 4px
+                );
+            animation: matrix 20s linear infinite;
+        }
+
+        @keyframes matrix {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+            margin-bottom: 10px;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5)); }
+            to { filter: drop-shadow(0 0 30px rgba(255, 0, 255, 0.8)); }
+        }
+
+        .tagline {
+            color: #888;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        /* Main Game Area */
+        .game-area {
+            flex: 1;
+            display: flex;
+            gap: 30px;
+        }
+
+        .main-panel {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .side-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Scenario Card */
+        .scenario-card {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+
+        .scenario-title {
+            flex: 1;
+        }
+
+        .scenario-title h2 {
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .scenario-type {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .scenario-content {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .email-style {
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #4299e1;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .meeting-notes {
+            background: rgba(255, 255, 0, 0.05);
+            border-left: 3px solid #f6e05e;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        /* Choices */
+        .choices {
+            display: grid;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .choice-btn:hover::before {
+            left: 100%;
+        }
+
+        .choice-btn:hover {
+            transform: translateX(10px);
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .choice-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .choice-icon {
+            font-size: 1.5em;
+        }
+
+        .choice-description {
+            color: #bbb;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        /* Info Cards */
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-card h3 {
+            margin-bottom: 15px;
+            color: #00ffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .regulation-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .regulation-pill {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pill-ai-act {
+            border-color: #f093fb;
+            color: #f093fb;
+        }
+
+        .pill-gdpr {
+            border-color: #4facfe;
+            color: #4facfe;
+        }
+
+        .pill-dora {
+            border-color: #fa709a;
+            color: #fa709a;
+        }
+
+        /* Result Modal */
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .result-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlide 0.5s ease-out;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            cursor: default;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #888;
+            transition: all 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .result-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .impact-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .impact-label {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .impact-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .positive { color: #48bb78; }
+        .negative { color: #fc8181; }
+        .neutral { color: #f6e05e; }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .continue-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* News Ticker */
+        .news-ticker {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .news-ticker h4 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ticker-content {
+            animation: scroll 20s linear infinite;
+            white-space: nowrap;
+            color: #faa;
+        }
+
+        @keyframes scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .company-setup {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px auto;
+            max-width: 600px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #00ffff;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        .sector-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .sector-btn {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sector-btn:hover, .sector-btn.selected {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Game Over Screen */
+        .game-over {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .final-report {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px auto;
+            max-width: 800px;
+        }
+
+        .achievement-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .achievement {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .achievement.unlocked {
+            border-color: #f6e05e;
+            background: rgba(246, 224, 94, 0.1);
+        }
+
+        .achievement-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            filter: grayscale(1);
+        }
+
+        .achievement.unlocked .achievement-icon {
+            filter: grayscale(0);
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+
+            .impact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sector-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="start-screen">
+            <h1 class="logo">TechCorp Simulator</h1>
+            <p class="tagline">Un'avventura nel mondo di AI Act, GDPR e DORA</p>
+            
+            <div class="company-setup">
+                <h2>🚀 Fonda la tua Startup</h2>
+                <p style="color: #888; margin-bottom: 30px;">
+                    Sei il CEO di una nuova startup tecnologica. Le tue decisioni determineranno
+                    il destino della tua azienda nel complesso mondo delle normative europee.
+                </p>
+                
+                <div class="input-group">
+                    <label for="companyName">Nome della tua azienda:</label>
+                    <input type="text" id="companyName" placeholder="Es: InnovateTech" />
+                </div>
+                
+                <div class="input-group">
+                    <label>Scegli il tuo settore:</label>
+                    <div class="sector-options">
+                        <button class="sector-btn" onclick="selectSector('ai')">
+                            <div style="font-size: 2em; margin-bottom: 10px;">🤖</div>
+                            <strong>AI & Machine Learning</strong>
+                            <p style="font-size: 0.9em; margin-top: 10px;">Sviluppo di soluzioni IA innovative</p>
+                        </button>
+                        <button class="sector-btn" onclick="selectSector('fintech')">
+                            <div style="font-size: 2em; margin-bottom: 10px;">💰</div>
+                            <strong>FinTech</strong>
+                            <p style="font-size: 0.9em; margin-top: 10px;">Servizi finanziari digitali</p>
+                        </button>
+                        <button class="sector-btn" onclick="selectSector('health')">
+                            <div style="font-size: 2em; margin-bottom: 10px;">🏥</div>
+                            <strong>HealthTech</strong>
+                            <p style="font-size: 0.9em; margin-top: 10px;">Soluzioni digitali per la salute</p>
+                        </button>
+                        <button class="sector-btn" onclick="selectSector('social')">
+                            <div style="font-size: 2em; margin-bottom: 10px;">🌐</div>
+                            <strong>Social Platform</strong>
+                            <p style="font-size: 0.9em; margin-top: 10px;">Piattaforma di networking</p>
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="continue-btn" onclick="startGame()" style="margin-top: 30px;">
+                    Inizia l'Avventura →
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <div class="header">
+                <h1 class="logo" id="companyLogo">TechCorp</h1>
+                <p class="tagline" id="companySector">Innovation Leader</p>
+            </div>
+
+            <div class="dashboard">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="funds">€1M</div>
+                    <div class="stat-label">Fondi</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">😊</div>
+                    <div class="stat-value" id="userTrust">50%</div>
+                    <div class="stat-label">Fiducia Utenti</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚖️</div>
+                    <div class="stat-value" id="compliance">50%</div>
+                    <div class="stat-label">Compliance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-value" id="innovation">50%</div>
+                    <div class="stat-label">Innovazione</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value" id="month">Mese 1</div>
+                    <div class="stat-label">Timeline</div>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="main-panel">
+                    <div id="scenarioContainer"></div>
+                </div>
+
+                <div class="side-panel">
+                    <div class="news-ticker">
+                        <h4>📰 Breaking News</h4>
+                        <div class="ticker-content" id="newsContent">
+                            Le autorità europee intensificano i controlli sulle aziende tech...
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>📋 Compliance Status</h3>
+                        <div class="regulation-pills">
+                            <div class="regulation-pill pill-ai-act">
+                                <span id="aiActStatus">⚠️</span> AI Act
+                            </div>
+                            <div class="regulation-pill pill-gdpr">
+                                <span id="gdprStatus">⚠️</span> GDPR
+                            </div>
+                            <div class="regulation-pill pill-dora">
+                                <span id="doraStatus">⚠️</span> DORA
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>🎯 Obiettivi</h3>
+                        <ul style="margin-left: 20px; color: #bbb;">
+                            <li>Raggiungi €10M di fondi</li>
+                            <li>Mantieni compliance > 70%</li>
+                            <li>Supera 12 mesi di attività</li>
+                            <li>Sblocca tutti gli achievement</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="game-over hidden">
+            <h1 class="logo">Game Over</h1>
+            <div class="final-report">
+                <h2 id="endTitle">Fine dell'Avventura</h2>
+                <p id="endMessage" style="color: #888; margin: 20px 0;"></p>
+                
+                <div class="impact-grid">
+                    <div class="impact-item">
+                        <div class="impact-label">Fondi Finali</div>
+                        <div class="impact-value" id="finalFunds">€0</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="impact-label">Mesi Sopravvissuti</div>
+                        <div class="impact-value" id="finalMonths">0</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="impact-label">Compliance Media</div>
+                        <div class="impact-value" id="finalCompliance">0%</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="impact-label">Fiducia Utenti</div>
+                        <div class="impact-value" id="finalTrust">0%</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;">🏆 Achievement Sbloccati</h3>
+                <div class="achievement-list" id="achievementList"></div>
+
+                <button class="continue-btn" onclick="location.reload()">
+                    🔄 Gioca Ancora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            companyName: 'TechCorp',
+            sector: 'ai',
+            month: 1,
+            funds: 1000000,
+            userTrust: 50,
+            compliance: 50,
+            innovation: 50,
+            aiActCompliance: false,
+            gdprCompliance: false,
+            doraCompliance: false,
+            currentScenario: 0,
+            decisions: [],
+            achievements: {
+                firstCompliance: false,
+                fullCompliance: false,
+                millionaire: false,
+                survivor: false,
+                trustworthy: false,
+                innovative: false,
+                ethicalLeader: false,
+                crisisManager: false
+            }
+        };
+
+        // Scenarios Database
+        const scenarios = {
+            ai: [
+                {
+                    id: 'ai_launch',
+                    month: 1,
+                    title: 'Il Grande Lancio',
+                    icon: '🚀',
+                    type: 'Decisione Strategica',
+                    content: `
+                        <p>Dopo mesi di sviluppo, il tuo team ha creato un innovativo sistema di IA per ${gameState.sector === 'health' ? 'diagnosi mediche' : gameState.sector === 'fintech' ? 'valutazione del credito' : 'moderazione contenuti'}.</p>
+                        
+                        <div class="email-style">
+                            <strong>Da:</strong> Marco, CTO<br>
+                            <strong>Oggetto:</strong> Sistema pronto per il lancio!<br><br>
+                            Il nostro modello ha un'accuratezza del 94%! Però... non abbiamo ancora completato la valutazione di conformità richiesta dall'AI Act per i sistemi ad alto rischio. Potremmo lanciarci comunque e sistemarla dopo?
+                        </div>
+                        
+                        <p>Il mercato è competitivo e ogni giorno di ritardo potrebbe costare caro...</p>
+                    `,
+                    choices: [
+                        {
+                            id: 'launch_now',
+                            icon: '🏃',
+                            title: 'Lancia Subito',
+                            description: 'Approfitta del vantaggio competitivo e completa la conformità in seguito.',
+                            impact: {
+                                funds: 500000,
+                                userTrust: 10,
+                                compliance: -30,
+                                innovation: 20
+                            },
+                            consequence: 'Hai guadagnato quote di mercato ma rischi sanzioni fino al 4% del fatturato per violazione AI Act!'
+                        },
+                        {
+                            id: 'compliance_first',
+                            icon: '📋',
+                            title: 'Conformità Prima',
+                            description: 'Completa la valutazione di conformità AI Act prima del lancio.',
+                            impact: {
+                                funds: -100000,
+                                userTrust: 5,
+                                compliance: 25,
+                                innovation: -5
+                            },
+                            consequence: 'Approccio prudente che dimostra responsabilità. Hai rispettato l\'Art. 6 dell\'AI Act sui sistemi ad alto rischio.',
+                            unlocks: ['aiActCompliance']
+                        },
+                        {
+                            id: 'sandbox',
+                            icon: '🧪',
+                            title: 'Sandbox Regolamentare',
+                            description: 'Richiedi l\'accesso alla sandbox AI Act per testare in ambiente controllato.',
+                            impact: {
+                                funds: -50000,
+                                userTrust: 15,
+                                compliance: 15,
+                                innovation: 10
+                            },
+                            consequence: 'Ottima scelta! Le sandbox (Art. 53-54 AI Act) permettono innovazione responsabile con supervisione delle autorità.'
+                        }
+                    ]
+                },
+                {
+                    id: 'data_breach',
+                    month: 3,
+                    title: 'Allarme Rosso: Data Breach!',
+                    icon: '🚨',
+                    type: 'Gestione Crisi',
+                    content: `
+                        <div class="meeting-notes">
+                            <strong>URGENTE - Riunione di Emergenza</strong><br>
+                            Ore 3:47 - Il team di sicurezza ha rilevato un accesso non autorizzato ai database. 
+                            Coinvolti dati personali di circa 50.000 utenti inclusi dati biometrici usati dal nostro sistema IA.
+                        </div>
+                        
+                        <p>Il GDPR richiede notifica entro 72 ore all'autorità di controllo. Il tempo stringe!</p>
+                    `,
+                    choices: [
+                        {
+                            id: 'notify_immediately',
+                            icon: '📢',
+                            title: 'Notifica Immediata',
+                            description: 'Notifica subito autorità e utenti coinvolti come richiesto dal GDPR.',
+                            impact: {
+                                funds: -200000,
+                                userTrust: -15,
+                                compliance: 20,
+                                innovation: 0
+                            },
+                            consequence: 'Hai rispettato gli Art. 33-34 GDPR. La trasparenza paga nel lungo termine!',
+                            unlocks: ['gdprCompliance']
+                        },
+                        {
+                            id: 'investigate_first',
+                            icon: '🔍',
+                            title: 'Indaga Prima',
+                            description: 'Aspetta di capire l\'entità del danno prima di notificare.',
+                            impact: {
+                                funds: -50000,
+                                userTrust: -5,
+                                compliance: -20,
+                                innovation: 0
+                            },
+                            consequence: 'Hai superato le 72 ore! Rischi sanzioni GDPR fino a €20M o 4% del fatturato.'
+                        },
+                        {
+                            id: 'cover_up',
+                            icon: '🤐',
+                            title: 'Minimizza',
+                            description: 'Risolvi internamente senza allertare nessuno.',
+                            impact: {
+                                funds: 0,
+                                userTrust: -40,
+                                compliance: -40,
+                                innovation: 0
+                            },
+                            consequence: 'Pessima scelta! Se scoperto, le conseguenze legali e reputazionali saranno devastanti.'
+                        }
+                    ]
+                },
+                {
+                    id: 'third_party',
+                    month: 5,
+                    title: 'Partnership Strategica Cloud',
+                    icon: '☁️',
+                    type: 'Gestione Fornitori',
+                    content: `
+                        <p>Per scalare il tuo servizio IA, devi scegliere un provider cloud. La scelta impatta la conformità DORA.</p>
+                        
+                        <div class="email-style">
+                            <strong>Da:</strong> CFO<br>
+                            <strong>Oggetto:</strong> Analisi fornitori cloud<br><br>
+                            - CloudFast: €50k/mese, nessuna certificazione ma velocissimi<br>
+                            - SecureCloud: €120k/mese, tutte le certificazioni ISO e SOC<br>
+                            - EuroCloud: €80k/mese, conforme DORA, sede UE
+                        </div>
+                    `,
+                    choices: [
+                        {
+                            id: 'cheap_fast',
+                            icon: '💸',
+                            title: 'CloudFast - Economico',
+                            description: 'Risparmia sui costi, massimizza la velocità.',
+                            impact: {
+                                funds: -50000,
+                                userTrust: 0,
+                                compliance: -25,
+                                innovation: 15
+                            },
+                            consequence: 'DORA richiede due diligence sui fornitori ICT critici! Rischi grosso senza certificazioni.'
+                        },
+                        {
+                            id: 'secure_certified',
+                            icon: '🛡️',
+                            title: 'SecureCloud - Ultra Sicuro',
+                            description: 'Massima sicurezza e certificazioni complete.',
+                            impact: {
+                                funds: -120000,
+                                userTrust: 10,
+                                compliance: 30,
+                                innovation: 5
+                            },
+                            consequence: 'Ottimo per DORA Art. 28! Fornitori certificati riducono rischi operativi ICT.',
+                            unlocks: ['doraCompliance']
+                        },
+                        {
+                            id: 'balanced_eu',
+                            icon: '🇪🇺',
+                            title: 'EuroCloud - Bilanciato',
+                            description: 'Buon compromesso con focus compliance EU.',
+                            impact: {
+                                funds: -80000,
+                                userTrust: 5,
+                                compliance: 20,
+                                innovation: 10
+                            },
+                            consequence: 'Scelta saggia! Provider EU semplifica GDPR e DORA compliance.'
+                        }
+                    ]
+                },
+                {
+                    id: 'ethics_dilemma',
+                    month: 7,
+                    title: 'Dilemma Etico',
+                    icon: '🤔',
+                    type: 'Decisione Etica',
+                    content: `
+                        <p>Un importante cliente government vuole usare la tua IA per un sistema controverso.</p>
+                        
+                        <div class="meeting-notes">
+                            <strong>Proposta Riservata</strong><br>
+                            Budget: €5M<br>
+                            Scopo: Sistema di "valutazione cittadini" per servizi pubblici<br>
+                            Note: Potrebbe configurarsi come social scoring...
+                        </div>
+                        
+                        <p>L'AI Act vieta esplicitamente i sistemi di social scoring (Art. 5), ma il cliente insiste che è solo "ottimizzazione servizi".</p>
+                    `,
+                    choices: [
+                        {
+                            id: 'accept_money',
+                            icon: '💰',
+                            title: 'Accetta il Contratto',
+                            description: '€5M potrebbero garantire il futuro dell\'azienda.',
+                            impact: {
+                                funds: 5000000,
+                                userTrust: -30,
+                                compliance: -50,
+                                innovation: -10
+                            },
+                            consequence: 'Hai violato il divieto di social scoring dell\'AI Act! Rischi chiusura e sanzioni enormi.'
+                        },
+                        {
+                            id: 'refuse_ethical',
+                            icon: '🚫',
+                            title: 'Rifiuta per Principio',
+                            description: 'I valori etici non sono negoziabili.',
+                            impact: {
+                                funds: -100000,
+                                userTrust: 25,
+                                compliance: 30,
+                                innovation: 10
+                            },
+                            consequence: 'Decisione coraggiosa! Hai protetto la reputazione e rispettato l\'AI Act.',
+                            achievement: 'ethicalLeader'
+                        },
+                        {
+                            id: 'propose_alternative',
+                            icon: '💡',
+                            title: 'Proponi Alternativa',
+                            description: 'Suggerisci un sistema conforme che soddisfi comunque le esigenze.',
+                            impact: {
+                                funds: 2000000,
+                                userTrust: 15,
+                                compliance: 15,
+                                innovation: 20
+                            },
+                            consequence: 'Brillante! Hai trovato una soluzione win-win rispettando le normative.'
+                        }
+                    ]
+                },
+                {
+                    id: 'gdpr_rights',
+                    month: 9,
+                    title: 'Valanga di Richieste GDPR',
+                    icon: '📨',
+                    type: 'Gestione Diritti',
+                    content: `
+                        <p>Dopo un articolo negativo sulla tua azienda, ricevi centinaia di richieste GDPR.</p>
+                        
+                        <div class="email-style">
+                            <strong>Report Legale Settimanale</strong><br>
+                            - 342 richieste di accesso dati (Art. 15)<br>
+                            - 89 richieste di cancellazione (Art. 17)<br>
+                            - 156 opposizioni al trattamento (Art. 21)<br>
+                            - Tempo di risposta GDPR: 30 giorni!
+                        </div>
+                    `,
+                    choices: [
+                        {
+                            id: 'hire_team',
+                            icon: '👥',
+                            title: 'Assumi Team Dedicato',
+                            description: 'Costa ma garantisce conformità nei tempi.',
+                            impact: {
+                                funds: -300000,
+                                userTrust: 20,
+                                compliance: 25,
+                                innovation: 0
+                            },
+                            consequence: 'Investimento saggio! Rispettare i diritti GDPR costruisce fiducia duratura.'
+                        },
+                        {
+                            id: 'automated_system',
+                            icon: '🤖',
+                            title: 'Sistema Automatizzato',
+                            description: 'Sviluppa un portale self-service per le richieste.',
+                            impact: {
+                                funds: -150000,
+                                userTrust: 10,
+                                compliance: 20,
+                                innovation: 15
+                            },
+                            consequence: 'Efficiente! Ma attenzione: alcune richieste necessitano verifica umana per GDPR.'
+                        },
+                        {
+                            id: 'delay_tactics',
+                            icon: '⏰',
+                            title: 'Tattiche Dilatorie',
+                            description: 'Rispondi lentamente sperando che desistano.',
+                            impact: {
+                                funds: -50000,
+                                userTrust: -20,
+                                compliance: -30,
+                                innovation: 0
+                            },
+                            consequence: 'Pessima idea! Il Garante Privacy può sanzionarti per mancato rispetto dei tempi GDPR.'
+                        }
+                    ]
+                },
+                {
+                    id: 'cyber_attack',
+                    month: 11,
+                    title: 'Attacco Ransomware!',
+                    icon: '🏴‍☠️',
+                    type: 'Crisi Sicurezza',
+                    content: `
+                        <div class="meeting-notes" style="background: rgba(255, 0, 0, 0.1); border-color: red;">
+                            <strong>ALLARME CRITICO</strong><br>
+                            I nostri sistemi sono stati criptati da ransomware!<br>
+                            Richiesta riscatto: €2M in Bitcoin<br>
+                            Sistemi IA principali: OFFLINE<br>
+                            Backup: Parzialmente compromessi
+                        </div>
+                        
+                        <p>DORA richiede resilienza operativa e piani di continuità. Come reagisci?</p>
+                    `,
+                    choices: [
+                        {
+                            id: 'pay_ransom',
+                            icon: '💸',
+                            title: 'Paga il Riscatto',
+                            description: 'Riprendi operatività velocemente.',
+                            impact: {
+                                funds: -2000000,
+                                userTrust: -25,
+                                compliance: -20,
+                                innovation: -10
+                            },
+                            consequence: 'Hai finanziato criminali e violato le best practice. DORA penalizza la mancanza di preparazione.'
+                        },
+                        {
+                            id: 'disaster_recovery',
+                            icon: '🔧',
+                            title: 'Attiva Disaster Recovery',
+                            description: 'Usa i piani di continuità e backup sicuri.',
+                            impact: {
+                                funds: -500000,
+                                userTrust: -10,
+                                compliance: 15,
+                                innovation: 5
+                            },
+                            consequence: 'I tuoi piani DORA hanno funzionato! Dimostri resilienza operativa.',
+                            achievement: 'crisisManager'
+                        },
+                        {
+                            id: 'rebuild_transparent',
+                            icon: '🏗️',
+                            title: 'Ricostruisci con Trasparenza',
+                            description: 'Comunica apertamente e ricostruisci meglio.',
+                            impact: {
+                                funds: -800000,
+                                userTrust: 5,
+                                compliance: 20,
+                                innovation: 10
+                            },
+                            consequence: 'La trasparenza paga! Hai trasformato una crisi in opportunità di miglioramento.'
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // News ticker messages
+        const newsMessages = [
+            "🚨 Multa record di €50M per violazione GDPR a big tech company...",
+            "📢 AI Act: nuove linee guida per sistemi ad alto rischio pubblicate...",
+            "💰 DORA: Banche EU investono miliardi in cyber resilienza...",
+            "⚖️ Garante Privacy intensifica controlli su IA generativa...",
+            "🔒 Nuovo data breach colpisce 10M di utenti europei...",
+            "🤖 Commissione UE propone sandbox per startup IA innovative...",
+            "🏛️ Parlamento EU discute estensione DORA a nuovi settori...",
+            "📊 Report: 73% aziende non pronte per full compliance GDPR..."
+        ];
+
+        let newsIndex = 0;
+        let selectedSector = null;
+
+        // Initialize
+        function init() {
+            // Randomize news
+            setInterval(() => {
+                newsIndex = (newsIndex + 1) % newsMessages.length;
+                document.getElementById('newsContent').textContent = newsMessages[newsIndex];
+            }, 10000);
+
+            // ESC key to close modal
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        }
+
+        // Sector selection
+        function selectSector(sector) {
+            selectedSector = sector;
+            document.querySelectorAll('.sector-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.sector-btn').classList.add('selected');
+        }
+
+        // Start game
+        function startGame() {
+            const companyName = document.getElementById('companyName').value || 'TechCorp';
+            if (!selectedSector) {
+                alert('Seleziona un settore per la tua azienda!');
+                return;
+            }
+
+            gameState.companyName = companyName;
+            gameState.sector = selectedSector;
+
+            // Update UI
+            document.getElementById('companyLogo').textContent = companyName;
+            document.getElementById('companySector').textContent = getSectorDescription(selectedSector);
+
+            // Show game screen
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+
+            // Start first scenario
+            updateUI();
+            showScenario(0);
+        }
+
+        function getSectorDescription(sector) {
+            const descriptions = {
+                'ai': 'AI & Machine Learning Pioneer',
+                'fintech': 'Financial Technology Innovator',
+                'health': 'Digital Health Revolution',
+                'social': 'Social Connection Platform'
+            };
+            return descriptions[sector];
+        }
+
+        // Show scenario
+        function showScenario(index) {
+            const scenario = scenarios.ai[index]; // For now, using AI scenarios for all
+            if (!scenario) {
+                endGame();
+                return;
+            }
+
+            const container = document.getElementById('scenarioContainer');
+            container.innerHTML = `
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div class="scenario-icon">${scenario.icon}</div>
+                        <div class="scenario-title">
+                            <h2>${scenario.title}</h2>
+                            <div class="scenario-type">${scenario.type}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-content">
+                        ${scenario.content}
+                    </div>
+                    
+                    <div class="choices">
+                        ${scenario.choices.map(choice => `
+                            <button class="choice-btn" onclick="makeChoice('${scenario.id}', '${choice.id}')">
+                                <div class="choice-title">
+                                    <span class="choice-icon">${choice.icon}</span>
+                                    ${choice.title}
+                                </div>
+                                <div class="choice-description">${choice.description}</div>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Make choice
+        function makeChoice(scenarioId, choiceId) {
+            const scenario = scenarios.ai.find(s => s.id === scenarioId);
+            const choice = scenario.choices.find(c => c.id === choiceId);
+
+            // Apply impacts
+            gameState.funds += choice.impact.funds || 0;
+            gameState.userTrust += choice.impact.userTrust || 0;
+            gameState.compliance += choice.impact.compliance || 0;
+            gameState.innovation += choice.impact.innovation || 0;
+
+            // Clamp values
+            gameState.userTrust = Math.max(0, Math.min(100, gameState.userTrust));
+            gameState.compliance = Math.max(0, Math.min(100, gameState.compliance));
+            gameState.innovation = Math.max(0, Math.min(100, gameState.innovation));
+
+            // Check unlocks
+            if (choice.unlocks) {
+                choice.unlocks.forEach(unlock => {
+                    gameState[unlock] = true;
+                });
+            }
+
+            // Check achievements
+            if (choice.achievement) {
+                gameState.achievements[choice.achievement] = true;
+            }
+
+            // Store decision
+            gameState.decisions.push({
+                scenario: scenarioId,
+                choice: choiceId,
+                month: gameState.month
+            });
+
+            // Show result
+            showResult(choice);
+        }
+
+        // Show result modal
+        function showResult(choice) {
+            const modal = document.createElement('div');
+            modal.className = 'result-modal';
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            };
+            
+            const isPositive = (choice.impact.funds > 0 || choice.impact.compliance > 0);
+            const icon = isPositive ? '✅' : '⚠️';
+
+            modal.innerHTML = `
+                <div class="result-content" onclick="event.stopPropagation()">
+                    <button class="close-button" onclick="closeModal()">×</button>
+                    <div class="result-header">
+                        <div class="result-icon">${icon}</div>
+                        <h2>${choice.title}</h2>
+                    </div>
+                    
+                    <p style="margin-bottom: 20px;">${choice.consequence}</p>
+                    
+                    <div class="impact-grid">
+                        ${choice.impact.funds ? `
+                            <div class="impact-item">
+                                <div class="impact-label">Fondi</div>
+                                <div class="impact-value ${choice.impact.funds > 0 ? 'positive' : 'negative'}">
+                                    ${choice.impact.funds > 0 ? '+' : ''}€${Math.abs(choice.impact.funds).toLocaleString()}
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${choice.impact.userTrust ? `
+                            <div class="impact-item">
+                                <div class="impact-label">Fiducia Utenti</div>
+                                <div class="impact-value ${choice.impact.userTrust > 0 ? 'positive' : 'negative'}">
+                                    ${choice.impact.userTrust > 0 ? '+' : ''}${choice.impact.userTrust}%
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${choice.impact.compliance ? `
+                            <div class="impact-item">
+                                <div class="impact-label">Compliance</div>
+                                <div class="impact-value ${choice.impact.compliance > 0 ? 'positive' : 'negative'}">
+                                    ${choice.impact.compliance > 0 ? '+' : ''}${choice.impact.compliance}%
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${choice.impact.innovation ? `
+                            <div class="impact-item">
+                                <div class="impact-label">Innovazione</div>
+                                <div class="impact-value ${choice.impact.innovation > 0 ? 'positive' : 'negative'}">
+                                    ${choice.impact.innovation > 0 ? '+' : ''}${choice.impact.innovation}%
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <button class="continue-btn" onclick="nextScenario()">
+                        Continua →
+                    </button>
+                    <p style="text-align: center; color: #666; margin-top: 20px; font-size: 0.9em;">
+                        Premi ESC o clicca fuori per chiudere
+                    </p>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        // Close modal function
+        function closeModal() {
+            const modal = document.querySelector('.result-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Next scenario
+        function nextScenario() {
+            // Remove modal
+            closeModal();
+
+            // Update month
+            gameState.month += 2;
+            gameState.currentScenario++;
+
+            // Check game over conditions
+            if (gameState.funds <= 0) {
+                endGame('bankruptcy');
+                return;
+            }
+            if (gameState.compliance <= 10) {
+                endGame('shutdown');
+                return;
+            }
+            if (gameState.userTrust <= 10) {
+                endGame('abandoned');
+                return;
+            }
+
+            // Update UI
+            updateUI();
+
+            // Next scenario or end
+            if (gameState.currentScenario >= scenarios.ai.length) {
+                endGame('success');
+            } else {
+                showScenario(gameState.currentScenario);
+            }
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('funds').textContent = `€${(gameState.funds / 1000000).toFixed(1)}M`;
+            document.getElementById('userTrust').textContent = `${gameState.userTrust}%`;
+            document.getElementById('compliance').textContent = `${gameState.compliance}%`;
+            document.getElementById('innovation').textContent = `${gameState.innovation}%`;
+            document.getElementById('month').textContent = `Mese ${gameState.month}`;
+
+            // Update compliance badges
+            document.getElementById('aiActStatus').textContent = gameState.aiActCompliance ? '✅' : '⚠️';
+            document.getElementById('gdprStatus').textContent = gameState.gdprCompliance ? '✅' : '⚠️';
+            document.getElementById('doraStatus').textContent = gameState.doraCompliance ? '✅' : '⚠️';
+
+            // Check achievements
+            checkAchievements();
+        }
+
+        // Check achievements
+        function checkAchievements() {
+            if (gameState.compliance >= 90) {
+                gameState.achievements.firstCompliance = true;
+            }
+            if (gameState.aiActCompliance && gameState.gdprCompliance && gameState.doraCompliance) {
+                gameState.achievements.fullCompliance = true;
+            }
+            if (gameState.funds >= 10000000) {
+                gameState.achievements.millionaire = true;
+            }
+            if (gameState.month >= 12) {
+                gameState.achievements.survivor = true;
+            }
+            if (gameState.userTrust >= 80) {
+                gameState.achievements.trustworthy = true;
+            }
+            if (gameState.innovation >= 80) {
+                gameState.achievements.innovative = true;
+            }
+        }
+
+        // End game
+        function endGame(reason = 'completed') {
+            const messages = {
+                'bankruptcy': {
+                    title: '💸 Bancarotta!',
+                    message: 'Hai finito i fondi. La tua avventura imprenditoriale si conclude qui. Ricorda: la compliance costa, ma le sanzioni costano di più!'
+                },
+                'shutdown': {
+                    title: '⚖️ Chiusura Forzata!',
+                    message: 'Le autorità hanno chiuso la tua azienda per gravi violazioni normative. La compliance non è opzionale!'
+                },
+                'abandoned': {
+                    title: '👥 Abbandono di Massa!',
+                    message: 'Gli utenti hanno perso completamente fiducia in te. Senza utenti, non c\'è business.'
+                },
+                'success': {
+                    title: '🎉 Missione Compiuta!',
+                    message: 'Hai navigato con successo nel complesso mondo delle normative EU! Sei pronto per le sfide del mondo reale.'
+                }
+            };
+
+            const endData = messages[reason] || messages['completed'];
+
+            // Show game over screen
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+
+            document.getElementById('endTitle').textContent = endData.title;
+            document.getElementById('endMessage').textContent = endData.message;
+
+            document.getElementById('finalFunds').textContent = `€${(gameState.funds / 1000000).toFixed(1)}M`;
+            document.getElementById('finalMonths').textContent = gameState.month;
+            document.getElementById('finalCompliance').textContent = `${gameState.compliance}%`;
+            document.getElementById('finalTrust').textContent = `${gameState.userTrust}%`;
+
+            // Show achievements
+            const achievementList = document.getElementById('achievementList');
+            const achievementData = {
+                'firstCompliance': { icon: '⚖️', name: 'Primo Passo', desc: 'Raggiunto 90% compliance' },
+                'fullCompliance': { icon: '🏆', name: 'Triple Crown', desc: 'Conformità totale: AI Act + GDPR + DORA' },
+                'millionaire': { icon: '💰', name: 'Unicorno', desc: 'Raggiunto €10M di valore' },
+                'survivor': { icon: '⏰', name: 'Sopravvissuto', desc: 'Operativo per 12+ mesi' },
+                'trustworthy': { icon: '❤️', name: 'Amato dagli Utenti', desc: '80%+ fiducia utenti' },
+                'innovative': { icon: '🚀', name: 'Innovatore', desc: '80%+ innovazione' },
+                'ethicalLeader': { icon: '🌟', name: 'Leader Etico', desc: 'Rifiutato compromessi etici' },
+                'crisisManager': { icon: '🛡️', name: 'Crisis Manager', desc: 'Gestito con successo una crisi maggiore' }
+            };
+
+            achievementList.innerHTML = Object.entries(achievementData).map(([key, data]) => {
+                const unlocked = gameState.achievements[key];
+                return `
+                    <div class="achievement ${unlocked ? 'unlocked' : ''}">
+                        <div class="achievement-icon">${data.icon}</div>
+                        <h4>${data.name}</h4>
+                        <p style="font-size: 0.9em; color: #888;">${data.desc}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+</html>

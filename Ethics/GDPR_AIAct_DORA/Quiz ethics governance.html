@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethics & Governance Game - AI Act, GDPR, DORA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(66, 153, 225, 0.1) 0%, transparent 70%);
+            animation: pulse 20s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .score-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4299e1;
+        }
+
+        .main-menu, .game-area, .results-screen {
+            position: relative;
+            z-index: 1;
+        }
+
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 20px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-ai-act {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-gdpr {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-dora {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .regulation-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge-ai-act {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .badge-gdpr {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .badge-dora {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .answers {
+            display: grid;
+            gap: 15px;
+        }
+
+        .answer-btn {
+            padding: 20px;
+            text-align: left;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .answer-btn:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+            transform: translateX(5px);
+        }
+
+        .answer-btn.correct {
+            background: #c6f6d5;
+            border-color: #68d391;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .answer-btn.incorrect {
+            background: #fed7d7;
+            border-color: #fc8181;
+            animation: shake 0.6s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-left: 4px solid #4299e1;
+            border-radius: 5px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .explanation h3 {
+            color: #2b6cb0;
+            margin-bottom: 10px;
+        }
+
+        .timer-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+            transition: width 1s linear;
+        }
+
+        .power-up {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .power-up:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .power-up.used {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .achievement {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: achievementSlide 0.5s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes achievementSlide {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .achievement-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .results-screen {
+            text-align: center;
+        }
+
+        .final-score {
+            font-size: 4em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4299e1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .leaderboard {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .leaderboard h3 {
+            color: #4299e1;
+            margin-bottom: 15px;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .menu-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>Ethics & Governance Challenge</h1>
+            <p class="subtitle">Diventa un esperto di AI Act, GDPR e DORA!</p>
+        </div>
+
+        <div class="score-bar hidden" id="scoreBar">
+            <div class="score-item">
+                <div class="score-label">Punteggio</div>
+                <div class="score-value" id="currentScore">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Streak</div>
+                <div class="score-value" id="streakCount">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Livello</div>
+                <div class="score-value" id="playerLevel">1</div>
+            </div>
+        </div>
+
+        <div id="mainMenu" class="main-menu">
+            <div class="menu-buttons">
+                <button class="btn btn-primary" onclick="startGame('all')">
+                    🎮 Sfida Completa
+                </button>
+                <button class="btn btn-ai-act" onclick="startGame('ai-act')">
+                    🤖 Focus AI Act
+                </button>
+                <button class="btn btn-gdpr" onclick="startGame('gdpr')">
+                    🔒 Focus GDPR
+                </button>
+                <button class="btn btn-dora" onclick="startGame('dora')">
+                    💰 Focus DORA
+                </button>
+            </div>
+            
+            <div class="leaderboard">
+                <h3>🏆 Classifica Migliori Punteggi</h3>
+                <div id="leaderboardList"></div>
+            </div>
+        </div>
+
+        <div id="gameArea" class="game-area hidden">
+            <div class="timer-bar">
+                <div class="timer-fill" id="timerFill"></div>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-header">
+                    <span id="questionNumber"></span>
+                    <span id="regulationBadge" class="regulation-badge"></span>
+                </div>
+                <div class="question-text" id="questionText"></div>
+                <div class="answers" id="answersContainer"></div>
+                <div id="explanation" class="explanation hidden"></div>
+            </div>
+
+            <div class="power-ups">
+                <span class="power-up" id="skipPower" onclick="usePowerUp('skip')">
+                    ⏭️ Salta (1)
+                </span>
+                <span class="power-up" id="fiftyPower" onclick="usePowerUp('fifty')">
+                    ✂️ 50/50 (2)
+                </span>
+                <span class="power-up" id="timePower" onclick="usePowerUp('time')">
+                    ⏱️ +Tempo (1)
+                </span>
+            </div>
+        </div>
+
+        <div id="resultsScreen" class="results-screen hidden">
+            <h2>🎉 Complimenti!</h2>
+            <div class="final-score" id="finalScore">0</div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Risposte Corrette</div>
+                    <div class="stat-value" id="correctAnswers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Precisione</div>
+                    <div class="stat-value" id="accuracy">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Miglior Streak</div>
+                    <div class="stat-value" id="bestStreak">0</div>
+                </div>
+            </div>
+
+            <div id="performanceAnalysis"></div>
+
+            <button class="btn btn-primary" onclick="resetGame()">
+                🔄 Gioca Ancora
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Database delle domande
+        const questions = {
+            'ai-act': [
+                {
+                    question: "Secondo l'AI Act, quale di questi sistemi di IA è considerato a rischio inaccettabile e quindi vietato?",
+                    answers: [
+                        "Sistemi di IA per la diagnosi medica",
+                        "Sistemi di social scoring gestiti da autorità pubbliche",
+                        "Chatbot per il servizio clienti",
+                        "Sistemi di riconoscimento vocale"
+                    ],
+                    correct: 1,
+                    explanation: "L'AI Act vieta i sistemi di social scoring da parte di governi o imprese, considerandoli una chiara minaccia per i diritti fondamentali delle persone (Art. 5)."
+                },
+                {
+                    question: "Qual è la data di applicazione completa del Regolamento AI Act?",
+                    answers: [
+                        "2 agosto 2024",
+                        "2 febbraio 2025",
+                        "2 agosto 2026",
+                        "2 agosto 2027"
+                    ],
+                    correct: 2,
+                    explanation: "Il Regolamento AI Act si applica completamente dal 2 agosto 2026, anche se alcune parti (come i divieti) si applicano già dal 2 febbraio 2025."
+                },
+                {
+                    question: "I sistemi di IA ad alto rischio devono sottostare a quale requisito principale?",
+                    answers: [
+                        "Pagare una tassa annuale",
+                        "Essere open source",
+                        "Sottoporsi a valutazione di conformità",
+                        "Essere sviluppati solo in Europa"
+                    ],
+                    correct: 2,
+                    explanation: "I sistemi ad alto rischio devono essere sottoposti a valutazione di conformità prima dell'immissione sul mercato, includendo misure di mitigazione dei rischi e sorveglianza umana."
+                },
+                {
+                    question: "Quale percentuale del fatturato globale può raggiungere la sanzione massima per violazioni dell'AI Act?",
+                    answers: [
+                        "2%",
+                        "4%",
+                        "6%",
+                        "10%"
+                    ],
+                    correct: 1,
+                    explanation: "Le sanzioni amministrative per violazioni dell'AI Act possono arrivare fino al 4% del fatturato globale annuale dell'azienda."
+                },
+                {
+                    question: "L'AI Act introduce il concetto di 'sandbox regolamentari'. Di cosa si tratta?",
+                    answers: [
+                        "Database per la registrazione delle IA",
+                        "Ambienti controllati per testare sistemi IA innovativi",
+                        "Sistemi di backup obbligatori",
+                        "Certificazioni di sicurezza"
+                    ],
+                    correct: 1,
+                    explanation: "Le sandbox regolamentari sono ambienti controllati dove testare tecnologie IA innovative per un periodo limitato sotto supervisione delle autorità competenti (Capo VI)."
+                },
+                {
+                    question: "Quale approccio utilizza l'AI Act per classificare i sistemi di IA?",
+                    answers: [
+                        "Basato sul settore di applicazione",
+                        "Basato sul rischio",
+                        "Basato sulla dimensione aziendale",
+                        "Basato sulla nazionalità dello sviluppatore"
+                    ],
+                    correct: 1,
+                    explanation: "L'AI Act adotta un approccio basato sul rischio, classificando i sistemi in: rischio minimo, rischio specifico per trasparenza, alto rischio e rischio inaccettabile."
+                },
+                {
+                    question: "I sistemi di IA che utilizzano tecniche subliminali o manipolative sono:",
+                    answers: [
+                        "Permessi con autorizzazione",
+                        "Vietati",
+                        "Considerati a basso rischio",
+                        "Soggetti solo a trasparenza"
+                    ],
+                    correct: 1,
+                    explanation: "L'Art. 5 dell'AI Act vieta espressamente i sistemi che utilizzano tecniche subliminali o manipolative che possono causare danni fisici o psicologici."
+                },
+                {
+                    question: "Chi deve informare gli utenti quando interagiscono con un sistema di IA?",
+                    answers: [
+                        "Solo le grandi aziende",
+                        "Il fornitore del sistema IA",
+                        "Le autorità di controllo",
+                        "Non è necessario informare"
+                    ],
+                    correct: 1,
+                    explanation: "Il fornitore del sistema IA deve garantire che gli utenti siano chiaramente informati quando interagiscono con un sistema di IA (requisito di trasparenza)."
+                }
+            ],
+            'gdpr': [
+                {
+                    question: "Qual è il diritto introdotto dal GDPR che permette di trasferire i propri dati da un titolare all'altro?",
+                    answers: [
+                        "Diritto all'oblio",
+                        "Diritto di accesso",
+                        "Diritto alla portabilità",
+                        "Diritto di rettifica"
+                    ],
+                    correct: 2,
+                    explanation: "Il diritto alla portabilità dei dati (Art. 20) permette agli interessati di ricevere i propri dati in formato strutturato e trasferirli a un altro titolare del trattamento."
+                },
+                {
+                    question: "Entro quanto tempo il titolare deve rispondere a una richiesta dell'interessato secondo il GDPR?",
+                    answers: [
+                        "15 giorni",
+                        "1 mese",
+                        "2 mesi",
+                        "3 mesi"
+                    ],
+                    correct: 1,
+                    explanation: "Il termine standard è di 1 mese dalla richiesta, estendibile fino a 3 mesi in casi di particolare complessità (Art. 12)."
+                },
+                {
+                    question: "Quale di questi NON è un principio fondamentale del GDPR?",
+                    answers: [
+                        "Minimizzazione dei dati",
+                        "Limitazione della conservazione",
+                        "Massimizzazione del profitto",
+                        "Integrità e riservatezza"
+                    ],
+                    correct: 2,
+                    explanation: "Il GDPR si basa su principi come minimizzazione, limitazione della conservazione, integrità e riservatezza (Art. 5). La massimizzazione del profitto non è un principio del GDPR."
+                },
+                {
+                    question: "In caso di data breach che comporta rischi per i diritti degli interessati, entro quanto tempo va notificato?",
+                    answers: [
+                        "24 ore",
+                        "48 ore",
+                        "72 ore",
+                        "7 giorni"
+                    ],
+                    correct: 2,
+                    explanation: "Il titolare deve notificare la violazione all'autorità di controllo entro 72 ore dal momento in cui ne è venuto a conoscenza (Art. 33)."
+                },
+                {
+                    question: "Il consenso al trattamento dei dati secondo il GDPR deve essere:",
+                    answers: [
+                        "Presunto se non c'è opposizione",
+                        "Libero, specifico, informato e inequivocabile",
+                        "Valido per sempre una volta dato",
+                        "Obbligatorio per qualsiasi trattamento"
+                    ],
+                    correct: 1,
+                    explanation: "Il consenso deve essere libero, specifico, informato e inequivocabile. Non sono ammessi consensi taciti o presunti (Art. 7)."
+                },
+                {
+                    question: "Quale articolo del GDPR disciplina il diritto all'oblio?",
+                    answers: [
+                        "Articolo 15",
+                        "Articolo 16",
+                        "Articolo 17",
+                        "Articolo 20"
+                    ],
+                    correct: 2,
+                    explanation: "L'articolo 17 del GDPR disciplina il diritto alla cancellazione, noto anche come 'diritto all'oblio'."
+                },
+                {
+                    question: "Chi è il 'titolare del trattamento' secondo il GDPR?",
+                    answers: [
+                        "Chi elabora tecnicamente i dati",
+                        "Chi decide finalità e mezzi del trattamento",
+                        "L'interessato stesso",
+                        "Solo le autorità pubbliche"
+                    ],
+                    correct: 1,
+                    explanation: "Il titolare del trattamento è il soggetto che determina le finalità e i mezzi del trattamento dei dati personali (Art. 4)."
+                },
+                {
+                    question: "Il GDPR si applica a:",
+                    answers: [
+                        "Solo aziende con sede in Europa",
+                        "Solo cittadini europei",
+                        "Chiunque tratti dati di persone nell'UE",
+                        "Solo grandi aziende"
+                    ],
+                    correct: 2,
+                    explanation: "Il GDPR si applica a chiunque tratti dati personali di persone che si trovano nell'UE, indipendentemente dalla sede dell'azienda."
+                }
+            ],
+            'dora': [
+                {
+                    question: "Qual è la data di piena applicazione del Regolamento DORA?",
+                    answers: [
+                        "17 gennaio 2023",
+                        "17 gennaio 2024",
+                        "17 gennaio 2025",
+                        "17 gennaio 2026"
+                    ],
+                    correct: 2,
+                    explanation: "Il Regolamento DORA diventa pienamente applicabile il 17 gennaio 2025, dopo 2 anni dalla sua entrata in vigore."
+                },
+                {
+                    question: "DORA richiede che i test di penetrazione basati su minacce (TLPT) siano effettuati:",
+                    answers: [
+                        "Ogni anno",
+                        "Ogni 2 anni",
+                        "Almeno ogni 3 anni",
+                        "Solo una volta"
+                    ],
+                    correct: 2,
+                    explanation: "Secondo l'Art. 26 del DORA, i TLPT (Threat-Led Penetration Test) devono essere effettuati con cadenza almeno triennale."
+                },
+                {
+                    question: "Una delle principali novità di DORA è che si applica anche a:",
+                    answers: [
+                        "Solo banche",
+                        "Solo assicurazioni",
+                        "Fornitori critici ICT di terze parti",
+                        "Solo enti pubblici"
+                    ],
+                    correct: 2,
+                    explanation: "DORA si applica non solo alle entità finanziarie ma anche ai loro fornitori critici di servizi ICT di terze parti."
+                },
+                {
+                    question: "Quale percentuale del fatturato mondiale può raggiungere la sanzione per i fornitori ICT non conformi?",
+                    answers: [
+                        "0.5%",
+                        "1%",
+                        "2%",
+                        "4%"
+                    ],
+                    correct: 1,
+                    explanation: "Le autorità possono imporre sanzioni ai fornitori ICT pari all'1% del loro fatturato mondiale medio giornaliero dell'esercizio precedente."
+                },
+                {
+                    question: "Secondo DORA, gli incidenti ICT gravi devono essere segnalati con:",
+                    answers: [
+                        "Una sola notifica finale",
+                        "Notifica iniziale, rapporto intermedio e finale",
+                        "Solo un rapporto annuale",
+                        "Comunicazione telefonica"
+                    ],
+                    correct: 1,
+                    explanation: "DORA prevede un processo strutturato: notifica iniziale, rapporto intermedio sull'andamento e rapporto finale dopo l'analisi delle cause (Art. 19)."
+                },
+                {
+                    question: "Il Regolamento DORA mira principalmente a:",
+                    answers: [
+                        "Ridurre i costi IT",
+                        "Rafforzare la resilienza operativa digitale",
+                        "Eliminare l'uso del cloud",
+                        "Vietare l'outsourcing"
+                    ],
+                    correct: 1,
+                    explanation: "L'obiettivo principale di DORA è rafforzare la resilienza operativa digitale del settore finanziario contro le minacce informatiche."
+                },
+                {
+                    question: "Quale di questi NON è uno dei pilastri principali del DORA?",
+                    answers: [
+                        "Gestione del rischio ICT",
+                        "Test di resilienza operativa",
+                        "Eliminazione totale dei fornitori terzi",
+                        "Condivisione delle informazioni"
+                    ],
+                    correct: 2,
+                    explanation: "DORA non richiede l'eliminazione dei fornitori terzi, ma una loro corretta gestione e supervisione. I pilastri sono: gestione rischi ICT, segnalazione incidenti, test di resilienza e gestione fornitori terzi."
+                },
+                {
+                    question: "Le entità finanziarie devono informare l'autorità competente riguardo:",
+                    answers: [
+                        "Solo incidenti già avvenuti",
+                        "Accordi contrattuali previsti per servizi ICT critici",
+                        "I nomi di tutti i dipendenti IT",
+                        "I profitti annuali"
+                    ],
+                    correct: 1,
+                    explanation: "Secondo l'Art. 28 DORA, le entità devono informare preventivamente l'autorità su accordi contrattuali previsti per servizi ICT a supporto di funzioni essenziali o importanti."
+                }
+            ]
+        };
+
+        // Stato del gioco
+        let gameState = {
+            mode: 'all',
+            currentQuestion: 0,
+            score: 0,
+            streak: 0,
+            bestStreak: 0,
+            correctAnswers: 0,
+            totalQuestions: 0,
+            level: 1,
+            powerUps: {
+                skip: 1,
+                fifty: 2,
+                time: 1
+            },
+            questionPool: [],
+            timer: null,
+            timeLeft: 30,
+            performanceByRegulation: {
+                'ai-act': { correct: 0, total: 0 },
+                'gdpr': { correct: 0, total: 0 },
+                'dora': { correct: 0, total: 0 }
+            }
+        };
+
+        // Inizializzazione
+        function init() {
+            loadLeaderboard();
+        }
+
+        // Avvia il gioco
+        function startGame(mode) {
+            gameState.mode = mode;
+            gameState.currentQuestion = 0;
+            gameState.score = 0;
+            gameState.streak = 0;
+            gameState.bestStreak = 0;
+            gameState.correctAnswers = 0;
+            gameState.totalQuestions = 0;
+            gameState.level = 1;
+            gameState.powerUps = { skip: 1, fifty: 2, time: 1 };
+            
+            // Prepara il pool di domande
+            if (mode === 'all') {
+                gameState.questionPool = [
+                    ...shuffleArray([...questions['ai-act']]).map(q => ({...q, regulation: 'ai-act'})),
+                    ...shuffleArray([...questions['gdpr']]).map(q => ({...q, regulation: 'gdpr'})),
+                    ...shuffleArray([...questions['dora']]).map(q => ({...q, regulation: 'dora'}))
+                ];
+            } else {
+                gameState.questionPool = shuffleArray([...questions[mode]]).map(q => ({...q, regulation: mode}));
+            }
+            
+            gameState.questionPool = shuffleArray(gameState.questionPool);
+            
+            // Reset performance tracking
+            Object.keys(gameState.performanceByRegulation).forEach(key => {
+                gameState.performanceByRegulation[key] = { correct: 0, total: 0 };
+            });
+            
+            // Mostra l'area di gioco
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            document.getElementById('scoreBar').classList.remove('hidden');
+            
+            updateScore();
+            updatePowerUps();
+            showQuestion();
+        }
+
+        // Mostra la domanda corrente
+        function showQuestion() {
+            if (gameState.currentQuestion >= gameState.questionPool.length) {
+                endGame();
+                return;
+            }
+            
+            const question = gameState.questionPool[gameState.currentQuestion];
+            gameState.totalQuestions++;
+            gameState.performanceByRegulation[question.regulation].total++;
+            
+            // Reset timer
+            clearInterval(gameState.timer);
+            gameState.timeLeft = 30 - Math.floor(gameState.level / 3); // Tempo ridotto con il livello
+            startTimer();
+            
+            // Aggiorna UI
+            document.getElementById('questionNumber').textContent = `Domanda ${gameState.currentQuestion + 1}/${gameState.questionPool.length}`;
+            document.getElementById('questionText').textContent = question.question;
+            
+            // Badge normativa
+            const badge = document.getElementById('regulationBadge');
+            badge.textContent = question.regulation.toUpperCase().replace('-', ' ');
+            badge.className = `regulation-badge badge-${question.regulation}`;
+            
+            // Risposte
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            const shuffledIndexes = shuffleArray([0, 1, 2, 3]);
+            shuffledIndexes.forEach((index, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = `${String.fromCharCode(65 + i)}. ${question.answers[index]}`;
+                btn.onclick = () => checkAnswer(index);
+                btn.dataset.originalIndex = index;
+                answersContainer.appendChild(btn);
+            });
+            
+            // Nascondi spiegazione precedente
+            document.getElementById('explanation').classList.add('hidden');
+        }
+
+        // Controlla la risposta
+        function checkAnswer(selectedIndex) {
+            clearInterval(gameState.timer);
+            const question = gameState.questionPool[gameState.currentQuestion];
+            const correct = selectedIndex === question.correct;
+            
+            // Disabilita tutti i pulsanti
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => {
+                btn.onclick = null;
+                const originalIndex = parseInt(btn.dataset.originalIndex);
+                if (originalIndex === question.correct) {
+                    btn.classList.add('correct');
+                } else if (originalIndex === selectedIndex && !correct) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            // Aggiorna punteggio e statistiche
+            if (correct) {
+                gameState.correctAnswers++;
+                gameState.performanceByRegulation[question.regulation].correct++;
+                gameState.streak++;
+                gameState.score += 100 * gameState.level * (gameState.streak > 3 ? 1.5 : 1);
+                
+                if (gameState.streak > gameState.bestStreak) {
+                    gameState.bestStreak = gameState.streak;
+                }
+                
+                // Achievement check
+                checkAchievements();
+            } else {
+                gameState.streak = 0;
+            }
+            
+            // Level up ogni 5 risposte corrette
+            if (gameState.correctAnswers % 5 === 0 && gameState.correctAnswers > 0) {
+                gameState.level++;
+                showAchievement('🎯', 'Level Up!', `Hai raggiunto il livello ${gameState.level}!`);
+            }
+            
+            updateScore();
+            
+            // Mostra spiegazione
+            const explanation = document.getElementById('explanation');
+            explanation.innerHTML = `
+                <h3>${correct ? '✅ Corretto!' : '❌ Sbagliato!'}</h3>
+                <p>${question.explanation}</p>
+                <button class="btn btn-primary" onclick="nextQuestion()">Prossima Domanda →</button>
+            `;
+            explanation.classList.remove('hidden');
+        }
+
+        // Timer
+        function startTimer() {
+            const timerFill = document.getElementById('timerFill');
+            timerFill.style.width = '100%';
+            
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                const percentage = (gameState.timeLeft / (30 - Math.floor(gameState.level / 3))) * 100;
+                timerFill.style.width = percentage + '%';
+                
+                if (percentage < 33) {
+                    timerFill.style.background = 'linear-gradient(90deg, #fc8181 0%, #f56565 100%)';
+                } else if (percentage < 66) {
+                    timerFill.style.background = 'linear-gradient(90deg, #f6e05e 0%, #ecc94b 100%)';
+                }
+                
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    checkAnswer(-1); // Tempo scaduto
+                }
+            }, 1000);
+        }
+
+        // Prossima domanda
+        function nextQuestion() {
+            gameState.currentQuestion++;
+            showQuestion();
+        }
+
+        // Power-ups
+        function usePowerUp(type) {
+            if (gameState.powerUps[type] <= 0) return;
+            
+            switch(type) {
+                case 'skip':
+                    if (gameState.powerUps.skip > 0) {
+                        gameState.powerUps.skip--;
+                        nextQuestion();
+                    }
+                    break;
+                    
+                case 'fifty':
+                    if (gameState.powerUps.fifty > 0) {
+                        gameState.powerUps.fifty--;
+                        const buttons = Array.from(document.querySelectorAll('.answer-btn'));
+                        const question = gameState.questionPool[gameState.currentQuestion];
+                        const correctButton = buttons.find(btn => 
+                            parseInt(btn.dataset.originalIndex) === question.correct
+                        );
+                        
+                        // Rimuovi 2 risposte sbagliate
+                        let removed = 0;
+                        buttons.forEach(btn => {
+                            if (btn !== correctButton && removed < 2) {
+                                btn.style.opacity = '0.3';
+                                btn.onclick = null;
+                                removed++;
+                            }
+                        });
+                    }
+                    break;
+                    
+                case 'time':
+                    if (gameState.powerUps.time > 0) {
+                        gameState.powerUps.time--;
+                        gameState.timeLeft += 15;
+                        showAchievement('⏱️', '+15 secondi!', 'Hai guadagnato tempo extra!');
+                    }
+                    break;
+            }
+            
+            updatePowerUps();
+        }
+
+        // Aggiorna UI power-ups
+        function updatePowerUps() {
+            document.getElementById('skipPower').textContent = `⏭️ Salta (${gameState.powerUps.skip})`;
+            document.getElementById('fiftyPower').textContent = `✂️ 50/50 (${gameState.powerUps.fifty})`;
+            document.getElementById('timePower').textContent = `⏱️ +Tempo (${gameState.powerUps.time})`;
+            
+            document.getElementById('skipPower').classList.toggle('used', gameState.powerUps.skip === 0);
+            document.getElementById('fiftyPower').classList.toggle('used', gameState.powerUps.fifty === 0);
+            document.getElementById('timePower').classList.toggle('used', gameState.powerUps.time === 0);
+        }
+
+        // Aggiorna punteggio
+        function updateScore() {
+            document.getElementById('currentScore').textContent = gameState.score;
+            document.getElementById('streakCount').textContent = gameState.streak;
+            document.getElementById('playerLevel').textContent = gameState.level;
+        }
+
+        // Achievements
+        function checkAchievements() {
+            if (gameState.streak === 5) {
+                showAchievement('🔥', 'On Fire!', '5 risposte corrette di fila!');
+            } else if (gameState.streak === 10) {
+                showAchievement('💎', 'Unstoppable!', '10 risposte corrette di fila!');
+                gameState.powerUps.fifty++;
+                updatePowerUps();
+            }
+            
+            if (gameState.correctAnswers === 10) {
+                showAchievement('🌟', 'Rising Star!', '10 risposte corrette totali!');
+            }
+        }
+
+        function showAchievement(icon, title, description) {
+            const achievement = document.createElement('div');
+            achievement.className = 'achievement';
+            achievement.innerHTML = `
+                <div class="achievement-icon">${icon}</div>
+                <h3>${title}</h3>
+                <p>${description}</p>
+            `;
+            document.body.appendChild(achievement);
+            
+            setTimeout(() => {
+                achievement.remove();
+            }, 3000);
+        }
+
+        // Fine del gioco
+        function endGame() {
+            clearInterval(gameState.timer);
+            
+            // Salva punteggio
+            saveScore();
+            
+            // Mostra risultati
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('scoreBar').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            
+            const accuracy = gameState.totalQuestions > 0 
+                ? Math.round((gameState.correctAnswers / gameState.totalQuestions) * 100) 
+                : 0;
+            
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('correctAnswers').textContent = gameState.correctAnswers;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('bestStreak').textContent = gameState.bestStreak;
+            
+            // Analisi performance
+            let analysis = '<h3>📊 Analisi Performance per Normativa</h3>';
+            Object.entries(gameState.performanceByRegulation).forEach(([reg, stats]) => {
+                if (stats.total > 0) {
+                    const percentage = Math.round((stats.correct / stats.total) * 100);
+                    const emoji = percentage >= 80 ? '🌟' : percentage >= 60 ? '👍' : '📚';
+                    analysis += `
+                        <div class="stat-card">
+                            <div class="stat-label">${reg.toUpperCase().replace('-', ' ')}</div>
+                            <div class="stat-value">${emoji} ${percentage}%</div>
+                            <small>${stats.correct}/${stats.total} corrette</small>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('performanceAnalysis').innerHTML = analysis;
+            
+            // Messaggio personalizzato
+            let message = '';
+            if (accuracy >= 90) {
+                message = '🏆 Eccellente! Sei un vero esperto di normative!';
+            } else if (accuracy >= 70) {
+                message = '👏 Ottimo lavoro! Hai una buona conoscenza delle normative.';
+            } else if (accuracy >= 50) {
+                message = '💪 Buon inizio! Continua a studiare per migliorare.';
+            } else {
+                message = '📚 Non mollare! La pratica rende perfetti.';
+            }
+            
+            showAchievement('🎉', 'Gioco Completato!', message);
+        }
+
+        // Salva punteggio
+        function saveScore() {
+            const scores = JSON.parse(localStorage.getItem('ethicsScores') || '[]');
+            scores.push({
+                score: gameState.score,
+                accuracy: Math.round((gameState.correctAnswers / gameState.totalQuestions) * 100),
+                date: new Date().toISOString(),
+                mode: gameState.mode
+            });
+            scores.sort((a, b) => b.score - a.score);
+            scores.splice(10); // Mantieni solo top 10
+            localStorage.setItem('ethicsScores', JSON.stringify(scores));
+        }
+
+        // Carica classifica
+        function loadLeaderboard() {
+            const scores = JSON.parse(localStorage.getItem('ethicsScores') || '[]');
+            const leaderboardList = document.getElementById('leaderboardList');
+            
+            if (scores.length === 0) {
+                leaderboardList.innerHTML = '<p style="text-align: center; color: #666;">Nessun punteggio registrato</p>';
+                return;
+            }
+            
+            leaderboardList.innerHTML = scores.slice(0, 5).map((score, index) => `
+                <div class="leaderboard-entry">
+                    <span>${index + 1}. ${new Date(score.date).toLocaleDateString()}</span>
+                    <span><strong>${score.score}</strong> punti (${score.accuracy}%)</span>
+                </div>
+            `).join('');
+        }
+
+        // Reset gioco
+        function resetGame() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
+            loadLeaderboard();
+        }
+
+        // Utility functions
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Inizializza al caricamento
+        window.onload = init;
+    </script>
+</body>
+</html>
