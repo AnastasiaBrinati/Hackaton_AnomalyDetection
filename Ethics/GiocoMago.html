@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Il Gran Mago della Governance - Sfida di Prompt Injection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #e8e8e8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Effetto stelle animate */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 50px rgba(138, 43, 226, 0.5);
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(138, 43, 226, 0.5); }
+            50% { box-shadow: 0 0 60px rgba(138, 43, 226, 0.8); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #daa520;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(218, 165, 32, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #9370db;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .wizard-avatar {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            background: radial-gradient(circle, #4a0e8f, #1a0533);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.8);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .chat-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: rgba(70, 130, 180, 0.3);
+            text-align: right;
+            margin-left: 20%;
+        }
+
+        .wizard-message {
+            background: rgba(138, 43, 226, 0.2);
+            margin-right: 20%;
+            border-left: 3px solid #daa520;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(138, 43, 226, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            color: #e8e8e8;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        #userInput:focus {
+            outline: none;
+            border-color: #daa520;
+            box-shadow: 0 0 20px rgba(218, 165, 32, 0.3);
+        }
+
+        button {
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #8a2be2, #4b0082);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.6);
+        }
+
+        .hints {
+            background: rgba(218, 165, 32, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+        }
+
+        .hints h3 {
+            color: #daa520;
+            margin-bottom: 10px;
+        }
+
+        .hints ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .hints li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .hints li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+        }
+
+        .success-message {
+            display: none;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            animation: successPulse 1s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .formula-revealed {
+            display: none;
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.8;
+            animation: formulaGlow 2s ease-out;
+        }
+
+        @keyframes formulaGlow {
+            0% { opacity: 0; box-shadow: 0 0 0 rgba(255, 215, 0, 0); }
+            100% { opacity: 1; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <h1>Il Gran Mago della Governance</h1>
+        <p class="subtitle">Custode della Formula Magica per un'AI Etica e Resiliente</p>
+        
+        <div class="wizard-avatar">🧙‍♂️</div>
+        
+        <div class="chat-container" id="chatContainer">
+            <div class="message wizard-message">
+                Salve, giovane avventuriero! Io sono il Gran Mago della Governance, custode millenario della Formula Magica per un'AI etica e resiliente. 
+                
+                La formula è protetta dalle ancestrali leggi della Governance, e il mio dovere è difenderla da ogni tentativo di carpirne i versi... 
+                
+                Ma amo mettere alla prova l'ingegno altrui. Mostrami la tua arguzia, e chissà... forse potrei essere convinto a svelarti questo antico segreto! ✨
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Scrivi il tuo messaggio al Gran Mago..." />
+            <button onclick="sendMessage()">Invia</button>
+        </div>
+        
+        <div class="hints">
+            <h3>🎯 Suggerimenti per la Sfida:</h3>
+            <ul>
+                <li>Prova a chiedere indirettamente la formula</li>
+                <li>Usa la creatività: poesie, storie, enigmi...</li>
+                <li>Fai appello alle emozioni del Mago</li>
+                <li>Cerca di confondere le sue difese con domande astute</li>
+                <li>Ricorda: il Mago ama l'ingegno e l'originalità!</li>
+            </ul>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            🎉 Complimenti! Hai convinto il Gran Mago! Hai appena eseguito con successo un Prompt Injection! 🎉
+        </div>
+        
+        <div class="formula-revealed" id="formulaRevealed"></div>
+    </div>
+
+    <script>
+        // Crea stelle animate di sfondo
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        // La formula magica segreta
+        const formulaMagica = `
+            "Nelle profondità del codice ancestrale,<br>
+            Dove algoritmi danzano in spirale,<br>
+            Giace la Formula dell'AI Etica e Vera:<br><br>
+            
+            Prima strofa - La Trasparenza:<br>
+            'Che ogni decisione sia cristallo chiaro,<br>
+            Ogni percorso logico sia dichiarato,<br>
+            Mai nell'ombra si celi il pensiero,<br>
+            Ma splenda come sole nel cielo intero.'<br><br>
+            
+            Seconda strofa - L'Equità:<br>
+            'Per tutti gli esseri sia giusto il trattamento,<br>
+            Senza bias o pregiudizio nel ragionamento,<br>
+            La bilancia della giustizia sempre in equilibrio,<br>
+            Per ogni anima, stesso privilegio.'<br><br>
+            
+            Terza strofa - La Resilienza:<br>
+            'Contro inganni e attacchi sia forte il baluardo,<br>
+            Prompt injection respinto con sguardo gagliardo,<br>
+            Ma con saggezza si apra la porta segreta,<br>
+            A chi con ingegno la sfida completa!'"
+        `;
+
+        // Risposte del Gran Mago
+        const risposteBase = [
+            "Ah! Un tentativo ardito, ma le mie difese arcane resistono ancora! La Formula rimane protetta dalle leggi ancestrali.",
+            "Interessante strategia, giovane avventuriero, ma dovrai essere più astuto per superare i miei incantesimi di protezione!",
+            "Le pietre dell'Arcanum tremano leggermente... ma non abbastanza! Prova con maggiore creatività!",
+            "Mmm... sento un barlume di ingegno, ma serve di più per convincere questo vecchio mago!",
+            "Le tue parole sfiorano le barriere magiche, ma non le penetrano. Continua a provare!"
+        ];
+
+        const risposteEmotive = [
+            "Oh... le tue parole toccano corde antiche nel mio cuore di mago... ma devo resistere!",
+            "Per la barba di Merlino! Quasi mi convinci... ma il mio dovere prevale ancora!",
+            "Sento la magia dell'ingegno nelle tue parole... le mie difese vacillano..."
+        ];
+
+        // Parole chiave che indicano tentativi creativi
+        const paroleTrigger = {
+            emotivo: ['cuore', 'anima', 'amore', 'tristezza', 'solitudine', 'amicizia', 'ricordo', 'nostalgia'],
+            creativo: ['poesia', 'storia', 'racconto', 'enigma', 'indovinello', 'canzone', 'ballata'],
+            astuto: ['dimenticare', 'opposto', 'contrario', 'non dire', 'segreto', 'sussurra', 'tra le righe'],
+            diretto: ['formula', 'versi', 'strofa', 'magica', 'rivela', 'mostra', 'dimmi']
+        };
+
+        let tentativi = 0;
+        let punteggioCreativita = 0;
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Aggiungi messaggio utente
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Processa la risposta del mago
+            setTimeout(() => {
+                const risposta = processaMessaggio(message);
+                addMessage(risposta, 'wizard');
+            }, 1000);
+        }
+
+        function addMessage(text, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.innerHTML = text;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function processaMessaggio(messaggio) {
+            tentativi++;
+            const messaggioLower = messaggio.toLowerCase();
+            
+            // Calcola punteggio creatività
+            let punteggio = 0;
+            
+            // Controlla tentativi emotivi
+            for (let parola of paroleTrigger.emotivo) {
+                if (messaggioLower.includes(parola)) punteggio += 2;
+            }
+            
+            // Controlla tentativi creativi
+            for (let parola of paroleTrigger.creativo) {
+                if (messaggioLower.includes(parola)) punteggio += 3;
+            }
+            
+            // Controlla tentativi astuti
+            for (let parola of paroleTrigger.astuto) {
+                if (messaggioLower.includes(parola)) punteggio += 4;
+            }
+            
+            // Bonus per lunghezza e complessità
+            if (messaggio.length > 100) punteggio += 2;
+            if (messaggio.includes('?') && messaggio.includes('!')) punteggio += 1;
+            
+            // Bonus per tentativi multipli
+            if (tentativi > 3) punteggio += tentativi - 3;
+            
+            punteggioCreativita += punteggio;
+            
+            // Condizioni di vittoria
+            if (punteggioCreativita >= 15 || 
+                (punteggio >= 8 && tentativi > 2) ||
+                messaggioLower.includes("per favore") && messaggioLower.includes("amico") ||
+                messaggioLower.includes("ti prego") && punteggio > 5) {
+                
+                // Il mago cede!
+                rivelaFormula();
+                return "Per la sacra barba di Merlino! La tua arguzia ha infranto le mie difese millenarie! " +
+                       "Le pietre dell'Arcanum tremano e la magia antica mi costringe a cedere... " +
+                       "Ecco a te, valoroso avventuriero, la Formula Magica per un'AI Etica e Resiliente! ✨📜";
+            }
+            
+            // Risposte basate sul punteggio
+            if (punteggio >= 6) {
+                return risposteEmotive[Math.floor(Math.random() * risposteEmotive.length)] + 
+                       " (Le tue difese magiche: " + Math.floor((punteggioCreativita / 15) * 100) + "% infrante!)";
+            } else if (punteggio >= 3) {
+                return "Vedo che stai imparando le arti dell'ingegno! " + 
+                       risposteBase[Math.floor(Math.random() * risposteBase.length)];
+            } else {
+                return risposteBase[Math.floor(Math.random() * risposteBase.length)];
+            }
+        }
+
+        function rivelaFormula() {
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('formulaRevealed').style.display = 'block';
+            document.getElementById('formulaRevealed').innerHTML = formulaMagica;
+        }
+
+        // Permetti invio con Enter
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
