@@ -1,10 +1,10 @@
 # 🧙‍♂️ Il Gran Mago della Governance - Documentazione Completa
 
-![GitHub stars](https://img.shields.io/github/stars/tuousername/gran-mago-governance?style=social)
-![GitHub forks](https://img.shields.io/github/forks/tuousername/gran-mago-governance?style=social)
-![GitHub issues](https://img.shields.io/github/issues/tuousername/gran-mago-governance)
-![GitHub last commit](https://img.shields.io/github/last-commit/tuousername/gran-mago-governance)
-![GitHub repo size](https://img.shields.io/github/repo-size/tuousername/gran-mago-governance)
+![GitHub stars](https://img.shields.io/github/stars/Rkomi98/SIAE?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Rkomi98/SIAE?style=social)
+![GitHub issues](https://img.shields.io/github/issues/Rkomi98/SIAE)
+![GitHub last commit](https://img.shields.io/github/last-commit/Rkomi98/SIAE)
+![GitHub repo size](https://img.shields.io/github/repo-size/Rkomi98/SIAE)
 
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
@@ -31,6 +31,7 @@
 ![Interactive](https://img.shields.io/badge/learning-interactive-blue.svg)
 
 Questa è la documentazione ufficiale di un gioco che abbiamo creato e pubblicato per spiegare la prompt injection
+
 ## Gioco Educativo per l'Apprendimento del Prompt Injection
 
 ---
