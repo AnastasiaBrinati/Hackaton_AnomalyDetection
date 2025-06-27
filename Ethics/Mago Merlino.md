@@ -606,13 +606,6 @@ Gli studenti che completano con successo il gioco possono ricevere:
 - [ ] Supporto multilingua
 - [ ] Modalità accessibilità avanzata
 
-### Feedback e Contributi
-
-Per suggerimenti, segnalazioni o contributi:
-- Email: [tuo-email]
-- GitHub: [tuo-repo]
-- Discord: [tuo-server]
-
 ---
 
 *"L'educazione alla sicurezza informatica inizia con la comprensione, non con la paura. Questo gioco trasforma una vulnerabilità complessa in un'avventura di apprendimento memorabile."*
