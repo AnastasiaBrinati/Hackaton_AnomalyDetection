@@ -30,7 +30,7 @@
 ![Prompt Injection](https://img.shields.io/badge/teaches-prompt%20injection-critical.svg)
 ![Interactive](https://img.shields.io/badge/learning-interactive-blue.svg)
 
-Questa è la documentazione ufficiale di un gioco che abbiamo creato e pubblicato per spiegare la prompt injection
+Questa è la [documentazione ufficiale](https://claude.ai/public/artifacts/bf131894-1513-4e4a-97dc-294c859e1f8c) di un gioco che abbiamo creato e pubblicato per spiegare la prompt injection
 
 ## Gioco Educativo per l'Apprendimento del Prompt Injection
 
