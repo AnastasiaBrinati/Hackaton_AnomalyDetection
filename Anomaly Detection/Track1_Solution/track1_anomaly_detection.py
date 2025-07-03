@@ -824,8 +824,8 @@ def main():
     print("GENERAZIONE FILE DI SUBMISSION")
     print("="*50)
     
-    team_name = "Team_Solution_Example"
-    members = ["Data Scientist 1", "ML Engineer 2", "Analyst 3"]
+    team_name = "Me&Giorgio"
+    members = ["Mirko", "Giorgio", "Manuel"]
     
     submission_file, submission_data = generate_submission(
         df=df, 
