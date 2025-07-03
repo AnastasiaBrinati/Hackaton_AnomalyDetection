@@ -1,5 +1,5 @@
 # 🚀 HACKATHON ANOMALY DETECTION 2025
-**"Ready-to-Launch Edition con Dataset Pubblici"**
+Questa cartella contiene l'hackathon per affrontare e vedere dal vivo quanto visto **completamente pronta** con dataset pubblici e sfide pre-configurate per l'anomaly detection in contesti reali simili a quelli SIAE.
 
 ## 📋 PANORAMICA EVENTO
 
@@ -7,7 +7,7 @@
 Hackathon **completamente pronta** con dataset pubblici e sfide pre-configurate per l'anomaly detection in contesti reali simili a quelli SIAE.
 
 ### ⏱️ Durata
-**24-48 ore** (formato flessibile)
+**14 ore totali** (2 giorni × 7 ore/giorno) - **Formato Sprint Intensivo**
 
 ### 🎁 **TUTTO INCLUSO**
 ✅ Dataset pubblici già scaricabili  
@@ -38,28 +38,30 @@ music_features = {
 }
 ```
 
-**🎯 Sfida**: Identificare brani con pattern di ascolto anomali che potrebbero indicare:
-- Streaming artificiale (bot)
-- Pirateria musicale
-- Anomalie nei metadati
+**🎯 Sfida**: Identificare **pattern di streaming anomali** in 3 ore di sviluppo + 2 ore optimization
 
-**💻 Starter Code**:
+**⏱️ Complessità**: **MEDIUM** - Perfetta per 14 ore
+- Baseline in 30 minuti
+- Feature engineering in 2 ore  
+- Advanced models in 3 ore
+- Tuning in 1.5 ore
+
+**💻 Starter Code Rapido**:
 ```python
+# 🚀 QUICK START - 15 minuti per baseline funzionante
 import pandas as pd
-import numpy as np
 from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler
-import librosa
 
-# Dataset già processato fornito
-df = pd.read_csv('fma_processed.csv')
-X = df[['tempo', 'energy', 'valence', 'streams_per_day']]
+# Auto-load dataset (già processato)
+df = pd.read_csv('music_streaming_anomalies.csv')
+features = ['stream_velocity', 'skip_rate', 'geographic_dispersion', 'time_pattern']
 
-# Baseline model
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-model = IsolationForest(contamination=0.05)
-anomalies = model.fit_predict(X_scaled)
+# Baseline model (3 righe!)
+model = IsolationForest(contamination=0.05, random_state=42)
+predictions = model.fit_predict(df[features])
+score = model.decision_function(df[features])
+
+print(f"✅ Baseline ready! Found {sum(predictions == -1)} anomalies")
 ```
 
 ---
@@ -88,7 +90,13 @@ transaction_data = {
 
 **🎯 Sfida**: Rilevare transazioni fraudolente simulando il problema dei pagamenti anomali delle royalties.
 
-**💻 Starter Code**:
+**⏱️ Complessità**: **EASY-MEDIUM** - Ideale per hackathon da 14 ore
+- Setup + EDA: 1 ora
+- Baseline models: 2 ore
+- Advanced techniques: 3 ore  
+- Ensemble & tuning: 2 ore
+
+**💻 Starter Code Ultra-Rapido**:
 ```python
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -134,7 +142,13 @@ document_types = [
 - Contratti manipolati
 - Fatture fraudolente
 
-**💻 Starter Code**:
+**⏱️ Complessità**: **MEDIUM** - Perfetta per 14 ore totali
+- Computer Vision setup: 1 ora
+- Feature extraction: 2 ore
+- Deep learning models: 4 ore
+- Fine-tuning: 2 ore
+
+**💻 Starter Code Express**:
 ```python
 import cv2
 import numpy as np
@@ -181,7 +195,13 @@ network_features = {
 - Attacchi DDoS
 - Comportamenti bot
 
-**💻 Starter Code**:
+**⏱️ Complessità**: **EASY** - Ottima per principianti
+- Data understanding: 45 min
+- Preprocessing: 1 ora  
+- Multiple algorithms: 2 ore
+- Comparison & tuning: 1.5 ore
+
+**💻 Starter Code Lightning**:
 ```python
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
@@ -204,7 +224,102 @@ predictions = detector.fit_predict(X)
 
 ---
 
-## 🛠️ AMBIENTE TECNICO PRE-CONFIGURATO
+## ⚡ SPRINT OPTIMIZATION PER 14 ORE
+
+### **🎯 Scope Ridotto ma Impattante**
+Invece di 4 track completi, focus su **2 track principali + 1 bonus**:
+
+**TRACK PRINCIPALE 1**: Music Anomaly (60% partecipanti)
+**TRACK PRINCIPALE 2**: Financial Fraud (35% partecipanti)  
+**TRACK BONUS**: Quick Challenge (5% partecipanti) - *Solo per expert*
+
+### **⚡ Fast-Track Development Strategy**
+
+**Milestone obbligatorie per timeline 14h**:
+- **Ora 3**: Working baseline submission
+- **Ora 6**: First improvement iteration  
+- **Ora 10**: Advanced model working
+- **Ora 13**: Final submission + demo ready
+
+### **🛠️ Pre-Configured Templates Specifici**
+
+**Template "14-Hour Sprint"**:
+```python
+# ⚡ HACKATHON 14H TEMPLATE - ULTRA OTTIMIZZATO
+
+# Imports rapidi - tutto in una cella
+import pandas as pd, numpy as np, matplotlib.pyplot as plt
+from sklearn.ensemble import IsolationForest, RandomForestClassifier
+from sklearn.svm import OneClassSVM
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report, roc_auc_score
+import seaborn as sns
+
+# Configurazione rapida
+plt.style.use('seaborn-v0_8')
+pd.set_option('display.max_columns', 20)
+
+# Data loader con timer
+import time
+def quick_load_and_explore(track_num):
+    start = time.time()
+    df = pd.read_csv(f'track_{track_num}_data.csv')
+    print(f"✅ Data loaded in {time.time()-start:.1f}s")
+    print(f"📊 Shape: {df.shape}")
+    print(f"🔍 Missing: {df.isnull().sum().sum()}")
+    return df
+
+# Baseline sprint (< 5 minuti)
+def sprint_baseline(X, contamination=0.05):
+    """Baseline in meno di 5 minuti garantiti"""
+    models = {
+        'IsolationForest': IsolationForest(contamination=contamination, random_state=42),
+        'OneClassSVM': OneClassSVM(nu=contamination),
+    }
+    
+    results = {}
+    for name, model in models.items():
+        start = time.time()
+        pred = model.fit_predict(X)
+        results[name] = {
+            'predictions': pred,
+            'time': time.time() - start,
+            'anomalies_found': sum(pred == -1)
+        }
+        print(f"✅ {name}: {results[name]['anomalies_found']} anomalies in {results[name]['time']:.1f}s")
+    
+    return results
+
+print("🚀 14-Hour Sprint Template Ready!")
+```
+
+### **📊 Simplified Evaluation (Real-time)**
+
+**Auto-scoring ogni ora**:
+```python
+# Scoring automatico ottimizzato per 14h
+class QuickLeaderboard:
+    def __init__(self):
+        self.hourly_scores = {}
+    
+    def quick_submit(self, team, predictions, hour_mark):
+        """Submit ultra-rapido con feedback immediato"""
+        score = self.calculate_quick_score(predictions)
+        self.hourly_scores[f"{team}_h{hour_mark}"] = score
+        
+        # Feedback istantaneo
+        print(f"⚡ {team} @ Hour {hour_mark}: Score = {score:.3f}")
+        return score
+    
+    def show_live_ranking(self):
+        """Classifica live ogni 2 ore"""
+        # Mostra top 3 in tempo reale
+        pass
+
+# Uso durante hackathon
+lb = QuickLeaderboard()
+lb.quick_submit("TeamAlpha", my_predictions, hour_mark=3)
+```
 
 ### **Google Colab Templates Ready-to-Use**
 
@@ -395,26 +510,79 @@ submission = {
 
 ---
 
-## 📅 TIMELINE SPRINT
+## 📅 TIMELINE OTTIMIZZATO (14 ORE TOTALI)
 
-### **Setup Phase (Pre-evento)**
-- **Email ai partecipanti**: Link a Colab templates
-- **Discord Server**: Canali per ogni track
-- **Dataset verificati**: Tutti scaricabili e testati
+### **Setup Phase (Pre-evento - 1 settimana prima)**
+- **Email ai partecipanti**: Link Colab + istruzioni setup
+- **Discord Server**: Canali per ogni track + help desk
+- **Dataset pre-test**: Tutti scaricabili e verificati
+- **Team formation**: Matching skills online (opzionale)
 
-### **Evento Day 1**
-- **09:00**: Kickoff + intro tecnica (30 min)
-- **09:30**: Teams scelgono track e iniziano
-- **12:30**: Lunch break + networking
-- **13:30**: Sviluppo + mentor disponibili
-- **18:00**: First checkpoint submission
+---
 
-### **Evento Day 2** 
-- **09:00**: Sprint finale
-- **14:00**: Submission deadline
-- **14:30**: Presentazioni (5 min per team)
-- **16:00**: Valutazione + networking
-- **17:00**: Premiazione
+### **GIORNO 1 - Development Sprint (7 ore)**
+**🕘 09:00-09:30 (30min)** - **Kickoff & Setup**
+- Welcome + overview delle sfide
+- Distribuzione credenziali e link
+- Team formation (se non già fatto)
+- Q&A tecnico veloce
+
+**🕘 09:30-12:30 (3 ore)** - **Sprint Sviluppo Parte 1**
+- Analisi esplorativa dei dati
+- Implementazione baseline model
+- Prime iterazioni e sperimentazione
+- *Mentori disponibili per supporto*
+
+**🕘 12:30-13:30 (1 ora)** - **Pausa Pranzo + Networking**
+- Lunch break
+- Condivisione quick wins tra team
+- Supporto tecnico per chi ha problemi
+
+**🕘 13:30-16:00 (2.5 ore)** - **Sprint Sviluppo Parte 2**
+- Miglioramento modelli
+- Feature engineering
+- Tuning iperparametri
+- Prime submission al leaderboard
+
+**🕘 16:00-16:30 (30min)** - **Checkpoint Intermedio**
+- **OBBLIGATORIO**: Prima submission funzionante
+- Quick status update (2 min per team)
+- Identificazione team in difficoltà per supporto extra
+
+---
+
+### **GIORNO 2 - Optimization & Demo (7 ore)**
+**🕘 09:00-09:15 (15min)** - **Briefing Giorno 2**
+- Recap risultati Giorno 1
+- Focus su optimization e presentazione
+- Timeline finale
+
+**🕘 09:15-12:00 (2h 45min)** - **Optimization Sprint**
+- Ensemble methods e stacking
+- Hyperparameter tuning avanzato
+- Implementazione tecniche avanzate
+- Preparazione visualizzazioni
+
+**🕘 12:00-13:00 (1 ora)** - **Pausa Pranzo + Prep Demo**
+- Lunch veloce
+- Inizio preparazione presentazioni
+- Test demo e script
+
+**🕘 13:00-15:00 (2 ore)** - **Finalizzazione + Demo Prep**
+- **14:00 DEADLINE**: Submission finale obbligatoria
+- Preparazione slide (max 5 slides)
+- Test delle demo
+- Backup plans per problemi tecnici
+
+**🕘 15:00-16:30 (1.5 ore)** - **Presentazioni**
+- **5 minuti per team** (3 min demo + 2 min Q&A)
+- Valutazione live della giuria
+- Feedback immediate su approcci
+
+**🕘 16:30-17:00 (30min)** - **Premiazione & Chiusura**
+- Annuncio vincitori
+- Recap insights tecnici
+- Networking finale + next steps
 
 ---
 
