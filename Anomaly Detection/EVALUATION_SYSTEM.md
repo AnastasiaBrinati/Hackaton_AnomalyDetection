@@ -32,33 +32,55 @@ python evaluate_submissions.py
 cat leaderboard.md
 ```
 
-### 2. Durante l'Hackathon
+### 2. Setup Sistema Automatico
+
+**PRIMA dell'hackathon - Setup iniziale:**
+```bash
+# Setup completo del sistema automatico
+python setup_auto_leaderboard.py
+```
+
+### 3. Durante l'Hackathon
 
 #### Modalità Automatica (Raccomandata)
 ```bash
-# Monitora automaticamente nuovi commit ogni 30 secondi
-python update_leaderboard.py --monitor
+# Opzione 1: Git Hook (automatico sui commit)
+# Nessuna azione richiesta - si attiva automaticamente!
+
+# Opzione 2: File Watcher (tempo reale)
+python file_watcher.py
 ```
 
 #### Modalità Manuale
 ```bash
-# Aggiorna manualmente dopo ogni commit
-python update_leaderboard.py
+# Aggiornamento rapido manuale
+./update_leaderboard_manual.sh
+
+# Oppure diretto
+python evaluate_submissions.py
 ```
 
-### 3. Verifica Sistema
+### 4. Verifica Sistema
 
 ```bash
-# Genera submission di esempio
+# 1. Setup sistema automatico
+python setup_auto_leaderboard.py
+
+# 2. Test manuale
+./update_leaderboard_manual.sh
+
+# 3. Genera submission di esempio
 cd Track1_Solution
 python track1_anomaly_detection.py
 
-# Verifica che il file sia stato creato
-ls ../submissions/submission_team_solution_example.json
+# 4. Verifica che il file sia stato creato
+ls ../submissions/submission_me_giorgio.json
 
-# Aggiorna leaderboard
+# 5. Test aggiornamento automatico
 cd ..
-python evaluate_submissions.py
+git add submissions/submission_me_giorgio.json
+git commit -m "Test submission"
+# La leaderboard dovrebbe aggiornarsi automaticamente!
 ```
 
 ## 👥 Istruzioni per i Partecipanti
@@ -167,7 +189,61 @@ def send_notification(team_name, score, rank):
     requests.post(webhook_url, json={"text": message})
 ```
 
+## 🔧 Metodi di Aggiornamento Automatico
+
+### 1. Git Hook (Consigliato per produzione)
+- ✅ **Si attiva automaticamente** sui commit con submissions
+- ✅ **Zero manutenzione** durante l'hackathon
+- ✅ **Commita automaticamente** le leaderboard aggiornate
+- 🔧 Setup: `python setup_auto_leaderboard.py`
+
+### 2. File Watcher (Consigliato per testing)
+- ✅ **Tempo reale** - aggiorna immediatamente sui file changes
+- ✅ **Monitoring continuo** della cartella submissions
+- ⚠️ Richiede **processo attivo**: `python file_watcher.py`
+
+### 3. Manuale (Backup)
+- ✅ **Controllo completo** sugli aggiornamenti
+- ✅ **Debugging facile** per problemi
+- 🔧 Uso: `./update_leaderboard_manual.sh`
+
 ## 🛠️ Troubleshooting
+
+### Problemi di Aggiornamento Automatico
+
+#### "Git hook non si attiva"
+```bash
+# Verifica esistenza hook
+ls -la .git/hooks/post-commit
+
+# Verifica permessi esecuzione
+chmod +x .git/hooks/post-commit
+
+# Re-setup se necessario
+python setup_auto_leaderboard.py
+```
+
+#### "File watcher non funziona"
+```bash
+# Installa dipendenza mancante
+pip install watchdog
+
+# Verifica cartella submissions
+ls -la submissions/
+
+# Avvia con debug
+python file_watcher.py
+```
+
+#### "Environment non trovato"
+```bash
+# Verifica esistenza environment
+ls -la hackathon_env/
+
+# Attiva manualmente se necessario
+source hackathon_env/bin/activate
+python evaluate_submissions.py
+```
 
 ### Problemi Comuni
 
@@ -205,13 +281,17 @@ python evaluate_submissions.py
 
 ## 📋 Checklist Pre-Hackathon
 
+- [ ] ✅ **Setup automatico eseguito**: `python setup_auto_leaderboard.py`
+- [ ] ✅ **Git hook testato**: commit di prova con submission
+- [ ] ✅ **Environment hackathon_env** configurato e funzionante
 - [ ] ✅ Sistema di valutazione testato
 - [ ] ✅ Leaderboard iniziale configurata  
 - [ ] ✅ File di esempio funzionante
 - [ ] ✅ Istruzioni per partecipanti chiare
-- [ ] ✅ Monitoring automatico attivo
 - [ ] ✅ Backup file importanti
 - [ ] ✅ Permessi Git repository configurati
+- [ ] ✅ **Watchdog installato** per file monitoring
+- [ ] ✅ **Script manuali testati**: `./update_leaderboard_manual.sh`
 
 ## 📋 Checklist Durante Hackathon
 

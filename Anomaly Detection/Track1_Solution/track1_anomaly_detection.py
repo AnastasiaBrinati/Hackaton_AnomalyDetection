@@ -725,7 +725,7 @@ def generate_submission(df, iso_forest, feature_cols, team_name="YourTeam", memb
     }
     
     # Salva il file di submission
-    submission_filename = f"../submissions/submission_{team_name.lower().replace(' ', '_')}.json"
+    submission_filename = f"../submissions/submission_{team_name.lower().replace(' ', '_').replace('&', '_')}.json"
     
     # Crea la directory submissions se non esiste
     os.makedirs("../submissions", exist_ok=True)
