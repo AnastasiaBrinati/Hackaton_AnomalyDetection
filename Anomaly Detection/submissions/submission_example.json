@@ -1,0 +1,68 @@
+{
+  "team_info": {
+    "team_name": "Team Example",
+    "members": ["Alice Smith", "Bob Johnson", "Charlie Brown"],
+    "track": "Track1",
+    "submission_time": "2024-01-15T14:30:00Z",
+    "submission_number": 1
+  },
+  "model_info": {
+    "algorithm": "Isolation Forest + DBSCAN",
+    "features_used": [
+      "attendance", 
+      "revenue_per_person", 
+      "occupancy_rate", 
+      "genre_encoded", 
+      "n_artists", 
+      "venue_specialization"
+    ],
+    "hyperparameters": {
+      "contamination": 0.1,
+      "n_estimators": 100,
+      "eps": 0.5,
+      "min_samples": 5
+    },
+    "feature_engineering": [
+      "revenue_per_person",
+      "occupancy_rate", 
+      "genre_popularity",
+      "venue_genre_diversity"
+    ]
+  },
+  "results": {
+    "total_events": 10000,
+    "anomalies_detected": 950,
+    "predictions": "Array of 0s and 1s (0=normal, 1=anomaly) - first 20 shown",
+    "predictions_sample": [0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+    "anomaly_scores": "Array of anomaly scores - first 20 shown", 
+    "anomaly_scores_sample": [-0.12, 0.85, -0.23, 0.71, -0.18, -0.09, 0.92, -0.15, -0.08, 0.78, -0.21, 0.69, -0.11, -0.19, 0.88, -0.14, 0.73, -0.16, -0.07, 0.81],
+    "confidence_scores": "Array of confidence scores - first 20 shown",
+    "confidence_scores_sample": [0.95, 0.87, 0.93, 0.91, 0.96, 0.98, 0.89, 0.94, 0.97, 0.88, 0.92, 0.90, 0.95, 0.93, 0.86, 0.94, 0.89, 0.95, 0.98, 0.87]
+  },
+  "metrics": {
+    "precision": 0.85,
+    "recall": 0.78,
+    "f1_score": 0.81,
+    "auc_roc": 0.89,
+    "accuracy": 0.92,
+    "true_positives": 742,
+    "false_positives": 132,
+    "true_negatives": 8306,
+    "false_negatives": 238
+  },
+  "performance_info": {
+    "training_time_seconds": 12.5,
+    "prediction_time_seconds": 2.1,
+    "memory_usage_mb": 245,
+    "model_size_mb": 18.7
+  },
+  "anomaly_breakdown": {
+    "impossible_attendance": 156,
+    "revenue_mismatch": 198,
+    "excessive_songs": 134,
+    "suspicious_timing": 89,
+    "genre_mismatch": 112,
+    "artist_overload": 79,
+    "other": 182
+  }
+} 

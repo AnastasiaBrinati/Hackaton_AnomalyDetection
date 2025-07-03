@@ -339,28 +339,101 @@ def generate_contract_images(n_contracts=1000):
 
 ---
 
-## 📊 Criteri di Valutazione
+## 📊 Sistema di Valutazione e Submission
 
-### Performance Tecnica (40%)
-- **Precision/Recall**: Bilanciamento tra falsi positivi e negativi
-- **F1-Score**: Media armonica per dataset sbilanciati
-- **AUC-ROC**: Robustezza a diverse soglie
-- **Interpretabilità**: Capacità di spiegare le anomalie
+### Come Funziona la Valutazione Automatica
 
-### Innovazione (30%)
-- Approcci creativi al problema
-- Uso di tecniche avanzate
-- Combinazione di metodologie
+I partecipanti devono generare un **file di submission** che verrà automaticamente valutato dal sistema. La leaderboard si aggiorna in tempo reale ad ogni submission.
 
-### Business Impact (20%)
-- Applicabilità reale per SIAE
-- Scalabilità della soluzione
-- Costo computazionale
+### Formato File di Submission
 
-### Presentazione (10%)
-- Chiarezza espositiva
-- Qualità visualizzazioni
-- Demo efficace
+Ogni team deve generare un file JSON chiamato `submission_[TEAM_NAME].json` con la seguente struttura:
+
+```json
+{
+  "team_info": {
+    "team_name": "Nome del Team",
+    "members": ["Nome1", "Nome2", "Nome3"],
+    "track": "Track1",
+    "submission_time": "2024-01-15T14:30:00Z"
+  },
+  "model_info": {
+    "algorithm": "Isolation Forest + DBSCAN",
+    "features_used": ["attendance", "revenue_per_person", "genre_encoded"],
+    "hyperparameters": {
+      "contamination": 0.1,
+      "n_estimators": 100
+    }
+  },
+  "results": {
+    "predictions": [0, 1, 0, 1, 0, ...],
+    "anomaly_scores": [-0.1, 0.8, -0.2, 0.7, ...],
+    "confidence_scores": [0.95, 0.87, 0.93, 0.91, ...]
+  },
+  "metrics": {
+    "precision": 0.85,
+    "recall": 0.78,
+    "f1_score": 0.81,
+    "auc_roc": 0.89
+  }
+}
+```
+
+### Criteri di Valutazione Automatica
+
+#### Performance Tecnica (50%)
+- **F1-Score** (25%): Media armonica di precision e recall
+- **AUC-ROC** (15%): Robustezza del modello
+- **Precision** (10%): Accuratezza delle anomalie rilevate
+
+#### Innovazione e Tecnica (30%)
+- **Numero di Features** (10%): Varietà di features utilizzate
+- **Complessità Algoritmica** (10%): Uso di tecniche avanzate
+- **Ensemble Methods** (10%): Combinazione di modelli
+
+#### Business Metrics (20%)
+- **Interpretabilità** (10%): Capacità di spiegare le anomalie
+- **Scalabilità** (10%): Efficienza computazionale
+
+### Come Submittare
+
+1. **Genera il file di submission** usando il tuo script Python
+2. **Fai commit** del file nella cartella `submissions/`
+3. **Push** su GitHub - la leaderboard si aggiorna automaticamente
+4. **Controlla** la tua posizione nella leaderboard
+
+```bash
+# Esempio di submission
+git add submissions/submission_team_awesome.json
+git commit -m "Team Awesome - Track 1 submission"
+git push origin main
+```
+
+### Regole di Submission
+
+- **Max 5 submissions** per team al giorno
+- **Ultimo submission** conta per la valutazione finale
+- **File size limit**: 50MB per submission
+- **Formato obbligatorio**: JSON come specificato sopra
+
+### Leaderboard
+
+La leaderboard è disponibile in tempo reale su:
+- **File**: `leaderboard.md` (aggiornato automaticamente)
+- **Dashboard**: Visualizzazione interattiva dei risultati
+- **Metriche**: Ranking basato su score composito
+
+### Scoring System
+
+Il **Final Score** è calcolato come:
+```
+Final Score = (F1-Score × 0.25) + (AUC-ROC × 0.15) + (Precision × 0.10) + 
+              (Innovation × 0.30) + (Business Impact × 0.20)
+```
+
+Dove:
+- **Innovation Score**: Basato su features, algoritmi e approcci
+- **Business Impact**: Valutato automaticamente su interpretabilità e scalabilità
 
 ---
 
@@ -461,26 +534,28 @@ print(f"Precision: {(df['is_anomaly'] & df['anomaly_type'].notna()).sum() / df['
 
 ## 📝 Deliverables Richiesti
 
-1. **Codice Sorgente**
-   - Repository GitHub pubblico
-   - README con istruzioni
-   - Requirements.txt
+### Submission Automatica (Obbligatoria)
+1. **File di Submission JSON**
+   - Formato standardizzato come specificato sopra
+   - Nome file: `submission_[TEAM_NAME].json`
+   - Posizionato nella cartella `submissions/`
 
-2. **Notebook Jupyter**
-   - EDA documentata
-   - Pipeline di training
-   - Risultati e visualizzazioni
+2. **Codice Sorgente**
+   - Script Python che genera il file di submission
+   - Funzione `generate_submission()` implementata
+   - README con istruzioni per riprodurre i risultati
 
+### Presentazione Finale (Giorno 2)
 3. **Presentazione** (max 10 slides)
    - Problema affrontato
    - Approccio tecnico
-   - Risultati ottenuti
+   - Risultati ottenuti (riferimento alla leaderboard)
    - Business impact
 
 4. **Demo** (opzionale ma consigliata)
    - Dashboard interattiva
-   - API REST
-   - Web application
+   - Visualizzazione anomalie in tempo reale
+   - API REST per integration
 
 ---
 
