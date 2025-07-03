@@ -15,7 +15,7 @@ Questo script implementa la Track 1 dell'hackathon SIAE, integrando i metadati F
 
 ### 1. Clona il repository e naviga nella directory
 ```bash
-cd "Anomaly Detection"
+cd "Anomaly Detection/Track1_Solution"
 ```
 
 ### 2. Installa le dipendenze
