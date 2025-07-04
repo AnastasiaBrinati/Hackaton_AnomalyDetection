@@ -1,0 +1,78 @@
+{
+  "team_info": {
+    "team_name": "Team Example Track2",
+    "members": ["Alice Smith", "Bob Johnson", "Charlie Brown"],
+    "track": "Track2",
+    "submission_time": "2024-01-15T15:30:00Z",
+    "submission_number": 1
+  },
+  "model_info": {
+    "algorithm": "Isolation Forest + DBSCAN + Computer Vision Features",
+    "features_used": [
+      "page_count",
+      "file_size_kb", 
+      "text_confidence_avg",
+      "signature_regions",
+      "siae_watermark_detected",
+      "visual_integrity_score",
+      "text_quality_score",
+      "siae_authenticity_score"
+    ],
+    "hyperparameters": {
+      "contamination": 0.12,
+      "n_estimators": 200,
+      "random_state": 42,
+      "dbscan_eps": 0.8,
+      "dbscan_min_samples": 5
+    },
+    "feature_engineering": [
+      "file_size_per_page",
+      "text_density",
+      "text_quality_score",
+      "visual_integrity_score", 
+      "siae_authenticity_score"
+    ]
+  },
+  "results": {
+    "total_documents": 5000,
+    "frauds_detected": 750,
+    "predictions": "Array of 0s and 1s (0=legitimate, 1=fraud) - first 20 shown",
+    "predictions_sample": [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1],
+    "fraud_scores": "Array of fraud scores - first 20 shown",
+    "fraud_scores_sample": [-0.15, 0.92, -0.28, -0.19, 0.88, -0.11, 0.95, -0.22, -0.16, 0.85, -0.13, -0.25, 0.91, -0.18, 0.89, -0.14, -0.21, 0.87, -0.17, 0.93],
+    "confidence_scores": "Array of confidence scores - first 20 shown",
+    "confidence_scores_sample": [0.89, 0.95, 0.92, 0.88, 0.94, 0.90, 0.96, 0.91, 0.87, 0.93, 0.89, 0.90, 0.95, 0.88, 0.94, 0.89, 0.91, 0.93, 0.88, 0.95]
+  },
+  "metrics": {
+    "precision": 0.82,
+    "recall": 0.76,
+    "f1_score": 0.79,
+    "auc_roc": 0.87,
+    "accuracy": 0.91,
+    "true_positives": 592,
+    "false_positives": 130,
+    "true_negatives": 4178,
+    "false_negatives": 186
+  },
+  "performance_info": {
+    "training_time_seconds": 18.7,
+    "prediction_time_seconds": 3.2,
+    "memory_usage_mb": 320,
+    "model_size_mb": 24.5
+  },
+  "fraud_breakdown": {
+    "digital_alteration": 245,
+    "signature_forgery": 156,
+    "template_fraud": 98,
+    "text_manipulation": 127,
+    "metadata_inconsistency": 89,
+    "layout_anomaly": 67
+  },
+  "track2_specific": {
+    "document_types_analyzed": 6,
+    "avg_text_confidence": 0.847,
+    "siae_watermark_detection_rate": 0.823,
+    "clusters_identified": 8,
+    "outlier_documents": 156
+  }
+} 

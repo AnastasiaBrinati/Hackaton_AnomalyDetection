@@ -16,29 +16,51 @@ import warnings
 warnings.filterwarnings('ignore')
 
 class SubmissionEvaluator:
-    def __init__(self, submissions_dir="submissions", truth_file="Track1_Solution/live_events_with_anomalies.csv"):
+    def __init__(self, submissions_dir="submissions"):
         self.submissions_dir = Path(submissions_dir)
-        self.truth_file = Path(truth_file)
-        self.ground_truth = None
-        self.load_ground_truth()
+        self.track_truth_files = {
+            "Track1": "Track1_Solution/live_events_with_anomalies.csv",
+            "Track2": "Track2_Solution/documents_fraud_detection.csv"
+        }
+        self.ground_truths = {}
+        self.load_all_ground_truths()
         
-    def load_ground_truth(self):
-        """Load ground truth data for evaluation"""
-        try:
-            if self.truth_file.exists():
-                df = pd.read_csv(self.truth_file)
-                # Create ground truth from anomaly_type column
-                self.ground_truth = df['anomaly_type'].notna().astype(int).values
-                print(f"Ground truth loaded: {len(self.ground_truth)} events")
-                print(f"True anomalies: {self.ground_truth.sum()}")
-            else:
-                print(f"Warning: Ground truth file not found at {self.truth_file}")
-                # Create synthetic ground truth for demonstration
-                self.ground_truth = np.random.choice([0, 1], size=10000, p=[0.9, 0.1])
-                print("Using synthetic ground truth for demonstration")
-        except Exception as e:
-            print(f"Error loading ground truth: {e}")
-            self.ground_truth = np.random.choice([0, 1], size=10000, p=[0.9, 0.1])
+    def load_all_ground_truths(self):
+        """Load ground truth data for all tracks"""
+        for track, truth_file in self.track_truth_files.items():
+            try:
+                truth_path = Path(truth_file)
+                if truth_path.exists():
+                    df = pd.read_csv(truth_path)
+                    
+                    if track == "Track1":
+                        # For Track1: anomaly_type column
+                        ground_truth = df['anomaly_type'].notna().astype(int).values
+                        print(f"{track} ground truth loaded: {len(ground_truth)} events")
+                        print(f"{track} true anomalies: {ground_truth.sum()}")
+                    elif track == "Track2":
+                        # For Track2: is_fraudulent column
+                        ground_truth = df['is_fraudulent'].astype(int).values
+                        print(f"{track} ground truth loaded: {len(ground_truth)} documents")
+                        print(f"{track} true frauds: {ground_truth.sum()}")
+                    
+                    self.ground_truths[track] = ground_truth
+                else:
+                    print(f"Warning: {track} ground truth file not found at {truth_path}")
+                    # Create synthetic ground truth
+                    if track == "Track1":
+                        self.ground_truths[track] = np.random.choice([0, 1], size=10000, p=[0.9, 0.1])
+                    elif track == "Track2":
+                        self.ground_truths[track] = np.random.choice([0, 1], size=5000, p=[0.85, 0.15])
+                    print(f"Using synthetic ground truth for {track}")
+                    
+            except Exception as e:
+                print(f"Error loading {track} ground truth: {e}")
+                # Fallback synthetic data
+                if track == "Track1":
+                    self.ground_truths[track] = np.random.choice([0, 1], size=10000, p=[0.9, 0.1])
+                elif track == "Track2":
+                    self.ground_truths[track] = np.random.choice([0, 1], size=5000, p=[0.85, 0.15])
     
     def validate_submission(self, submission_data):
         """Validate submission format and content"""
@@ -184,11 +206,17 @@ class SubmissionEvaluator:
             
             # Get submission info
             team_info = submission_data['team_info']
+            track = team_info.get('track', 'Unknown')
+            
+            # Track-specific information
+            track_specific_data = {}
+            if track == "Track2" and 'track2_specific' in submission_data:
+                track_specific_data = submission_data['track2_specific']
             
             return {
                 'team_name': team_info['team_name'],
                 'members': team_info['members'],
-                'track': team_info.get('track', 'Unknown'),
+                'track': track,
                 'submission_time': team_info.get('submission_time', 'Unknown'),
                 'valid': True,
                 'errors': [],
@@ -206,8 +234,10 @@ class SubmissionEvaluator:
                 },
                 'algorithm': submission_data.get('model_info', {}).get('algorithm', 'Unknown'),
                 'num_features': len(submission_data.get('model_info', {}).get('features_used', [])),
-                'anomalies_detected': submission_data.get('results', {}).get('anomalies_detected', 0),
-                'submission_file': submission_file.name
+                'anomalies_detected': submission_data.get('results', {}).get('anomalies_detected', 0) or 
+                                     submission_data.get('results', {}).get('frauds_detected', 0),
+                'submission_file': submission_file.name,
+                'track_specific': track_specific_data
             }
             
         except Exception as e:
@@ -240,30 +270,79 @@ class SubmissionEvaluator:
         return results
     
     def generate_leaderboard(self, results):
-        """Generate leaderboard markdown"""
+        """Generate multi-track leaderboard markdown"""
         leaderboard_md = """# 🏆 SIAE Hackathon Leaderboard
 
 *Ultimo aggiornamento: {timestamp}*
 
-## Track 1: Live Events Anomaly Detection
+## 🌟 Overall Rankings
 
-| Rank | Team | Score | F1 | Precision | Recall | AUC-ROC | Algorithm | Features | Members |
-|------|------|-------|----|-----------|---------|---------|-----------|------------|---------|
+### 🥇 Top Teams Across All Tracks
 """.format(timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         
-        for i, result in enumerate(results):
+        # Overall top teams (best score from any track)
+        team_best_scores = {}
+        for result in results:
             if not result['valid']:
                 continue
-                
-            rank = i + 1
             team = result['team_name']
+            track = result.get('track', 'Unknown')
             score = result['scores']['final']
-            metrics = result['metrics']
+            
+            if team not in team_best_scores or score > team_best_scores[team]['score']:
+                team_best_scores[team] = {
+                    'score': score,
+                    'track': track,
+                    'result': result
+                }
+        
+        # Sort by best score
+        sorted_teams = sorted(team_best_scores.items(), key=lambda x: x[1]['score'], reverse=True)
+        
+        leaderboard_md += "\n| Rank | Team | Best Score | Track | F1 | Algorithm | Members |\n"
+        leaderboard_md += "|------|------|------------|-------|----|-----------|---------|\n"
+        
+        for i, (team_name, team_data) in enumerate(sorted_teams[:10]):
+            rank = i + 1
+            result = team_data['result']
+            track = team_data['track']
+            score = team_data['score']
+            f1 = result['metrics']['f1_score']
             algorithm = result['algorithm']
-            num_features = result['num_features']
             members = ", ".join(result['members'])
             
-            leaderboard_md += f"| {rank} | {team} | {score:.3f} | {metrics['f1_score']:.3f} | {metrics['precision']:.3f} | {metrics['recall']:.3f} | {metrics['auc_roc']:.3f} | {algorithm} | {num_features} | {members} |\n"
+            leaderboard_md += f"| {rank} | {team_name} | {score:.3f} | {track} | {f1:.3f} | {algorithm} | {members} |\n"
+        
+        # Separate leaderboards by track
+        tracks = set(r.get('track', 'Unknown') for r in results if r['valid'])
+        
+        for track in sorted(tracks):
+            track_results = [r for r in results if r['valid'] and r.get('track') == track]
+            
+            if track == "Track1":
+                track_title = "Track 1: Live Events Anomaly Detection"
+                data_type = "Events"
+            elif track == "Track2":
+                track_title = "Track 2: Document Fraud Detection" 
+                data_type = "Documents"
+            else:
+                track_title = f"{track}: Unknown Track"
+                data_type = "Items"
+            
+            leaderboard_md += f"\n## {track_title}\n\n"
+            leaderboard_md += "| Rank | Team | Score | F1 | Precision | Recall | AUC-ROC | Algorithm | Features | Members |\n"
+            leaderboard_md += "|------|------|-------|----|-----------|---------|---------|-----------|------------|----------|\n"
+        
+            for i, result in enumerate(track_results):
+                rank = i + 1
+                team = result['team_name']
+                score = result['scores']['final']
+                metrics = result['metrics']
+                algorithm = result['algorithm']
+                num_features = result['num_features']
+                members = ", ".join(result['members'])
+                
+                leaderboard_md += f"| {rank} | {team} | {score:.3f} | {metrics['f1_score']:.3f} | {metrics['precision']:.3f} | {metrics['recall']:.3f} | {metrics['auc_roc']:.3f} | {algorithm} | {num_features} | {members} |\n"
         
         # Add invalid submissions
         invalid_submissions = [r for r in results if not r['valid']]
@@ -272,22 +351,40 @@ class SubmissionEvaluator:
             for result in invalid_submissions:
                 leaderboard_md += f"- **{result['team_name']}**: {', '.join(result['errors'])}\n"
         
-        # Add detailed scores
-        leaderboard_md += "\n## 📊 Detailed Scores\n\n"
-        for i, result in enumerate(results):
-            if not result['valid']:
+        # Add detailed scores by track
+        leaderboard_md += "\n## 📊 Detailed Scores by Track\n\n"
+        
+        for track in sorted(tracks):
+            track_results = [r for r in results if r['valid'] and r.get('track') == track]
+            if not track_results:
                 continue
                 
-            rank = i + 1
-            team = result['team_name']
-            scores = result['scores']
+            if track == "Track1":
+                track_title = "Track 1: Live Events Anomaly Detection"
+            elif track == "Track2":
+                track_title = "Track 2: Document Fraud Detection"
+            else:
+                track_title = f"{track}: Unknown Track"
+                
+            leaderboard_md += f"### {track_title}\n\n"
             
-            leaderboard_md += f"### {rank}. {team}\n"
-            leaderboard_md += f"- **Technical Score**: {scores['technical']:.3f} (50%)\n"
-            leaderboard_md += f"- **Innovation Score**: {scores['innovation']:.3f} (30%)\n"
-            leaderboard_md += f"- **Business Score**: {scores['business']:.3f} (20%)\n"
-            leaderboard_md += f"- **Final Score**: {scores['final']:.3f}\n"
-            leaderboard_md += f"- **Anomalies Detected**: {result['anomalies_detected']}\n\n"
+            for i, result in enumerate(track_results):
+                rank = i + 1
+                team = result['team_name']
+                scores = result['scores']
+                
+                leaderboard_md += f"#### {rank}. {team}\n"
+                leaderboard_md += f"- **Technical Score**: {scores['technical']:.3f} (50%)\n"
+                leaderboard_md += f"- **Innovation Score**: {scores['innovation']:.3f} (30%)\n"
+                leaderboard_md += f"- **Business Score**: {scores['business']:.3f} (20%)\n"
+                leaderboard_md += f"- **Final Score**: {scores['final']:.3f}\n"
+                
+                if track == "Track1":
+                    leaderboard_md += f"- **Anomalies Detected**: {result.get('anomalies_detected', 0)}\n\n"
+                elif track == "Track2":
+                    leaderboard_md += f"- **Frauds Detected**: {result.get('anomalies_detected', 0)}\n\n"
+                else:
+                    leaderboard_md += f"- **Issues Detected**: {result.get('anomalies_detected', 0)}\n\n"
         
         return leaderboard_md
     

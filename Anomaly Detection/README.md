@@ -339,16 +339,47 @@ def generate_contract_images(n_contracts=1000):
 
 ---
 
-## 📊 Sistema di Valutazione e Submission
+## 📊 Sistema di Valutazione Multi-Track
+
+### 🎯 Track Disponibili
+
+#### Track 1: Live Events Anomaly Detection
+- **Focus**: Rilevamento anomalie in eventi musicali live
+- **Dataset**: Eventi live sintetici + metadati FMA
+- **Script**: `Track1_Solution/track1_anomaly_detection.py`
+- **Submission**: `submissions/submission_[team]_track1.json`
+
+#### Track 2: Document Fraud Detection  
+- **Focus**: Rilevamento frodi in documenti SIAE
+- **Dataset**: Documenti digitali sintetici (contratti, licenze)
+- **Script**: `Track2_Solution/track2_document_fraud_detection.py`
+- **Submission**: `submissions/submission_[team]_track2.json`
+
+### 🚀 Partecipazione Multi-Track
+
+Un team può partecipare a **uno o più track** simultaneamente:
+
+```bash
+# Solo Track 1
+cd Track1_Solution && python track1_anomaly_detection.py
+
+# Solo Track 2  
+cd Track2_Solution && python track2_document_fraud_detection.py
+
+# Entrambi i track (consigliato per massimizzare opportunità)
+cd Track1_Solution && python track1_anomaly_detection.py
+cd ../Track2_Solution && python track2_document_fraud_detection.py
+```
 
 ### Come Funziona la Valutazione Automatica
 
-I partecipanti devono generare un **file di submission** che verrà automaticamente valutato dal sistema. La leaderboard si aggiorna in tempo reale ad ogni submission.
+I partecipanti devono generare un **file di submission** che verrà automaticamente valutato dal sistema. La leaderboard si aggiorna in tempo reale ad ogni submission per tutti i track.
 
-### Formato File di Submission
+### Formato File di Submission Multi-Track
 
-Ogni team deve generare un file JSON chiamato `submission_[TEAM_NAME].json` con la seguente struttura:
+Ogni team deve generare file JSON separati per ogni track:
 
+#### Track 1: `submission_[TEAM_NAME]_track1.json`
 ```json
 {
   "team_info": {
@@ -366,15 +397,53 @@ Ogni team deve generare un file JSON chiamato `submission_[TEAM_NAME].json` con 
     }
   },
   "results": {
-    "predictions": [0, 1, 0, 1, 0, ...],
-    "anomaly_scores": [-0.1, 0.8, -0.2, 0.7, ...],
-    "confidence_scores": [0.95, 0.87, 0.93, 0.91, ...]
+    "total_events": 10000,
+    "anomalies_detected": 950,
+    "predictions": [0, 1, 0, 1, 0],
+    "anomaly_scores": [-0.1, 0.8, -0.2, 0.7]
   },
   "metrics": {
     "precision": 0.85,
     "recall": 0.78,
     "f1_score": 0.81,
     "auc_roc": 0.89
+  }
+}
+```
+
+#### Track 2: `submission_[TEAM_NAME]_track2.json`
+```json
+{
+  "team_info": {
+    "team_name": "Nome del Team",
+    "members": ["Nome1", "Nome2", "Nome3"],
+    "track": "Track2",
+    "submission_time": "2024-01-15T14:30:00Z"
+  },
+  "model_info": {
+    "algorithm": "Isolation Forest + Computer Vision Features",
+    "features_used": ["text_confidence", "visual_integrity", "siae_authenticity"],
+    "hyperparameters": {
+      "contamination": 0.12,
+      "n_estimators": 200
+    }
+  },
+  "results": {
+    "total_documents": 5000,
+    "frauds_detected": 750,
+    "predictions": [0, 1, 0, 1, 0],
+    "fraud_scores": [-0.15, 0.92, -0.28, 0.88]
+  },
+  "metrics": {
+    "precision": 0.82,
+    "recall": 0.76,
+    "f1_score": 0.79,
+    "auc_roc": 0.87
+  },
+  "track2_specific": {
+    "document_types_analyzed": 6,
+    "avg_text_confidence": 0.847,
+    "siae_watermark_detection_rate": 0.823
   }
 }
 ```
@@ -416,12 +485,30 @@ git push origin main
 - **File size limit**: 50MB per submission
 - **Formato obbligatorio**: JSON come specificato sopra
 
-### Leaderboard
+### Leaderboard Multi-Track
+
+Il sistema genera **3 classifiche**:
+
+#### 1. 🌟 Overall Leaderboard
+- **Ranking globale** di tutti i team
+- Basato sul **miglior score** ottenuto in qualsiasi track
+- Determina il **vincitore assoluto** dell'hackathon
+
+#### 2. 🎯 Track-Specific Leaderboards
+- **Track 1**: Classifica dedicata Live Events Anomaly Detection
+- **Track 2**: Classifica dedicata Document Fraud Detection
+- Competizione diretta tra team dello stesso track
+
+#### 3. 📈 Detailed Performance Dashboard
+- Metriche dettagliate per track
+- Confronto algoritmi e tecniche
+- Analisi performance temporale
 
 La leaderboard è disponibile in tempo reale su:
 - **File**: `leaderboard.md` (aggiornato automaticamente)
+- **Multi-Track**: `leaderboard_multi_track.md` (formato esteso)
 - **Dashboard**: Visualizzazione interattiva dei risultati
-- **Metriche**: Ranking basato su score composito
+- **Metriche**: Ranking basato su score composito per track
 
 ### Scoring System
 
@@ -437,23 +524,52 @@ Dove:
 
 ---
 
-## 🏆 Premi Suggeriti
+## 🏆 Premi Multi-Track
 
-**1° Classificato**:
-- Buoni formazione (corsi online ML/AI)
+### 🥇 Premio Overall (Vincitore Assoluto)
+**Miglior team considerando tutti i track**:
+- Buoni formazione avanzata (corsi online ML/AI)
 - Mentorship con esperti del settore
 - Possibilità stage/collaborazione SIAE
+- Riconoscimento ufficiale SIAE
 
-**2° Classificato**:
+### 🎯 Premi per Track
+
+#### 🏅 Track 1: Live Events Anomaly Detection
+**1° Classificato**:
 - Libri tecnici su anomaly detection
 - Abbonamento piattaforme cloud (AWS/GCP)
+- Certificato specializzato Track 1
 
-**3° Classificato**:
+#### 🏅 Track 2: Document Fraud Detection  
+**1° Classificato**:
+- Libri tecnici su computer vision e fraud detection
+- Abbonamento piattaforme cloud (AWS/GCP)
+- Certificato specializzato Track 2
+
+### 🌟 Premi Speciali
+
+#### "Most Innovative Team"
+- Per l'approccio più creativo cross-track
+- Gadget tech premium
+- Certificato di innovazione
+
+#### "Best Multi-Track Team"
+- Per il team con migliori performance su più track
+- Bonus formazione specializzata
+- Riconoscimento versatilità
+
+#### "Rising Star"
+- Per il team emergente con approccio promettente
 - Gadget tech
-- Certificati di partecipazione speciali
+- Mentorship personalizzata
 
-**Premio Speciale "Most Innovative"**:
-- Per l'approccio più creativo
+### 📊 Distribuzione Premi
+
+- **1 vincitore overall** (premio principale)
+- **2 vincitori track** (Track 1 + Track 2)
+- **3 premi speciali** (innovazione, multi-track, rising star)
+- **Certificati di partecipazione** per tutti i team validi
 
 ---
 
