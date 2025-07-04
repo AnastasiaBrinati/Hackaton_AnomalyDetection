@@ -1,6 +1,6 @@
 # 🏆 SIAE Hackathon Leaderboard
 
-*Ultimo aggiornamento: 2025-07-04 09:49:27*
+*Ultimo aggiornamento: 2025-07-04 09:49:54*
 
 ## 🌟 Overall Rankings
 
