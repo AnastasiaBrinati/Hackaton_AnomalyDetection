@@ -1,9 +1,152 @@
 # 🎵 SIAE Anomaly Detection Hackathon
 ## Rilevamento Anomalie nei Diritti d'Autore e Utilizzi Musicali
 
+![Status](https://img.shields.io/badge/status-active-success.svg)
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.3.0-orange.svg)
+![Pandas](https://img.shields.io/badge/Pandas-2.0+-green.svg)
+![Tracks](https://img.shields.io/badge/Tracks-4-purple.svg)
+![Duration](https://img.shields.io/badge/Duration-2%20days-red.svg)
+![Dataset](https://img.shields.io/badge/Dataset-95K%20samples-brightgreen.svg)
+![Level](https://img.shields.io/badge/Level-Intermediate%20to%20Expert-yellow.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Participants](https://img.shields.io/badge/Teams-Unlimited-blue.svg)
+![Evaluation](https://img.shields.io/badge/Evaluation-Automated-lightblue.svg)
+![Leaderboard](https://img.shields.io/badge/Leaderboard-Real%20Time-ff69b4.svg)
+
 ### 📅 Durata: 2 giorni (14 ore totali)
 - **Giorno 1**: 7 ore (9:30-13:00, 14:00-17:00)
 - **Giorno 2**: 7 ore (9:30-13:00, 14:00-17:00)
+
+---
+
+## 🚀 Quick Start Guide
+
+### 📥 Setup Rapido (5 minuti)
+
+```bash
+# 1. Clona il repository
+git clone <repository-url>
+cd "Anomaly Detection"
+
+# 2. Installa dipendenze base (opzionale per vedere esempi)
+pip install pandas numpy matplotlib seaborn scikit-learn
+
+# 3. Esegui una track di esempio
+cd Track1_Solution
+python track1_anomaly_detection.py
+```
+
+### 📊 Dati per Track - Come Ottenerli
+
+#### 🎪 **Track 1: Live Events Anomaly Detection**
+![Isolation Forest](https://img.shields.io/badge/Algorithm-Isolation%20Forest-orange.svg)
+![DBSCAN](https://img.shields.io/badge/Clustering-DBSCAN-blue.svg)
+![Dataset Size](https://img.shields.io/badge/Dataset-50K%20events-green.svg)
+![Execution Time](https://img.shields.io/badge/Runtime-2%20min-red.svg)
+
+```bash
+cd Track1_Solution
+python track1_anomaly_detection.py
+# ✅ Dataset sintetico generato automaticamente (50,000 eventi)
+# ✅ Include metadati FMA (scaricati automaticamente o generati)
+# ⏱️ Tempo esecuzione: ~2 minuti
+```
+
+#### 📄 **Track 2: Document Fraud Detection**
+![Computer Vision](https://img.shields.io/badge/Tech-Computer%20Vision-purple.svg)
+![OCR](https://img.shields.io/badge/OCR-Tesseract-yellow.svg)
+![Dataset Size](https://img.shields.io/badge/Dataset-5K%20documents-green.svg)
+![Execution Time](https://img.shields.io/badge/Runtime-1%20min-red.svg)
+
+```bash
+cd Track2_Solution
+python track2_document_fraud_detection.py
+# ✅ Dataset documenti sintetici generato automaticamente (5,000 documenti)
+# ✅ Simula contratti, licenze, dichiarazioni SIAE
+# ⏱️ Tempo esecuzione: ~1 minuto
+```
+
+#### 🎵 **Track 3: Music Anomaly Detection**
+![FMA Dataset](https://img.shields.io/badge/Dataset-FMA%20Real-brightgreen.svg)
+![Audio Features](https://img.shields.io/badge/Features-MFCC%20%2B%20Spectral-blue.svg)
+![Dataset Size](https://img.shields.io/badge/Dataset-25K%20tracks-green.svg)
+![Execution Time](https://img.shields.io/badge/Runtime-3%20min-red.svg)
+
+```bash
+cd Track3_Solution
+python track3_music.py
+# ✅ Dataset FMA scaricato automaticamente (342MB) o generato sintetico
+# ✅ 25,000+ tracce musicali con metadati
+# ⏱️ Tempo esecuzione: ~3 minuti
+```
+
+#### 🔒 **Track 4: Copyright Infringement Detection**
+![Guaranteed Clustering](https://img.shields.io/badge/Clustering-Guaranteed-brightgreen.svg)
+![Advanced Features](https://img.shields.io/badge/Features-40%2B%20Dimensions-orange.svg)
+![Dataset Size](https://img.shields.io/badge/Dataset-15K%20works-green.svg)
+![Execution Time](https://img.shields.io/badge/Runtime-2%20min-red.svg)
+
+```bash
+cd Track4_Solution
+python track4_copyright_infringement.py
+# ✅ Dataset opere creative sintetiche generato automaticamente (15,000 opere)
+# ✅ Include 5 tipi di violazioni copyright
+# ⏱️ Tempo esecuzione: ~2 minuti
+```
+
+### 📈 Risultati Automatici
+
+Ogni script produce automaticamente:
+- **📊 Visualizzazioni** salvate come PNG
+- **📋 Dataset CSV** con risultati completi  
+- **📄 File submission JSON** per la leaderboard
+- **📈 Metriche di performance** stampate a console
+
+### 🏆 Submission alla Leaderboard
+
+```bash
+# Valuta tutte le submission
+python evaluate_submissions.py
+
+# Aggiorna leaderboard automaticamente
+python update_leaderboard.py
+```
+
+**🎯 Pronto in 5 minuti!** Tutti i dati vengono generati automaticamente - non servono download manuali.
+
+### 🛠️ Tech Stack Completo
+
+#### Core Technologies
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg?logo=python)
+![NumPy](https://img.shields.io/badge/NumPy-1.24+-orange.svg?logo=numpy)
+![Pandas](https://img.shields.io/badge/Pandas-2.0+-green.svg?logo=pandas)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.3.0-orange.svg?logo=scikit-learn)
+
+#### Machine Learning & Analysis
+![Isolation Forest](https://img.shields.io/badge/Isolation%20Forest-Anomaly%20Detection-red.svg)
+![DBSCAN](https://img.shields.io/badge/DBSCAN-Clustering-blue.svg)
+![PCA](https://img.shields.io/badge/PCA-Dimensionality%20Reduction-purple.svg)
+![Random Forest](https://img.shields.io/badge/Random%20Forest-Ensemble-darkgreen.svg)
+
+#### Visualization & Analysis
+![Matplotlib](https://img.shields.io/badge/Matplotlib-3.7+-blue.svg?logo=matplotlib)
+![Seaborn](https://img.shields.io/badge/Seaborn-0.12+-darkblue.svg)
+![Plotly](https://img.shields.io/badge/Plotly-5.0+-brightgreen.svg?logo=plotly)
+
+#### Audio & Computer Vision
+![Audio Processing](https://img.shields.io/badge/Audio-MFCC%20%2B%20Spectral-yellow.svg)
+![Computer Vision](https://img.shields.io/badge/Computer%20Vision-OCR%20%2B%20Features-purple.svg)
+![Feature Engineering](https://img.shields.io/badge/Features-40%2B%20Dimensions-orange.svg)
+
+### 📈 Performance Metrics
+
+![Accuracy](https://img.shields.io/badge/Accuracy-85%25%2B-brightgreen.svg)
+![F1 Score](https://img.shields.io/badge/F1%20Score-0.80%2B-green.svg)
+![AUC-ROC](https://img.shields.io/badge/AUC--ROC-0.85%2B-blue.svg)
+![Precision](https://img.shields.io/badge/Precision-80%25%2B-lightgreen.svg)
+![Recall](https://img.shields.io/badge/Recall-75%25%2B-yellow.svg)
+![Processing Speed](https://img.shields.io/badge/Processing-1--3%20min-red.svg)
 
 ---
 
@@ -17,146 +160,125 @@ I partecipanti dovranno sviluppare sistemi di anomaly detection per identificare
 
 ---
 
-## 📊 Dataset Disponibili
+## 📊 Dataset per Track - Dettagli Tecnici
 
-### Dataset 1: MusicBrainz Database (Open Source)
-**Descrizione**: Database aperto con informazioni su artisti, album, tracce e relazioni.
-
-**Download**:
+### 🎪 Track 1: Live Events Anomaly Detection
+**Come Ottenere i Dati**:
 ```bash
-# Scaricare il dump PostgreSQL completo (circa 25GB compressi)
-wget https://musicbrainz.org/doc/MusicBrainz_Database/Download
-
-# O utilizzare subset più piccoli via API
-pip install musicbrainzngs
+cd Track1_Solution
+python track1_anomaly_detection.py
 ```
 
-**Contenuto**:
-- Metadati di milioni di registrazioni musicali
-- Relazioni tra artisti, opere e album
-- Informazioni su pubblicazioni e distribuzioni
+**Dataset Generati Automaticamente**:
+- ✅ **50,000 eventi live sintetici** con 5 tipi di anomalie:
+  - `duplicate_declaration` - Dichiarazioni duplicate
+  - `impossible_attendance` - Partecipazione impossibile (>capacità)
+  - `revenue_mismatch` - Revenue non coerente con audience
+  - `excessive_songs` - Numero eccessivo di brani (50-100)
+  - `suspicious_timing` - Orari sospetti (4:00 AM)
 
-### Dataset 2: Free Music Archive (FMA)
-**Descrizione**: Metadati di tracce musicali con informazioni su generi, artisti e utilizzi.
+- ✅ **Metadati FMA** (opzionale):
+  - Scaricati automaticamente da: `https://os.unil.cloud.switch.ch/fma/fma_metadata.zip`
+  - Se download fallisce → dataset FMA sintetico generato (10,000 tracce)
+  - Include generi, artisti, durate, popolarità
 
-**Download**:
+**Output**: `live_events_with_anomalies.csv` (50,000 righe)
+
+### 📄 Track 2: Document Fraud Detection  
+**Come Ottenere i Dati**:
 ```bash
-# Dataset metadati (342 MB)
-wget https://os.unil.cloud.switch.ch/fma/fma_metadata.zip
-unzip fma_metadata.zip
-
-# Features audio pre-estratte (1GB) 
-wget https://os.unil.cloud.switch.ch/fma/fma_small.zip
-unzip fma_small.zip
+cd Track2_Solution
+python track2_document_fraud_detection.py
 ```
 
-**Contenuto**:
-- 106,574 tracce di 16,341 artisti
-- Metadati su generi, date, licenze
-- Features audio pre-calcolate
+**Dataset Generati Automaticamente**:
+- ✅ **5,000 documenti SIAE sintetici** con 5 tipi di frodi:
+  - `digital_alteration` - Alterazioni digitali (noise elevato)
+  - `signature_forgery` - Firme contraffatte (signature_regions = 0)
+  - `template_fraud` - Template fraudolenti (watermark SIAE mancanti)
+  - `metadata_manipulation` - Manipolazione metadati
+  - `quality_inconsistency` - Qualità audio inconsistente
 
-### Dataset 3: Million Song Dataset (Subset)
-**Descrizione**: Subset del famoso dataset con metadati di canzoni.
+- ✅ **Features estratte automaticamente**:
+  - Risoluzione, dimensioni file, confidence OCR
+  - Regioni di firma, watermark, seal detection
+  - Noise level, edge sharpness, consistency scores
 
-**Download**:
+**Output**: `documents_fraud_detection.csv` (5,000 righe)
+
+### 🎵 Track 3: Music Anomaly Detection
+**Come Ottenere i Dati**:
 ```bash
-# Subset di 10,000 canzoni (280MB)
-wget http://static.echonest.com/millionsongsubset_full.tar.gz
-tar -xzf millionsongsubset_full.tar.gz
-
-# Script Python per processare i file HDF5
-pip install h5py pandas
+cd Track3_Solution
+python track3_music.py
 ```
 
-### Dataset 4: Dataset Sintetico Eventi Live
-**Descrizione**: Dataset generato per simulare dichiarazioni di eventi e concerti.
+**Dataset Utilizzati**:
+- ✅ **FMA (Free Music Archive) - Priorità 1**:
+  - URL: `https://os.unil.cloud.switch.ch/fma/fma_metadata.zip` (342MB)
+  - Contenuto: 106,574 tracce reali, 16,341 artisti
+  - Features: generi, date, durate, popolarità, coordinate artisti
 
-**Generazione** (fornito come script):
-```python
-# File: generate_live_events.py
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-import random
+- ✅ **Dataset FMA Sintetico - Fallback automatico**:
+  - 25,000 tracce simulate se download FMA fallisce
+  - Mantiene struttura e distribuzioni realistiche
+  - Genera automaticamente 5 tipi di anomalie musicali
 
-def generate_live_events_dataset(n_events=50000):
-    """
-    Genera un dataset sintetico di eventi live con anomalie inserite
-    """
-    venues = [f"Venue_{i}" for i in range(1, 501)]
-    cities = ["Milano", "Roma", "Napoli", "Torino", "Bologna", "Firenze", 
-              "Palermo", "Genova", "Bari", "Venezia"]
-    
-    events = []
-    start_date = datetime(2023, 1, 1)
-    
-    for i in range(n_events):
-        venue = random.choice(venues)
-        city = random.choice(cities)
-        
-        # Genera evento normale
-        event_date = start_date + timedelta(days=random.randint(0, 730))
-        capacity = random.randint(50, 5000)
-        attendance = random.randint(int(capacity * 0.3), capacity)
-        
-        # Numero di brani eseguiti (normale: 10-30)
-        n_songs = random.randint(10, 30)
-        
-        # Revenue (normale: proporzionale all'attendance)
-        base_revenue = attendance * random.uniform(15, 50)
-        
-        # Inserisci anomalie (10% dei casi)
-        anomaly_type = None
-        if random.random() < 0.1:
-            anomaly_type = random.choice([
-                "duplicate_declaration",
-                "impossible_attendance", 
-                "revenue_mismatch",
-                "excessive_songs",
-                "suspicious_timing"
-            ])
-            
-            if anomaly_type == "duplicate_declaration":
-                # Stesso venue, stessa data, orari vicini
-                pass
-            elif anomaly_type == "impossible_attendance":
-                attendance = int(capacity * random.uniform(1.1, 1.5))
-            elif anomaly_type == "revenue_mismatch":
-                base_revenue = attendance * random.uniform(0.1, 5)
-            elif anomaly_type == "excessive_songs":
-                n_songs = random.randint(50, 100)
-            elif anomaly_type == "suspicious_timing":
-                # Eventi alle 4 del mattino
-                event_date = event_date.replace(hour=4)
-        
-        events.append({
-            'event_id': f'EVT_{i:06d}',
-            'venue_id': venue,
-            'city': city,
-            'event_date': event_date,
-            'capacity': capacity,
-            'attendance': attendance,
-            'n_songs_declared': n_songs,
-            'total_revenue': round(base_revenue, 2),
-            'anomaly_type': anomaly_type
-        })
-    
-    return pd.DataFrame(events)
+**Anomalie Musicali Simulate**:
+- `plagio_similarity` - Similarità sospetta in features audio
+- `bot_streaming` - Pattern innaturali di ascolto (like/play ratio anomalo)
+- `metadata_manipulation` - Date future o inconsistenti
+- `genre_mismatch` - Genere non corrispondente a features
+- `audio_quality_fraud` - Qualità dichiarata vs dimensione file
 
-# Genera e salva il dataset
-df = generate_live_events_dataset()
-df.to_csv('live_events_dataset.csv', index=False)
-print(f"Dataset generato con {len(df)} eventi")
-print(f"Anomalie inserite: {df['anomaly_type'].notna().sum()}")
+**Output**: `music_anomaly_detection_results.csv` (25,000 righe)
+
+### 🔒 Track 4: Copyright Infringement Detection
+**Come Ottenere i Dati**:
+```bash
+cd Track4_Solution
+python track4_copyright_infringement.py
 ```
 
-### Dataset 5: ISRC Database Sample
-**Descrizione**: Codici ISRC (International Standard Recording Code) per tracciare registrazioni.
+**Dataset Generati Automaticamente**:
+- ✅ **15,000 opere creative sintetiche** con 5 tipi di violazioni:
+  - `unauthorized_sampling` - Campionamento non autorizzato (diviso in 3 cluster per tempo)
+  - `derivative_work` - Opere derivate (divise per engagement alto/basso)
+  - `metadata_manipulation` - Manipolazione metadati copyright
+  - `cross_platform_violation` - Violazioni multi-piattaforma
+  - `content_id_manipulation` - Elusione Content ID
 
-**Download**:
+- ✅ **Features Avanzate**:
+  - Audio: tempo, tonalità, MFCC, spettro, chroma
+  - Engagement: play/like/share counts, viral coefficient
+  - Business: revenue, royalty rates, licensing
+  - Technical: hash, fingerprint, compression, quality
+  - Platform: distribuzione multi-piattaforma, geolocalizzazione
+
+**Clustering Garantito**: Sistema ottimizzato che produce sempre 5-8 cluster visibili
+
+**Output**: `copyright_infringement_detection_results.csv` (15,000 righe)
+
+### 🔧 Fallback per Connessioni Limitate
+
+Tutti i sistemi includono **fallback automatici**:
+- Se download esterni falliscono → generazione sintetica locale
+- Se librerie mancanti → versioni semplificate
+- Se memoria limitata → dataset ridotti automaticamente
+- **Nessun intervento manuale richiesto**
+
+### 📈 Monitoraggio Download
+
 ```bash
-# Dataset esempio con ISRC codes
-wget https://github.com/datasets/isrc/raw/main/data/isrc-sample.csv
+# Verifica status download FMA
+python -c "
+import requests
+try:
+    r = requests.head('https://os.unil.cloud.switch.ch/fma/fma_metadata.zip', timeout=5)
+    print(f'✅ FMA disponibile ({r.headers.get(\"content-length\", \"sconosciuto\")} bytes)')
+except:
+    print('❌ FMA non disponibile - useremo dataset sintetico')
+"
 ```
 
 ---
@@ -196,101 +318,81 @@ pip install torch torchvision tensorflow
 
 ## 📋 Challenge Tracks
 
-### Track 1: Anomaly Detection in Live Events (Livello: Intermedio)
-**Dataset**: Dataset Sintetico Eventi Live + FMA metadata
+### 🎪 Track 1: Live Events Anomaly Detection (Livello: Intermedio)
+**Soluzione Completa**: `Track1_Solution/track1_anomaly_detection.py`  
+**Dataset**: Eventi live sintetici (50,000) + Metadati FMA (opzionale)
 
 **Obiettivi**:
-- Identificare eventi con attendance sospetta
-- Rilevare venue con pattern di dichiarazione anomali
-- Trovare discrepanze revenue/attendance
+- ✅ Identificare eventi con attendance impossibile (>capacità venue)
+- ✅ Rilevare revenue/attendance mismatch (guadagni anomali)
+- ✅ Trovare dichiarazioni duplicate (stesso venue/data)
+- ✅ Individuare timing sospetti (eventi notturni anomali)
+- ✅ Rilevare numero eccessivo di brani eseguiti
 
-**Tecniche suggerite**:
-- Isolation Forest per anomalie multivariate
-- DBSCAN per clustering venue simili
-- Time series analysis per pattern temporali
+**Tecniche implementate**:
+- **Isolation Forest** per anomalie multivariate (contamination=0.1)
+- **DBSCAN** per clustering venue con pattern simili
+- **Feature engineering** avanzato (30+ features)
+- **Visualizzazioni** complete con 6 grafici di analisi
 
-### Track 2: Copyright Declaration Anomalies (Livello: Avanzato)
-**Dataset**: MusicBrainz + Million Song Dataset
-
-**Obiettivi**:
-- Identificare opere con attribuzioni sospette
-- Rilevare pattern di plagio potenziale
-- Trovare anomalie nelle catene di diritti
-
-**Tecniche suggerite**:
-- Graph Neural Networks per relazioni
-- NLP per analisi similarità titoli
-- Embedding musicali per confronti
-
-### Track 3: Document Fraud Detection (Livello: Esperto)
-**Dataset**: Generare documenti sintetici con anomalie
-
-**Script generazione documenti**:
-```python
-# File: generate_contracts.py
-from PIL import Image, ImageDraw, ImageFont
-import random
-import os
-
-def generate_contract_images(n_contracts=1000):
-    """Genera immagini di contratti con anomalie inserite"""
-    
-    for i in range(n_contracts):
-        # Crea immagine base
-        img = Image.new('RGB', (800, 1000), color='white')
-        draw = ImageDraw.Draw(img)
-        
-        # Aggiungi testo standard
-        draw.text((50, 50), "CONTRATTO DI CESSIONE DIRITTI", fill='black')
-        draw.text((50, 100), f"Numero: {i:06d}", fill='black')
-        
-        # Inserisci anomalie casuali (10%)
-        anomaly = None
-        if random.random() < 0.1:
-            anomaly = random.choice([
-                "missing_signature",
-                "altered_date",
-                "duplicate_watermark",
-                "suspicious_formatting"
-            ])
-            
-            if anomaly == "missing_signature":
-                # Non aggiungere area firma
-                pass
-            elif anomaly == "altered_date":
-                # Data impossibile
-                draw.text((50, 150), "Data: 31/02/2024", fill='red')
-        
-        # Salva immagine
-        img.save(f'contracts/contract_{i:06d}.png')
-        
-        # Salva metadata
-        with open('contracts_metadata.csv', 'a') as f:
-            f.write(f"{i:06d},{anomaly}\n")
-```
+### 📄 Track 2: Document Fraud Detection (Livello: Avanzato)  
+**Soluzione Completa**: `Track2_Solution/track2_document_fraud_detection.py`  
+**Dataset**: Documenti SIAE sintetici (5,000) con features di computer vision
 
 **Obiettivi**:
-- Rilevare documenti alterati o falsificati
-- Identificare firme mancanti o sospette
-- Trovare inconsistenze nel layout
+- ✅ Rilevare alterazioni digitali (pixel noise anomalo)
+- ✅ Identificare firme contraffatte o mancanti
+- ✅ Trovare template fraudolenti (watermark SIAE mancanti)
+- ✅ Individuare manipolazione metadati documento
+- ✅ Rilevare inconsistenze qualità/formato
 
-**Tecniche suggerite**:
-- CNN per classificazione immagini
-- Autoencoder per ricostruzione
-- OCR + NLP per analisi testuale
+**Tecniche implementate**:
+- **Isolation Forest** ottimizzato per fraud detection (contamination=0.12)
+- **Computer Vision features**: noise level, edge sharpness, OCR confidence
+- **Metadata analysis**: consistency scoring, temporal analysis
+- **DBSCAN clustering** per pattern di frode simili
 
-### Track 4: Streaming Pattern Analysis (Livello: Intermedio)
-**Dataset**: FMA + Dataset sintetico streaming
+### 🎵 Track 3: Music Anomaly Detection (Livello: Esperto)
+**Soluzione Completa**: `Track3_Solution/track3_music.py`  
+**Dataset**: FMA reale (106K tracce) o sintetico (25K) con fallback automatico
 
 **Obiettivi**:
-- Identificare pattern di ascolto bot/artificiali
-- Rilevare playlist manipulation
-- Trovare anomalie geografiche
+- ✅ Rilevare plagio tramite similarità features audio (MFCC, tempo, chiave)
+- ✅ Identificare bot streaming (pattern like/play innaturali)
+- ✅ Trovare manipolazione metadati (date future, inconsistenze)
+- ✅ Individuare genre mismatch (features audio vs genere dichiarato)
+- ✅ Rilevare audio quality fraud (qualità vs dimensione file)
 
-**Tecniche suggerite**:
-- LOF per pattern di ascolto
-- Markov chains per sequenze
-- Analisi geospaziale
+**Tecniche implementate**:
+- **Isolation Forest** con 25+ features audio avanzate
+- **PCA** per riduzione dimensionalità e clustering
+- **FMA integration** con download automatico e fallback sintetico
+- **Advanced audio features**: spectral analysis, chroma, MFCC
+
+### 🔒 Track 4: Copyright Infringement Detection (Livello: Esperto)
+**Soluzione Completa**: `Track4_Solution/track4_copyright_infringement.py`  
+**Dataset**: Opere creative sintetiche (15,000) con clustering garantito
+
+**Obiettivi**:
+- ✅ Rilevare campionamento non autorizzato (similarità audio pattern)
+- ✅ Identificare opere derivate (modifiche minori a opere esistenti)
+- ✅ Trovare manipolazione metadati copyright (falsificazione info)
+- ✅ Individuare violazioni cross-platform (distribuzione non autorizzata)
+- ✅ Rilevare elusione Content ID (alterazioni per bypassare filtri)
+
+**Tecniche implementate**:
+- **Isolation Forest** con 40+ features multidimensionali
+- **Clustering GARANTITO** rule-based (sempre 5-8 cluster visibili)
+- **Multi-platform analysis**: engagement, revenue, fingerprinting
+- **Advanced features**: audio complexity, viral coefficient, compression analysis
+
+### 🚀 Tutte le Track includono:
+- **🔄 Esecuzione automatica** (1-3 minuti per track)
+- **📊 Visualizzazioni complete** (6 grafici per track)
+- **📋 Dataset CSV** con risultati completi
+- **📄 Submission JSON** automatica per leaderboard
+- **📈 Metriche complete**: Accuracy, Precision, Recall, F1-Score, AUC-ROC
+- **🎯 Ground truth** per valutazione oggettiva
 
 ---
 
@@ -366,19 +468,23 @@ def generate_contract_images(n_contracts=1000):
 Un team può partecipare a **uno o più track** simultaneamente:
 
 ```bash
-# Solo Track 1
+# Solo Track 1 (Live Events)
 cd Track1_Solution && python track1_anomaly_detection.py
 
-# Solo Track 2  
+# Solo Track 2 (Document Fraud)  
 cd Track2_Solution && python track2_document_fraud_detection.py
 
-# Solo Track 3
-cd Track3_Solution && python track3_music_anomaly_detection.py
+# Solo Track 3 (Music Anomaly)
+cd Track3_Solution && python track3_music.py
+
+# Solo Track 4 (Copyright Infringement)
+cd Track4_Solution && python track4_copyright_infringement.py
 
 # Tutti i track (consigliato per massimizzare opportunità)
 cd Track1_Solution && python track1_anomaly_detection.py
 cd ../Track2_Solution && python track2_document_fraud_detection.py
-cd ../Track3_Solution && python track3_music_anomaly_detection.py
+cd ../Track3_Solution && python track3_music.py
+cd ../Track4_Solution && python track4_copyright_infringement.py
 ```
 
 ### Come Funziona la Valutazione Automatica
@@ -497,6 +603,46 @@ Ogni team deve generare file JSON separati per ogni track:
 }
 ```
 
+#### Track 4: `submission_[TEAM_NAME]_track4.json`
+```json
+{
+  "team_info": {
+    "team_name": "Nome del Team",
+    "members": ["Nome1", "Nome2", "Nome3"],
+    "track": "Track4",
+    "submission_time": "2024-01-15T14:30:00Z"
+  },
+  "model_info": {
+    "algorithm": "Isolation Forest + Guaranteed Clustering",
+    "features_used": ["audio_complexity", "engagement_viral_coefficient", "revenue_per_stream"],
+    "hyperparameters": {
+      "contamination": 0.12,
+      "n_estimators": 200
+    }
+  },
+  "results": {
+    "total_works": 15000,
+    "infringements_detected": 1800,
+    "predictions": [0, 1, 0, 1, 0],
+    "infringement_scores": [-0.08, 0.91, -0.25, 0.87]
+  },
+  "metrics": {
+    "precision": 0.84,
+    "recall": 0.79,
+    "f1_score": 0.81,
+    "auc_roc": 0.88
+  },
+  "track4_specific": {
+    "violation_types_detected": 5,
+    "clusters_identified": 7,
+    "avg_engagement_viral_coefficient": 0.73,
+    "cross_platform_violations": 287,
+    "content_id_manipulations": 195,
+    "clustering_rate": 0.92
+  }
+}
+```
+
 ### Criteri di Valutazione Automatica
 
 #### Performance Tecnica (50%)
@@ -547,6 +693,7 @@ Il sistema genera **3 classifiche**:
 - **Track 1**: Classifica dedicata Live Events Anomaly Detection
 - **Track 2**: Classifica dedicata Document Fraud Detection
 - **Track 3**: Classifica dedicata Music Anomaly Detection
+- **Track 4**: Classifica dedicata Copyright Infringement Detection
 - Competizione diretta tra team dello stesso track
 
 #### 3. 📈 Detailed Performance Dashboard
