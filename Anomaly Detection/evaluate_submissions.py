@@ -20,7 +20,8 @@ class SubmissionEvaluator:
         self.submissions_dir = Path(submissions_dir)
         self.track_truth_files = {
             "Track1": "Track1_Solution/live_events_with_anomalies.csv",
-            "Track2": "Track2_Solution/documents_fraud_detection.csv"
+            "Track2": "Track2_Solution/documents_fraud_detection.csv",
+            "Track3": "Track3_Solution/music_anomaly_detection_results.csv"
         }
         self.ground_truths = {}
         self.load_all_ground_truths()
@@ -43,6 +44,11 @@ class SubmissionEvaluator:
                         ground_truth = df['is_fraudulent'].astype(int).values
                         print(f"{track} ground truth loaded: {len(ground_truth)} documents")
                         print(f"{track} true frauds: {ground_truth.sum()}")
+                    elif track == "Track3":
+                        # For Track3: is_anomaly column
+                        ground_truth = df['is_anomaly'].astype(int).values
+                        print(f"{track} ground truth loaded: {len(ground_truth)} tracks")
+                        print(f"{track} true anomalies: {ground_truth.sum()}")
                     
                     self.ground_truths[track] = ground_truth
                 else:
@@ -52,6 +58,8 @@ class SubmissionEvaluator:
                         self.ground_truths[track] = np.random.choice([0, 1], size=10000, p=[0.9, 0.1])
                     elif track == "Track2":
                         self.ground_truths[track] = np.random.choice([0, 1], size=5000, p=[0.85, 0.15])
+                    elif track == "Track3":
+                        self.ground_truths[track] = np.random.choice([0, 1], size=25000, p=[0.92, 0.08])
                     print(f"Using synthetic ground truth for {track}")
                     
             except Exception as e:
@@ -61,6 +69,8 @@ class SubmissionEvaluator:
                     self.ground_truths[track] = np.random.choice([0, 1], size=10000, p=[0.9, 0.1])
                 elif track == "Track2":
                     self.ground_truths[track] = np.random.choice([0, 1], size=5000, p=[0.85, 0.15])
+                elif track == "Track3":
+                    self.ground_truths[track] = np.random.choice([0, 1], size=25000, p=[0.92, 0.08])
     
     def validate_submission(self, submission_data):
         """Validate submission format and content"""
@@ -212,6 +222,8 @@ class SubmissionEvaluator:
             track_specific_data = {}
             if track == "Track2" and 'track2_specific' in submission_data:
                 track_specific_data = submission_data['track2_specific']
+            elif track == "Track3" and 'track3_specific' in submission_data:
+                track_specific_data = submission_data['track3_specific']
             
             return {
                 'team_name': team_info['team_name'],
@@ -325,6 +337,9 @@ class SubmissionEvaluator:
             elif track == "Track2":
                 track_title = "Track 2: Document Fraud Detection" 
                 data_type = "Documents"
+            elif track == "Track3":
+                track_title = "Track 3: Music Anomaly Detection"
+                data_type = "Tracks"
             else:
                 track_title = f"{track}: Unknown Track"
                 data_type = "Items"
@@ -363,6 +378,8 @@ class SubmissionEvaluator:
                 track_title = "Track 1: Live Events Anomaly Detection"
             elif track == "Track2":
                 track_title = "Track 2: Document Fraud Detection"
+            elif track == "Track3":
+                track_title = "Track 3: Music Anomaly Detection"
             else:
                 track_title = f"{track}: Unknown Track"
                 
@@ -383,6 +400,8 @@ class SubmissionEvaluator:
                     leaderboard_md += f"- **Anomalies Detected**: {result.get('anomalies_detected', 0)}\n\n"
                 elif track == "Track2":
                     leaderboard_md += f"- **Frauds Detected**: {result.get('anomalies_detected', 0)}\n\n"
+                elif track == "Track3":
+                    leaderboard_md += f"- **Music Anomalies Detected**: {result.get('anomalies_detected', 0)}\n\n"
                 else:
                     leaderboard_md += f"- **Issues Detected**: {result.get('anomalies_detected', 0)}\n\n"
         

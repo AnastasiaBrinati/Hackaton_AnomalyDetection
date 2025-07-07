@@ -18,10 +18,16 @@ Il sistema di valutazione SIAE supporta ora **multiple track** con leaderboard u
 - **Obiettivo**: Identificare alterazioni digitali, firme false, template non autorizzati
 - **Tecniche**: Computer Vision, OCR, CNN, Autoencoder
 
+### Track 3: Music Anomaly Detection
+- **Focus**: Rilevamento anomalie in tracce musicali con dataset FMA
+- **Dataset**: FMA (Free Music Archive) con 25,000+ tracce sintetiche
+- **Obiettivo**: Identificare plagio, bot streaming, metadata manipulation, genre mismatch
+- **Tecniche**: Advanced Feature Engineering, Isolation Forest, Music Analytics
+
 ### Track Futuri (In Preparazione)
-- **Track 3**: Streaming Pattern Analysis
 - **Track 4**: Copyright Infringement Detection
 - **Track 5**: Music Similarity Fraud
+- **Track 6**: Streaming Pattern Analysis
 
 ## 🏆 Sistema di Classifiche
 
@@ -52,9 +58,14 @@ SIAE_Hackathon/
 │   ├── track2_document_fraud_detection.py
 │   ├── requirements.txt
 │   └── README.md
+├── Track3_Solution/
+│   ├── track3_music_anomaly_detection.py
+│   ├── requirements.txt
+│   └── README.md
 ├── submissions/
 │   ├── submission_[team]_track1.json
 │   ├── submission_[team]_track2.json
+│   ├── submission_[team]_track3.json
 │   ├── submission_example.json
 │   └── submission_example_track2.json
 ├── evaluate_submissions.py    # Multi-track evaluator
@@ -75,20 +86,28 @@ python track1_anomaly_detection.py
 cd Track2_Solution
 python track2_document_fraud_detection.py
 # Genera: submissions/submission_team_track2.json
+
+# Solo Track 3
+cd Track3_Solution
+python track3_music_anomaly_detection.py
+# Genera: submissions/submission_team_track3.json
 ```
 
 ### Scelta 2: Multi-Track (Consigliata)
 ```bash
-# Team che partecipa a entrambi i track
+# Team che partecipa a tutti i track
 cd Track1_Solution
 python track1_anomaly_detection.py  # Score Track 1
 
 cd ../Track2_Solution  
 python track2_document_fraud_detection.py  # Score Track 2
 
+cd ../Track3_Solution
+python track3_music_anomaly_detection.py  # Score Track 3
+
 # La leaderboard mostrerà:
-# - Best score overall (max tra Track1 e Track2)
-# - Posizione in entrambe le classifiche separate
+# - Best score overall (max tra Track1, Track2, Track3)
+# - Posizione in tutte le classifiche separate
 ```
 
 ## 📊 Sistema di Scoring Multi-Track
@@ -111,6 +130,11 @@ Final Score = (Technical × 0.5) + (Innovation × 0.3) + (Business × 0.2)
 - **Innovation**: Computer vision features, OCR integration, layout analysis
 - **Business**: Processing speed, document type coverage
 
+#### Track 3: Music Analytics
+- **Technical**: F1-Score (music anomaly detection), AUC-ROC, Precision
+- **Innovation**: Music feature engineering, FMA integration, clustering analysis
+- **Business**: Scalability for music catalogs, genre/artist interpretability
+
 ## 🔧 Setup Multi-Track
 
 ### 1. Environment Setup
@@ -121,6 +145,10 @@ pip install -r requirements.txt
 
 # Track 2 dependencies  
 cd Track2_Solution
+pip install -r requirements.txt
+
+# Track 3 dependencies
+cd Track3_Solution
 pip install -r requirements.txt
 
 # Sistema di valutazione
@@ -175,6 +203,25 @@ python setup_auto_leaderboard.py
 }
 ```
 
+#### Track 3 (Music Anomaly)
+```json
+{
+  "team_info": {"track": "Track3"},
+  "results": {
+    "total_tracks": 25000,
+    "anomalies_detected": 2000
+  },
+  "metrics": {...},
+  "track3_specific": {
+    "genres_analyzed": 18,
+    "artists_analyzed": 2000,
+    "avg_track_duration": 240.5,
+    "avg_audio_complexity": 0.65,
+    "suspicious_clusters": 8
+  }
+}
+```
+
 ## 🎪 Strategie Multi-Track
 
 ### Team Strategy 1: Specialization
@@ -190,7 +237,7 @@ python setup_auto_leaderboard.py
 ### Team Strategy 3: Innovation Focus
 - **Focus**: Approcci creativi cross-track
 - **Vantaggio**: Premio "Most Innovative"
-- **Esempio**: Transfer learning tra Track1 e Track2
+- **Esempio**: Transfer learning tra Track1/Track3 (musica) e Track2 (documenti)
 
 ## 📈 Leaderboard Multi-Track
 
@@ -204,23 +251,24 @@ Rank | Team | Best Score | Track | Algorithm
 ```
 
 ### Track-Specific Rankings
-- **Track 1**: Competizione diretta anomaly detection
-- **Track 2**: Competizione diretta fraud detection
+- **Track 1**: Competizione diretta anomaly detection eventi live
+- **Track 2**: Competizione diretta fraud detection documenti
+- **Track 3**: Competizione diretta music anomaly detection
 - **Future Tracks**: Rankings dedicati
 
 ## 🔮 Roadmap Track Futuri
 
-### Track 3: Streaming Pattern Analysis
+### Track 4: Streaming Pattern Analysis
 - **Dataset**: Pattern di streaming + FMA
 - **Obiettivo**: Bot detection, playlist manipulation
 - **Tecniche**: Time series, graph analysis
 
-### Track 4: Copyright Infringement
+### Track 5: Copyright Infringement
 - **Dataset**: Audio fingerprints + metadata
 - **Obiettivo**: Unauthorized usage detection  
 - **Tecniche**: Audio processing, similarity matching
 
-### Track 5: Music Similarity Fraud
+### Track 6: Music Similarity Fraud
 - **Dataset**: Audio features + copyright data
 - **Obiettivo**: Plagio musicale detection
 - **Tecniche**: Deep audio analysis, feature matching

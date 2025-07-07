@@ -355,6 +355,12 @@ def generate_contract_images(n_contracts=1000):
 - **Script**: `Track2_Solution/track2_document_fraud_detection.py`
 - **Submission**: `submissions/submission_[team]_track2.json`
 
+#### Track 3: Music Anomaly Detection
+- **Focus**: Rilevamento anomalie in tracce musicali FMA
+- **Dataset**: FMA (Free Music Archive) con 25,000+ tracce
+- **Script**: `Track3_Solution/track3_music_anomaly_detection.py`
+- **Submission**: `submissions/submission_[team]_track3.json`
+
 ### 🚀 Partecipazione Multi-Track
 
 Un team può partecipare a **uno o più track** simultaneamente:
@@ -366,9 +372,13 @@ cd Track1_Solution && python track1_anomaly_detection.py
 # Solo Track 2  
 cd Track2_Solution && python track2_document_fraud_detection.py
 
-# Entrambi i track (consigliato per massimizzare opportunità)
+# Solo Track 3
+cd Track3_Solution && python track3_music_anomaly_detection.py
+
+# Tutti i track (consigliato per massimizzare opportunità)
 cd Track1_Solution && python track1_anomaly_detection.py
 cd ../Track2_Solution && python track2_document_fraud_detection.py
+cd ../Track3_Solution && python track3_music_anomaly_detection.py
 ```
 
 ### Come Funziona la Valutazione Automatica
@@ -448,6 +458,45 @@ Ogni team deve generare file JSON separati per ogni track:
 }
 ```
 
+#### Track 3: `submission_[TEAM_NAME]_track3.json`
+```json
+{
+  "team_info": {
+    "team_name": "Nome del Team",
+    "members": ["Nome1", "Nome2", "Nome3"],
+    "track": "Track3",
+    "submission_time": "2024-01-15T14:30:00Z"
+  },
+  "model_info": {
+    "algorithm": "Isolation Forest + Advanced Music Features",
+    "features_used": ["audio_complexity", "listens_vs_artist_avg", "genre_encoded"],
+    "hyperparameters": {
+      "contamination": 0.08,
+      "n_estimators": 200
+    }
+  },
+  "results": {
+    "total_tracks": 25000,
+    "anomalies_detected": 2000,
+    "predictions": [0, 1, 0, 1, 0],
+    "anomaly_scores": [-0.12, 0.95, -0.31, 0.82]
+  },
+  "metrics": {
+    "precision": 0.80,
+    "recall": 0.75,
+    "f1_score": 0.77,
+    "auc_roc": 0.85
+  },
+  "track3_specific": {
+    "genres_analyzed": 18,
+    "artists_analyzed": 2000,
+    "avg_track_duration": 240.5,
+    "avg_audio_complexity": 0.65,
+    "suspicious_clusters": 8
+  }
+}
+```
+
 ### Criteri di Valutazione Automatica
 
 #### Performance Tecnica (50%)
@@ -497,6 +546,7 @@ Il sistema genera **3 classifiche**:
 #### 2. 🎯 Track-Specific Leaderboards
 - **Track 1**: Classifica dedicata Live Events Anomaly Detection
 - **Track 2**: Classifica dedicata Document Fraud Detection
+- **Track 3**: Classifica dedicata Music Anomaly Detection
 - Competizione diretta tra team dello stesso track
 
 #### 3. 📈 Detailed Performance Dashboard
@@ -547,6 +597,12 @@ Dove:
 - Abbonamento piattaforme cloud (AWS/GCP)
 - Certificato specializzato Track 2
 
+#### 🏅 Track 3: Music Anomaly Detection
+**1° Classificato**:
+- Libri tecnici su music analytics e feature engineering
+- Abbonamento piattaforme cloud (AWS/GCP)
+- Certificato specializzato Track 3
+
 ### 🌟 Premi Speciali
 
 #### "Most Innovative Team"
@@ -567,7 +623,7 @@ Dove:
 ### 📊 Distribuzione Premi
 
 - **1 vincitore overall** (premio principale)
-- **2 vincitori track** (Track 1 + Track 2)
+- **3 vincitori track** (Track 1 + Track 2 + Track 3)
 - **3 premi speciali** (innovazione, multi-track, rising star)
 - **Certificati di partecipazione** per tutti i team validi
 

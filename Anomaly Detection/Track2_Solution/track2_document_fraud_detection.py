@@ -323,7 +323,7 @@ def create_fraud_visualizations(df):
     plt.savefig('document_fraud_detection_results.png', dpi=300, bbox_inches='tight')
     plt.show()
 
-def generate_submission_track2(df, iso_forest, feature_cols, team_name="YourTeam", members=["Member1", "Member2"]):
+def generate_submission_track2(df, iso_forest, feature_cols, team_name="me&Giorgio", members=["Mirko", "Giorgio"]):
     """Genera il file di submission per Track 2"""
     print(f"\nGenerando file di submission Track 2 per {team_name}...")
     

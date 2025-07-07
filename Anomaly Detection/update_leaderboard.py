@@ -68,7 +68,13 @@ def main():
     print("=" * 60)
     
     # Check if we're in a git repository
-    if not Path('.git').exists():
+    try:
+        result = subprocess.run(['git', 'rev-parse', '--git-dir'], 
+                              capture_output=True, text=True)
+        if result.returncode != 0:
+            print("❌ Not in a git repository. Please run from project root.")
+            return
+    except Exception:
         print("❌ Not in a git repository. Please run from project root.")
         return
     
