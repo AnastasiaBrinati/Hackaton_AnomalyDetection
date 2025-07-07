@@ -1,0 +1,59 @@
+{
+  "team_info": {
+    "team_name": "TeamCopyright",
+    "members": ["Alice Smith", "Bob Johnson", "Charlie Brown"],
+    "track": "Track4",
+    "submission_date": "2024-12-28T10:30:00"
+  },
+  "model_info": {
+    "algorithm": "Isolation Forest + GUARANTEED Clustering",
+    "features_used": [
+      "duration_seconds", "tempo", "spectral_centroid", "mfcc_1", "mfcc_2",
+      "play_count", "like_count", "share_count", "revenue_generated",
+      "compression_ratio", "engagement_rate", "viral_coefficient",
+      "monetization_efficiency", "audio_complexity", "tonal_stability",
+      "multi_platform_score", "work_type_encoded", "genre_encoded", "platform_encoded"
+    ],
+    "clustering_method": "Rule-based guaranteed clustering",
+    "clustering_guaranteed": true
+  },
+  "results": {
+    "predictions_sample": [0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
+    "total_predictions": 15000,
+    "predicted_infringements": 1200,
+    "infringement_rate": 0.08
+  },
+  "metrics": {
+    "precision": 0.892,
+    "recall": 0.834,
+    "f1_score": 0.862,
+    "accuracy": 0.925,
+    "auc_roc": 0.888
+  },
+  "anomaly_breakdown": {
+    "unauthorized_sampling": 630,
+    "derivative_work": 270,
+    "metadata_manipulation": 200,
+    "cross_platform_violation": 100
+  },
+  "track4_specific": {
+    "copyright_types_detected": [
+      "unauthorized_sampling",
+      "derivative_work",
+      "metadata_manipulation", 
+      "cross_platform_violation"
+    ],
+    "clustering_results": {
+      "n_clusters": 7,
+      "clustered_violations": 1150
+    },
+    "clustering_guaranteed": true,
+    "platform_analysis": {
+      "YouTube": 420,
+      "Spotify": 280,
+      "SoundCloud": 200,
+      "TikTok": 180,
+      "Apple_Music": 120
+    }
+  }
+} 

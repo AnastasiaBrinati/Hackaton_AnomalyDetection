@@ -663,8 +663,8 @@ def main():
             print(f"  - {atype}: {count} tracce")
     
     # 8. Genera submission
-    team_name = "YourTeam"  # CAMBIA QUI
-    members = ["Member1", "Member2", "Member3"]  # CAMBIA QUI
+    team_name = "Me&Giorgio"  # CAMBIA QUI
+    members = ["Mirko", "Giorgio", "Manuel"]  # CAMBIA QUI
     
     submission_file, submission_data = generate_submission_track3(
         df, iso_forest, feature_cols, team_name, members
