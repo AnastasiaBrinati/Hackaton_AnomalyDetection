@@ -20,6 +20,38 @@
 
 ---
 
+## 🎯 In cosa consiste l'Hackathon
+
+### 🎪 Obiettivo Principale
+Sviluppare **sistemi di anomaly detection** per identificare comportamenti sospetti nei diritti d'autore musicali. I partecipanti devono creare algoritmi che rilevano automaticamente frodi, utilizzi anomali e pattern irregolari nei dati SIAE.
+
+### 🏆 Come Funziona
+1. **Scegli una Track** (o partecipa a multiple track)
+2. **Esegui lo script** per generare dataset e modello di esempio
+3. **Personalizza l'algoritmo** per migliorare le performance
+4. **Submetti i risultati** attraverso file JSON automatici
+5. **Compete nella leaderboard** in tempo reale
+
+### 📊 Cosa Devi Calcolare
+Per ogni track devi implementare un modello che:
+- **Identifica anomalie** nei dati (binary classification: normale/anomalo)
+- **Calcola metriche** di performance: F1-Score, Precision, Recall, AUC-ROC
+- **Genera predizioni** su dataset di test
+- **Produce visualization** dei risultati
+
+### 📤 Come Submittare
+1. **Modifica** il `team_name` e `members` nel codice
+2. **Esegui** lo script della track scelta
+3. **Verifica** che venga generato il file `submissions/submission_[team]_[track].json`
+4. **Commit e push** - la leaderboard si aggiorna automaticamente!
+
+### 🥇 Vincere l'Hackathon
+- **Overall Winner**: Miglior score tra tutte le track
+- **Track Winner**: Miglior score per singola track
+- **Innovation Award**: Approccio più creativo
+
+---
+
 ## 🚀 Quick Start Guide
 
 ### 📥 Setup Rapido (5 minuti)
@@ -280,6 +312,249 @@ except:
     print('❌ FMA non disponibile - useremo dataset sintetico')
 "
 ```
+
+---
+
+## 📤 Guida Completa alla Submission
+
+### 🎯 Passo 1: Preparazione del Team
+
+**Prima di iniziare**:
+1. **Forma il team** (massimo 4 persone)
+2. **Scegli un nome team** (es: "DataDetectives", "AnomalyHunters")
+3. **Decide la strategia**: una track o multi-track?
+
+### 🚀 Passo 2: Esegui e Personalizza
+
+Per ogni track che vuoi affrontare:
+
+```bash
+# Track 1: Live Events
+cd Track1_Solution
+# IMPORTANTE: Modifica questi parametri nel file prima di eseguire
+# team_name = "Il Tuo Nome Team"
+# members = ["Nome1", "Nome2", "Nome3"]
+python track1_anomaly_detection.py
+
+# Track 2: Document Fraud
+cd Track2_Solution
+# IMPORTANTE: Modifica team_name e members
+python track2_document_fraud_detection.py
+
+# Track 3: Music Anomaly
+cd Track3_Solution
+# IMPORTANTE: Modifica team_name e members
+python track3_music.py
+
+# Track 4: Copyright Infringement
+cd Track4_Solution
+# IMPORTANTE: Modifica team_name e members
+python track4_copyright_infringement.py
+```
+
+### 📊 Passo 3: Verifica i Risultati
+
+Ogni script genera automaticamente:
+- **📋 Dataset CSV** con risultati completi
+- **📄 File JSON** per submission nella cartella `submissions/`
+- **📈 Grafici** di visualizzazione (salvati come PNG)
+- **📊 Metriche** stampate a console
+
+**Verifica che sia stato creato**:
+```bash
+# Controlla che i file siano stati generati
+ls submissions/submission_*
+# Dovresti vedere file come:
+# submission_il_tuo_team_track1.json
+# submission_il_tuo_team_track2.json
+# etc.
+```
+
+### 🔧 Passo 4: Personalizza l'Algoritmo (Opzionale)
+
+**Per migliorare il tuo score**:
+1. **Modifica i parametri** dell'Isolation Forest:
+   ```python
+   iso_forest = IsolationForest(
+       contamination=0.08,  # Prova 0.05-0.15
+       n_estimators=200,    # Prova 100-500
+       random_state=42
+   )
+   ```
+
+2. **Aggiungi nuove features**:
+   ```python
+   # Esempio per Track 1
+   df['custom_feature'] = df['attendance'] / df['capacity']
+   df['revenue_efficiency'] = df['total_revenue'] / df['attendance']
+   ```
+
+3. **Cambia l'algoritmo**:
+   ```python
+   # Prova altri algoritmi
+   from sklearn.ensemble import RandomForestClassifier
+   from sklearn.svm import OneClassSVM
+   ```
+
+### 📤 Passo 5: Submission Finale
+
+**Commit i tuoi risultati**:
+```bash
+# Aggiungi i file di submission
+git add submissions/submission_il_tuo_team_*.json
+
+# Commit con messaggio descrittivo
+git commit -m "Il Tuo Team - Submission Track 1,2,3,4"
+
+# Push per aggiornare la leaderboard
+git push origin main
+```
+
+**🎉 FATTO!** La leaderboard si aggiorna automaticamente in pochi secondi.
+
+### 🏆 Passo 6: Monitora la Leaderboard
+
+**Controlla la tua posizione**:
+- Apri `leaderboard.md` per vedere le classifiche
+- La leaderboard mostra:
+  - **Overall Ranking** (tutti i team)
+  - **Track-specific Rankings**
+  - **Detailed Scores** con breakdown
+
+### 📋 Cosa Viene Valutato
+
+**Il sistema calcola automaticamente**:
+
+#### 📊 Technical Score (50%)
+- **F1-Score** (25%): Quanto bene rilevi le anomalie
+- **AUC-ROC** (15%): Robustezza del modello
+- **Precision** (10%): Accuratezza delle tue predizioni
+
+#### 🧠 Innovation Score (30%)
+- **Numero Features** (10%): Varietà di features utilizzate
+- **Complessità Algoritmo** (10%): Uso di tecniche avanzate
+- **Feature Engineering** (10%): Features creative/derivate
+
+#### 💼 Business Score (20%)
+- **Performance** (10%): Velocità di esecuzione
+- **Interpretabilità** (10%): Capacità di spiegare le anomalie
+
+### 🔄 Regole di Submission
+
+- **Maximum 5 submission** per team per giorno
+- **L'ultima submission** conta per la valutazione finale
+- **File size limit**: 50MB per submission
+- **Formato obbligatorio**: JSON come negli esempi
+
+### 🎯 Strategia Vincente
+
+1. **Multi-track approach**: Partecipa a più track per massimizzare le opportunità
+2. **Inizia semplice**: Usa la baseline e poi migliora
+3. **Focus su F1-Score**: È il 25% del punteggio totale
+4. **Feature engineering**: Crea features creative per l'innovation score
+5. **Iterazione rapida**: Fai submission frequenti per testare miglioramenti
+
+### 🚨 Troubleshooting
+
+**Errore: "Missing required field"**
+- Controlla che il JSON contenga tutti i campi richiesti
+- Verifica che `team_name` e `members` siano stati modificati
+
+**Errore: "Invalid JSON format"**
+- Testa il JSON: `python -m json.tool submissions/submission_tuo_team.json`
+
+**Submission non appare in leaderboard**
+- Verifica che il file sia stato committato
+- Controlla il nome file: deve essere `submission_[team]_[track].json`
+- Assicurati che il campo `track` sia corretto ("Track1", "Track2", etc.)
+
+### 📈 Parametri Specifici da Calcolare per Track
+
+#### 🎪 Track 1: Live Events Anomaly Detection
+**Devi calcolare**:
+- **Predizioni binarie**: 0 (normale) o 1 (anomalo) per ogni evento
+- **Anomaly scores**: Punteggio di anomalia (-1 a +1)
+- **Metriche**: Precision, Recall, F1-Score, AUC-ROC
+- **Contatori**: Total events, anomalies detected
+
+**Anomalie da rilevare**:
+- Eventi con attendance > capacity
+- Revenue/attendance ratio anomalo
+- Dichiarazioni duplicate (stesso venue+data)
+- Numero eccessivo di brani (>40)
+- Timing sospetti (eventi notturni 2-6 AM)
+
+#### 📄 Track 2: Document Fraud Detection
+**Devi calcolare**:
+- **Predizioni binarie**: 0 (autentico) o 1 (fraudolento) per ogni documento
+- **Fraud scores**: Punteggio di frode (-1 a +1)
+- **Metriche**: Precision, Recall, F1-Score, AUC-ROC
+- **Contatori**: Total documents, frauds detected
+
+**Frodi da rilevare**:
+- Alterazioni digitali (noise anomalo)
+- Firme contraffatte/mancanti
+- Template fraudolenti (watermark SIAE mancanti)
+- Manipolazione metadati
+- Inconsistenze qualità/formato
+
+#### 🎵 Track 3: Music Anomaly Detection
+**Devi calcolare**:
+- **Predizioni binarie**: 0 (normale) o 1 (anomalo) per ogni traccia
+- **Anomaly scores**: Punteggio di anomalia (-1 a +1)
+- **Metriche**: Precision, Recall, F1-Score, AUC-ROC
+- **Contatori**: Total tracks, anomalies detected
+
+**Anomalie da rilevare**:
+- Plagio (similarità elevata tra tracce)
+- Bot streaming (like/play ratio innaturale)
+- Manipolazione metadati (date future/inconsistenti)
+- Genre mismatch (audio features vs genere)
+- Audio quality fraud (qualità vs dimensione)
+
+#### 🔒 Track 4: Copyright Infringement Detection
+**Devi calcolare**:
+- **Predizioni binarie**: 0 (legale) o 1 (violazione) per ogni opera
+- **Infringement scores**: Punteggio di violazione (-1 a +1)
+- **Metriche**: Precision, Recall, F1-Score, AUC-ROC
+- **Contatori**: Total works, infringements detected
+
+**Violazioni da rilevare**:
+- Campionamento non autorizzato
+- Opere derivate non autorizzate
+- Manipolazione metadati copyright
+- Violazioni cross-platform
+- Elusione Content ID
+
+### 🎯 Riassunto: Come Partecipare in 5 Passi
+
+1. **📝 Prepara il Team**: Scegli nome e membri (max 4 persone)
+
+2. **🚀 Esegui gli Script**: 
+   ```bash
+   cd Track1_Solution && python track1_anomaly_detection.py
+   # Modifica prima team_name e members nel file!
+   ```
+
+3. **📊 Verifica i Risultati**: 
+   ```bash
+   ls submissions/submission_*
+   # Controlla che i file JSON siano stati generati
+   ```
+
+4. **📤 Fai la Submission**: 
+   ```bash
+   git add submissions/submission_tuo_team_*.json
+   git commit -m "Team Submission"
+   git push origin main
+   ```
+
+5. **🏆 Monitora la Leaderboard**: 
+   ```bash
+   # Apri leaderboard.md per vedere la tua posizione
+   ```
+
+**🎉 È tutto! La leaderboard si aggiorna automaticamente e puoi competere su 4 track diverse!**
 
 ---
 
@@ -703,7 +978,6 @@ Il sistema genera **3 classifiche**:
 
 La leaderboard è disponibile in tempo reale su:
 - **File**: `leaderboard.md` (aggiornato automaticamente)
-- **Multi-Track**: `leaderboard_multi_track.md` (formato esteso)
 - **Dashboard**: Visualizzazione interattiva dei risultati
 - **Metriche**: Ranking basato su score composito per track
 

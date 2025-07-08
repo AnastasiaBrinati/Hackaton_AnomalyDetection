@@ -390,7 +390,7 @@ def create_visualizations(df):
     print(f"✅ Visualizzazioni salvate. Cluster: {clustering_stats}")
     return clustering_stats
 
-def generate_submission(df, iso_forest, feature_cols, team_name="YourTeam", members=["Member1", "Member2"]):
+def generate_submission(df, iso_forest, feature_cols, team_name="Me&Giorgio", members=["Mirko", "Giorgio"]):
     """Genera submission con statistiche cluster"""
     print("📄 Generazione submission...")
     
