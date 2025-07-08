@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard di Studio MLOps: Testing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chatbot-container {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="flex h-screen">
+        <!-- Sidebar di navigazione -->
+        <aside class="w-64 bg-white shadow-md flex-shrink-0">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-gray-900">MLOps: Testing</h1>
+                <p class="text-sm text-gray-500 mt-1">Il tuo percorso di studio</p>
+            </div>
+            <nav class="mt-6">
+                <a href="#introduzione" class="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+                    <i class="fas fa-play-circle w-6"></i>
+                    <span class="mx-4 font-medium">Introduzione</span>
+                </a>
+                <a href="#perche-testare" class="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+                    <i class="fas fa-lightbulb w-6"></i>
+                    <span class="mx-4 font-medium">Perché Testare</span>
+                </a>
+                <a href="#tipologie" class="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+                    <i class="fas fa-sitemap w-6"></i>
+                    <span class="mx-4 font-medium">Tipologie di Test</span>
+                </a>
+                <a href="#strategia" class="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+                    <i class="fas fa-route w-6"></i>
+                    <span class="mx-4 font-medium">Strategia di Testing</span>
+                </a>
+                <a href="#cicd" class="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+                    <i class="fas fa-cogs w-6"></i>
+                    <span class="mx-4 font-medium">CI/CD per ML</span>
+                </a>
+                <a href="#monitoraggio" class="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+                    <i class="fas fa-chart-line w-6"></i>
+                    <span class="mx-4 font-medium">Monitoraggio</span>
+                </a>
+                 <a href="#concetti-chiave" class="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-200">
+                    <i class="fas fa-key w-6"></i>
+                    <span class="mx-4 font-medium">Concetti Chiave</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Contenuto principale -->
+        <main class="flex-1 overflow-y-auto p-8 md:p-12">
+            <div id="introduzione" class="mb-12">
+                <h2 class="text-3xl font-bold mb-4">Introduzione al Testing in MLOps</h2>
+                <p class="text-lg text-gray-600">Benvenuto nella tua dashboard di studio personalizzata. Questa risorsa è progettata per guidarti attraverso i concetti fondamentali del testing nel ciclo di vita del Machine Learning (MLOps). Il testing non è solo una fase, ma una pratica continua essenziale per garantire l'affidabilità, la robustezza e l'equità dei sistemi di ML in produzione. Esploreremo perché è cruciale, quali tipi di test esistono e come integrarli in una strategia completa.</p>
+            </div>
+
+            <div id="perche-testare" class="mb-12 scroll-mt-20">
+                <h2 class="text-3xl font-bold mb-6">Perché il Testing è Cruciale in MLOps?</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="font-bold text-xl mb-2">Sfide Silenziose dei Sistemi ML</h3>
+                        <p>A differenza del software tradizionale, i modelli di ML possono fallire silenziosamente. Il codice potrebbe funzionare perfettamente, ma i risultati possono diventare inaffidabili a causa di cambiamenti nei dati. Il testing aiuta a smascherare questi problemi nascosti.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="font-bold text-xl mb-2">Data Drift (Deriva dei Dati)</h3>
+                        <p>I dati del mondo reale cambiano costantemente. Il Data Drift si verifica quando la distribuzione dei dati di produzione si allontana da quella dei dati di addestramento, rendendo il modello meno accurato. I test continui sui dati sono l'unica difesa.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="font-bold text-xl mb-2">Model Decay (Decadimento del Modello)</h3>
+                        <p>Con il tempo, le performance di un modello "invecchiano" e decadono naturalmente. Il monitoraggio e i test periodici permettono di identificare quando un modello necessita di un riaddestramento per rimanere efficace.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="font-bold text-xl mb-2">Bias Amplification (Amplificazione dei Bias)</h3>
+                        <p>I modelli possono non solo replicare, ma anche amplificare i bias presenti nei dati di addestramento, portando a decisioni ingiuste o discriminatorie. I test di fairness sono essenziali per costruire sistemi equi e responsabili.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tipologie" class="mb-12 scroll-mt-20">
+                <h2 class="text-3xl font-bold mb-6">Tipologie di Test in MLOps</h2>
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <p class="mb-6">Nel contesto MLOps, i test si dividono principalmente in due macro-categorie, che si aggiungono ai tradizionali test sul codice.</p>
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <div class="flex-1">
+                            <h4 class="text-2xl font-semibold mb-3 text-blue-600">Data Testing (Test sui Dati)</h4>
+                            <p>I dati sono il cuore del ML. Questo tipo di test valida la qualità, coerenza e integrità dei dati. Include controlli su:</p>
+                            <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li><strong>Schema e Formato:</strong> I dati hanno la struttura e i tipi corretti?</li>
+                                <li><strong>Completezza:</strong> Ci sono valori mancanti o nulli inaspettati?</li>
+                                <li><strong>Plausibilità Statistica:</strong> I valori rientrano in range accettabili? Le distribuzioni sono stabili?</li>
+                                <li><strong>Data Drift:</strong> I nuovi dati sono simili a quelli di addestramento?</li>
+                            </ul>
+                        </div>
+                        <div class="flex-1">
+                             <h4 class="text-2xl font-semibold mb-3 text-green-600">Model Testing (Test sul Modello)</h4>
+                            <p>Questi test si concentrano sulla validazione delle performance e del comportamento del modello. Vanno oltre la semplice accuratezza e includono:</p>
+                             <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li><strong>Performance:</strong> Metriche come accuratezza, precisione, recall su set di validazione.</li>
+                                <li><strong>Robustezza:</strong> Come si comporta il modello con dati rumorosi o anomali (outlier)?</li>
+                                <li><strong>Stabilità:</strong> I risultati sono consistenti a fronte di piccole variazioni?</li>
+                                <li><strong>Fairness:</strong> Il modello performa equamente su diversi sottogruppi di dati?</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="strategia" class="mb-12 scroll-mt-20">
+                <h2 class="text-3xl font-bold mb-6">Strategia di Testing nell'ML Pipeline</h2>
+                <p class="text-lg mb-6">Un testing efficace non è un singolo evento, ma una strategia integrata lungo tutta la pipeline di Machine Learning. I controlli devono essere inseriti in ogni fase critica.</p>
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <div class="relative border-l-4 border-blue-500 pl-8 space-y-10">
+                        <!-- Step 1 -->
+                        <div class="relative">
+                            <div class="absolute -left-10 h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">1</div>
+                            <h4 class="font-bold text-xl">Validazione Dati Grezzi</h4>
+                            <p class="text-gray-600">All'inizio della pipeline. Si eseguono test di qualità sui dati in ingresso per prevenire che dati errati "inquinino" le fasi successive.</p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="relative">
+                            <div class="absolute -left-10 h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">2</div>
+                            <h4 class="font-bold text-xl">Test sul Preprocessing</h4>
+                            <p class="text-gray-600">Si includono test unitari sulle funzioni di trasformazione e feature engineering per garantire che funzionino come previsto in tutti i casi.</p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="relative">
+                            <div class="absolute -left-10 h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">3</div>
+                            <h4 class="font-bold text-xl">Validazione Modello Addestrato</h4>
+                            <p class="text-gray-600">Dopo il training, si esegue una suite completa di test sul modello (performance, robustezza, fairness) per decidere se è idoneo alla produzione.</p>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="relative">
+                            <div class="absolute -left-10 h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">4</div>
+                            <h4 class="font-bold text-xl">Test di Integrazione</h4>
+                            <p class="text-gray-600">Prima del deployment, si eseguono test end-to-end in un ambiente di staging per verificare che tutti i componenti della pipeline interagiscano correttamente.</p>
+                        </div>
+                        <!-- Step 5 -->
+                        <div class="relative">
+                            <div class="absolute -left-10 h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">5</div>
+                            <h4 class="font-bold text-xl">Monitoraggio Post-Deployment</h4>
+                            <p class="text-gray-600">Dopo il rilascio, il testing continua sotto forma di monitoraggio costante per rilevare drift, decadimento delle performance e anomalie in tempo reale.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cicd" class="mb-12 scroll-mt-20">
+                <h2 class="text-3xl font-bold mb-6">CI/CD: Integrazione e Deployment Continui per ML</h2>
+                 <div class="bg-white p-8 rounded-lg shadow">
+                    <p class="mb-6">L'automazione tramite CI/CD (Continuous Integration/Continuous Deployment) è fondamentale per applicare una strategia di testing in modo scalabile e ripetibile.</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-2xl font-semibold mb-3">CI per ML</h4>
+                            <p>La Continuous Integration in MLOps non riguarda solo il codice. Ad ogni modifica (di codice, dati o configurazione), una pipeline automatica dovrebbe:</p>
+                            <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li>Eseguire i test sui dati.</li>
+                                <li>(Ri)addestrare il modello.</li>
+                                <li>Eseguire i test sul modello.</li>
+                                <li>Creare un pacchetto del modello se i test passano.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-2xl font-semibold mb-3">CD per ML</h4>
+                            <p>La Continuous Deployment automatizza il rilascio del modello in produzione dopo che ha superato tutti i test. Le strategie comuni includono:</p>
+                             <ul class="list-disc list-inside mt-4 space-y-2">
+                                <li><strong>Blue-Green Deployment:</strong> Si rilascia la nuova versione a fianco della vecchia e si sposta il traffico solo quando è sicura.</li>
+                                <li><strong>Canary Release:</strong> Si rilascia il nuovo modello solo a una piccola percentuale di utenti per monitorarne il comportamento prima del rilascio completo.</li>
+                             </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-gray-800 text-white p-4 rounded-lg">
+                        <pre><code class="language-yaml"># Esempio di pipeline CI/CD (GitHub Actions)
+jobs:
+  validate_data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run data quality tests
+        run: python tests/validate_data.py
+
+  train_and_test_model:
+    needs: validate_data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Train model
+        run: python src/train.py
+      - name: Run model performance tests
+        run: python tests/evaluate_model.py
+
+  deploy_to_staging:
+    needs: train_and_test_model
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to staging environment
+        run: ./deploy.sh staging</code></pre>
+                    </div>
+                 </div>
+            </div>
+
+            <div id="monitoraggio" class="mb-12 scroll-mt-20">
+                <h2 class="text-3xl font-bold mb-6">Monitoraggio Continuo dei Sistemi ML</h2>
+                <p class="text-lg mb-6">Il monitoraggio è "testing in produzione". È un processo attivo per garantire che il sistema ML rimanga affidabile nel tempo.</p>
+                <div class="bg-white p-8 rounded-lg shadow grid md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-2">Monitoraggio Infrastruttura</h4>
+                        <p>Controllo delle risorse hardware: utilizzo di CPU/GPU, memoria, latenza del servizio. Simile alle applicazioni software tradizionali.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-2">Monitoraggio Qualità Dati</h4>
+                        <p>Tracciamento delle statistiche dei dati di input per rilevare il Data Drift. Si monitorano distribuzioni, valori nulli, e cambiamenti di schema.</p>
+                    </div>
+                     <div>
+                        <h4 class="text-xl font-semibold mb-2">Monitoraggio Performance Modello</h4>
+                        <p>Verifica continua dell'efficacia del modello. Poiché le etichette reali (ground truth) possono mancare, si usano spesso proxy come la distribuzione delle predizioni o il feedback degli utenti.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="concetti-chiave" class="scroll-mt-20">
+                <h2 class="text-3xl font-bold mb-6">Concetti Chiave da Ricordare</h2>
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <p><strong class="text-indigo-600">Data Drift:</strong> Cambiamento nella distribuzione statistica dei dati di produzione rispetto ai dati di addestramento.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <p><strong class="text-indigo-600">Model Decay:</strong> Degrado naturale delle performance di un modello nel tempo.</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <p><strong class="text-indigo-600">Test di Fairness:</strong> Test per verificare che un modello non produca risultati discriminatori verso specifici sottogruppi di popolazione.</p>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <p><strong class="text-indigo-600">CI/CD Pipeline:</strong> Un flusso di lavoro automatizzato che costruisce, testa e rilascia software (o modelli ML) in modo continuo e affidabile.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Chatbot -->
+    <div id="chatbot-container" class="chatbot-container fixed bottom-5 right-5">
+        <div id="chatbot-window" class="w-96 h-[32rem] bg-white rounded-lg shadow-xl flex flex-col hidden">
+            <div class="bg-gray-800 text-white p-4 rounded-t-lg flex justify-between items-center">
+                <h3 class="font-bold">MLOps Chatbot</h3>
+                <button id="close-chatbot" class="text-white">&times;</button>
+            </div>
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto">
+                <!-- Messaggi del chat -->
+                 <div class="mb-4">
+                    <p class="bg-gray-200 text-gray-800 rounded-lg p-2 inline-block">Ciao! Sono qui per aiutarti. Fammi una domanda sul testing in MLOps.</p>
+                </div>
+            </div>
+            <div class="p-4 border-t">
+                <div class="flex">
+                    <input type="text" id="chat-input" placeholder="Scrivi la tua domanda..." class="flex-1 border rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="chat-send" class="bg-blue-500 text-white px-4 rounded-r-lg hover:bg-blue-600">Invia</button>
+                </div>
+            </div>
+        </div>
+        <button id="open-chatbot" class="bg-gray-800 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-gray-700">
+            <i class="fas fa-robot fa-2x"></i>
+        </button>
+    </div>
+
+    <script>
+        // Gestione apertura/chiusura chatbot
+        const chatbotContainer = document.getElementById('chatbot-container');
+        const openChatbotBtn = document.getElementById('open-chatbot');
+        const closeChatbotBtn = document.getElementById('close-chatbot');
+        const chatbotWindow = document.getElementById('chatbot-window');
+
+        openChatbotBtn.addEventListener('click', () => {
+            chatbotWindow.classList.remove('hidden');
+            openChatbotBtn.classList.add('hidden');
+        });
+
+        closeChatbotBtn.addEventListener('click', () => {
+            chatbotWindow.classList.add('hidden');
+            openChatbotBtn.classList.remove('hidden');
+        });
+
+        // Logica del chatbot
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send');
+        const chatMessages = document.getElementById('chat-messages');
+
+        const qaPairs = {
+            "cos'è il data drift": "Il Data Drift è il cambiamento nella distribuzione statistica dei dati di produzione rispetto ai dati usati per l'addestramento del modello. È un problema perché il modello potrebbe diventare meno accurato.",
+            "perché il testing è importante": "Il testing in MLOps è cruciale per garantire che i modelli di Machine Learning siano affidabili, robusti ed equi in produzione. Aiuta a rilevare problemi 'silenziose' come il data drift e il model decay.",
+            "tipi di test": "I test principali sono: Data Testing (verifica la qualità dei dati) e Model Testing (verifica le performance, la robustezza e la fairness del modello).",
+            "cos'è il model decay": "Il Model Decay (o decadimento del modello) è la perdita di performance di un modello nel tempo, man mano che la realtà si allontana dai dati su cui è stato addestrato.",
+            "cos'è ci/cd": "CI/CD sta per Continuous Integration e Continuous Deployment. È un insieme di pratiche per automatizzare le fasi di test e rilascio del software (e dei modelli ML), rendendo il processo più veloce e affidabile.",
+            "differenza tra data testing e model testing": "Il Data Testing si concentra sui dati in input (qualità, formato, distribuzione), mentre il Model Testing si concentra sull'output e sul comportamento del modello (accuratezza, robustezza, fairness).",
+            "come si monitora un modello": "Un modello si monitora controllando tre aree principali: l'infrastruttura (CPU, memoria), la qualità dei dati in input (per il drift) e le performance del modello stesso (accuratezza, distribuzione delle predizioni).",
+            "ciao": "Ciao! Come posso aiutarti a studiare il testing in MLOps?",
+            "grazie": "Prego! Se hai altre domande, non esitare a chiedere."
+        };
+
+        const getBotResponse = (userInput) => {
+            const lowerCaseInput = userInput.toLowerCase();
+            for (const key in qaPairs) {
+                if (lowerCaseInput.includes(key)) {
+                    return qaPairs[key];
+                }
+            }
+            return "Non sono sicuro di aver capito. Prova a riformulare la domanda. Puoi chiedermi ad esempio: 'Cos'è il data drift?' o 'Perché il testing è importante?'.";
+        }
+
+        const sendMessage = () => {
+            const userInput = chatInput.value.trim();
+            if (userInput === '') return;
+
+            // Aggiungi messaggio utente
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.classList.add('mb-4', 'text-right');
+            userMessageDiv.innerHTML = `<p class="bg-blue-500 text-white rounded-lg p-2 inline-block">${userInput}</p>`;
+            chatMessages.appendChild(userMessageDiv);
+
+            // Pulisci input
+            chatInput.value = '';
+
+            // Simula risposta del bot
+            setTimeout(() => {
+                const botResponse = getBotResponse(userInput);
+                const botMessageDiv = document.createElement('div');
+                botMessageDiv.classList.add('mb-4');
+                botMessageDiv.innerHTML = `<p class="bg-gray-200 text-gray-800 rounded-lg p-2 inline-block">${botResponse}</p>`;
+                chatMessages.appendChild(botMessageDiv);
+
+                // Scrolla fino all'ultimo messaggio
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 500);
+
+             // Scrolla fino all'ultimo messaggio
+             chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Smooth scrolling per i link della sidebar
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
