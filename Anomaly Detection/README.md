@@ -64,12 +64,30 @@ cd "Anomaly Detection"
 # 2. Installa dipendenze base (opzionale per vedere esempi)
 pip install pandas numpy matplotlib seaborn scikit-learn
 
-# 3. Esegui una track di esempio
+# 3. IMPORTANTE: Genera i dataset identici per tutti
+python generate_datasets.py
+
+# 4. Esegui una track di esempio
 cd Track1_Solution
 python track1_anomaly_detection.py
 ```
 
-### 📊 Dati per Track - Come Ottenerli
+### 📊 Dataset Identici per Tutti i Partecipanti
+
+**🎯 IMPORTANTE**: Per garantire performance comparabili, tutti i partecipanti devono usare gli stessi dataset.
+
+#### 🚀 **Generazione Dataset Centralizzata**
+
+```bash
+# PASSO OBBLIGATORIO: Genera i dataset identici per tutti
+python generate_datasets.py
+
+# Questo comando crea:
+# - datasets/track1_live_events.csv (50,000 eventi)
+# - datasets/track2_documents.csv (5,000 documenti)  
+# - datasets/track3_music.csv (25,000 tracce)
+# - datasets/track4_copyright.csv (15,000 opere)
+```
 
 #### 🎪 **Track 1: Live Events Anomaly Detection**
 ![Isolation Forest](https://img.shields.io/badge/Algorithm-Isolation%20Forest-orange.svg)
@@ -78,10 +96,10 @@ python track1_anomaly_detection.py
 ![Execution Time](https://img.shields.io/badge/Runtime-2%20min-red.svg)
 
 ```bash
-cd Track1_Solution
-python track1_anomaly_detection.py
-# ✅ Dataset sintetico generato automaticamente (50,000 eventi)
-# ✅ Include metadati FMA (scaricati automaticamente o generati)
+# Usa il dataset generato centralmente
+df = pd.read_csv('datasets/track1_live_events.csv')
+# ✅ 50,000 eventi live identici per tutti
+# ✅ 5 tipi di anomalie: duplicate_declaration, impossible_attendance, revenue_mismatch, excessive_songs, suspicious_timing
 # ⏱️ Tempo esecuzione: ~2 minuti
 ```
 
@@ -92,10 +110,10 @@ python track1_anomaly_detection.py
 ![Execution Time](https://img.shields.io/badge/Runtime-1%20min-red.svg)
 
 ```bash
-cd Track2_Solution
-python track2_document_fraud_detection.py
-# ✅ Dataset documenti sintetici generato automaticamente (5,000 documenti)
-# ✅ Simula contratti, licenze, dichiarazioni SIAE
+# Usa il dataset generato centralmente
+df = pd.read_csv('datasets/track2_documents.csv')
+# ✅ 5,000 documenti SIAE identici per tutti
+# ✅ 5 tipi di frodi: digital_alteration, signature_forgery, template_fraud, metadata_manipulation, quality_inconsistency
 # ⏱️ Tempo esecuzione: ~1 minuto
 ```
 
@@ -106,10 +124,10 @@ python track2_document_fraud_detection.py
 ![Execution Time](https://img.shields.io/badge/Runtime-3%20min-red.svg)
 
 ```bash
-cd Track3_Solution
-python track3_music.py
-# ✅ Dataset FMA scaricato automaticamente (342MB) o generato sintetico
-# ✅ 25,000+ tracce musicali con metadati
+# Usa il dataset generato centralmente
+df = pd.read_csv('datasets/track3_music.csv')
+# ✅ 25,000 tracce musicali identiche per tutti
+# ✅ 5 tipi di anomalie: plagio_similarity, bot_streaming, metadata_manipulation, genre_mismatch, audio_quality_fraud
 # ⏱️ Tempo esecuzione: ~3 minuti
 ```
 
@@ -120,10 +138,10 @@ python track3_music.py
 ![Execution Time](https://img.shields.io/badge/Runtime-2%20min-red.svg)
 
 ```bash
-cd Track4_Solution
-python track4_copyright_infringement.py
-# ✅ Dataset opere creative sintetiche generato automaticamente (15,000 opere)
-# ✅ Include 5 tipi di violazioni copyright
+# Usa il dataset generato centralmente
+df = pd.read_csv('datasets/track4_copyright.csv')
+# ✅ 15,000 opere creative identiche per tutti
+# ✅ 5 tipi di violazioni: unauthorized_sampling, derivative_work, metadata_manipulation, cross_platform_violation, content_id_manipulation
 # ⏱️ Tempo esecuzione: ~2 minuti
 ```
 
@@ -530,31 +548,70 @@ git push origin main
 
 1. **📝 Prepara il Team**: Scegli nome e membri (max 4 persone)
 
-2. **🚀 Esegui gli Script**: 
+2. **🗂️ Genera i Dataset Identici**: 
+   ```bash
+   python generate_datasets.py
+   # OBBLIGATORIO: Crea dataset identici per tutti i partecipanti
+   ```
+
+3. **🚀 Esegui gli Script**: 
    ```bash
    cd Track1_Solution && python track1_anomaly_detection.py
    # Modifica prima team_name e members nel file!
    ```
 
-3. **📊 Verifica i Risultati**: 
+4. **📊 Verifica i Risultati**: 
    ```bash
    ls submissions/submission_*
    # Controlla che i file JSON siano stati generati
    ```
 
-4. **📤 Fai la Submission**: 
+5. **📤 Fai la Submission**: 
    ```bash
    git add submissions/submission_tuo_team_*.json
    git commit -m "Team Submission"
    git push origin main
    ```
 
-5. **🏆 Monitora la Leaderboard**: 
+6. **🏆 Monitora la Leaderboard**: 
    ```bash
    # Apri leaderboard.md per vedere la tua posizione
    ```
 
-**🎉 È tutto! La leaderboard si aggiorna automaticamente e puoi competere su 4 track diverse!**
+**🎉 È tutto! I dataset sono identici per tutti, le performance sono comparabili!**
+
+### 🎯 Perché Dataset Identici?
+
+#### ✅ **Vantaggi per i Partecipanti**
+- **Performance comparabili**: Tutti i team lavorano sugli stessi dati
+- **Fairness garantita**: Nessun vantaggio dovuto a differenze nei dataset
+- **Benchmark affidabile**: Le tue metriche sono direttamente confrontabili
+- **Riproducibilità**: Seed fisso (42) garantisce risultati identici
+
+#### 🔧 **Vantaggi Tecnici**
+- **Stesso numero di anomalie**: Stesse percentuali per tutti
+- **Stesse distribuzioni**: Feature identiche tra partecipanti
+- **Clustering garantito**: I cluster sono sempre visibili
+- **Metriche standardizzate**: F1-Score, AUC-ROC, Precision confrontabili
+
+#### 📊 **Caratteristiche Dataset**
+- **Track 1**: 50,000 eventi, 5% anomalie, 5 tipologie
+- **Track 2**: 5,000 documenti, 12% frodi, 5 tipologie
+- **Track 3**: 25,000 tracce, 8% anomalie, 5 tipologie  
+- **Track 4**: 15,000 opere, 7% violazioni, 5 tipologie
+
+#### 💡 **Come Usare nei Tuoi Script**
+```python
+import pandas as pd
+
+# Carica il dataset della track che vuoi affrontare
+df_track1 = pd.read_csv('datasets/track1_live_events.csv')
+df_track2 = pd.read_csv('datasets/track2_documents.csv')
+df_track3 = pd.read_csv('datasets/track3_music.csv')
+df_track4 = pd.read_csv('datasets/track4_copyright.csv')
+
+# Ora puoi sviluppare il tuo modello sui dati identici per tutti!
+```
 
 ---
 
