@@ -6,4 +6,4 @@ scrape_configs:
     # L'host 'host.docker.internal' è una keyword speciale di Docker
     # che permette al container di raggiungere i servizi in esecuzione sulla macchina host (il tuo PC)
     static_configs:
-      - targets: ['host.docker.internal:5000']
+      - targets: ['192.168.10.66:5000']
