@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s # Frequenza con cui raccogliere le metriche
+
+scrape_configs:
+  - job_name: 'ml-model-app'
+    # L'host 'host.docker.internal' è una keyword speciale di Docker
+    # che permette al container di raggiungere i servizi in esecuzione sulla macchina host (il tuo PC)
+    static_configs:
+      - targets: ['host.docker.internal:5000']
