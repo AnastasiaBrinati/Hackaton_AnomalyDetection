@@ -10,21 +10,6 @@ Questo progetto implementa un sistema di monitoraggio per modelli di Machine Lea
 - **Python 3.8+**: Per l'applicazione ML
 - **Dataset**: [Credit Card Fraud Detection Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
 
-## ✅ Operazioni Già Completate
-
-Durante la configurazione iniziale sono state già eseguite le seguenti operazioni:
-
-1. **Docker avviato** e configurato per l'avvio automatico
-2. **docker-compose.yml sistemato** (rimossa versione obsoleta)
-3. **Utente aggiunto al gruppo docker** (richiede riavvio terminale)
-4. **Container Prometheus e Grafana avviati** e funzionanti
-5. **File di configurazione prometheus.yml** già presente
-
-**Stato attuale**:
-- ✅ Prometheus: http://localhost:9090
-- ✅ Grafana: http://localhost:3000
-- ✅ Container in esecuzione
-
 ## 🚀 Setup Iniziale
 
 ### 1. Configurazione Docker
@@ -57,6 +42,22 @@ systemctl status docker
 docker --version
 docker-compose --version
 ```
+
+
+## ✅ Operazioni Già Completate
+
+Durante la configurazione iniziale sono state già eseguite le seguenti operazioni:
+
+1. **Docker avviato** e configurato per l'avvio automatico
+2. **docker-compose.yml sistemato** (rimossa versione obsoleta)
+3. **Utente aggiunto al gruppo docker** (richiede riavvio terminale)
+4. **Container Prometheus e Grafana avviati** e funzionanti
+5. **File di configurazione prometheus.yml** già presente
+
+**Stato attuale**:
+- ✅ Prometheus: http://localhost:9090
+- ✅ Grafana: http://localhost:3000
+- ✅ Container in esecuzione
 
 ## 🏗️ Struttura del Progetto
 
