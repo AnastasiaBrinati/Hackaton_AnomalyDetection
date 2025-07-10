@@ -169,12 +169,17 @@ Questo setup è stato completamente testato su **Fedora 42** con tutte le proble
 3. **Docker networking** - Configurato IP dell'host invece di host.docker.internal
 4. **Prometheus connection** - Configurazione corretta per Linux
 5. **Flask API** - Errori di sintassi corretti e librerie installate
+6. **Flask API hanging** - Risolto problema di Flask che si blocca e causa target "down"
+7. **Grafana connection errors** - Risolto errore "querying the Prometheus API"
 
 ### **Stato Attuale Verificato:**
 - ✅ **Prometheus**: http://localhost:9090 (raccoglie metriche)
 - ✅ **Grafana**: http://localhost:3000 (pronto per dashboard)
 - ✅ **Flask API**: http://localhost:5000 (modello ML attivo)
 - ✅ **Connessione**: Prometheus → Flask API (health: up)
+- ✅ **Logs**: Container Prometheus (172.18.0.x) fa richieste /metrics con successo
+
+> ⚠️ **Nota**: Se Flask API si blocca (target Prometheus "down"), riavviare con `kill <PID>` e `python app.py`
 
 ## Struttura del Progetto
 
@@ -454,6 +459,36 @@ docker logs prometheus
 
 ## Risoluzione Problemi
 
+### Diagnosi Rapida (Tutti i Sistemi)
+**Se qualcosa non funziona, usa questi comandi per identificare il problema:**
+
+```bash
+# 1. Verifica container Docker
+sudo docker ps
+# Dovresti vedere 'grafana' e 'prometheus' in stato "Up"
+
+# 2. Verifica Flask API
+curl -s http://localhost:5000/metrics | head -3
+# Dovrebbe restituire metriche Prometheus
+
+# 3. Verifica target Prometheus
+curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
+# Dovrebbe restituire: "health":"up"
+
+# 4. Verifica processo Flask
+ps aux | grep -i python | grep app.py
+# Dovrebbe mostrare il processo in esecuzione
+
+# 5. Testa Grafana → Prometheus
+# Vai su http://localhost:3000 e prova una query semplice come "up"
+```
+
+**Interpretazione risultati**:
+- **Container non in esecuzione**: `sudo docker-compose up -d`
+- **Flask API non risponde**: Riavvia Flask (vedi sezione specifica)
+- **Target "down"**: Flask API bloccato o configurazione IP errata
+- **Grafana errori**: Prometheus non raggiungibile o Flask API non funziona
+
 ### Problemi Specifici Linux
 
 #### Docker daemon non in esecuzione
@@ -579,19 +614,89 @@ curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
 
 **Soluzione**: Identifica e risolvi il conflitto
 ```bash
-# 1. Trova IP dell'host
-HOST_IP=$(hostname -I | awk '{print $1}')
-echo "IP dell'host: $HOST_IP"
+# 1. Trova processo che usa porta 5000
+lsof -i :5000
 
-# 2. Modifica prometheus.yml
-sed -i "s/host.docker.internal:5000/${HOST_IP}:5000/" prometheus/prometheus.yml
+# 2. Termina il processo se necessario
+kill -9 <PID>
 
-# 3. Riavvia Prometheus
-sudo docker-compose restart prometheus
+# 3. Riavvia Flask API
+source MLOps/bin/activate
+python app.py
+```
 
-# 4. Verifica connessione
+### Errore Grafana "There was an error returned querying the Prometheus API"
+**Problema**: Flask API si blocca o smette di rispondere, causando target Prometheus "down"
+
+**Sintomi**:
+```bash
+# Target Prometheus mostra "down"
+curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
+"health":"down"
+
+# Flask API non risponde (timeout o nessuna risposta)
+curl -v http://localhost:5000/metrics
+```
+
+**Diagnosi**: Controlla i log di Flask API
+```bash
+# Verifica se Flask è in esecuzione
+ps aux | grep -i python | grep app.py
+
+# Se Flask è in esecuzione ma non risponde, controlla i log
+# Cerca errori o richieste che rimangono appese
+```
+
+**Soluzione**: Riavvia Flask API
+```bash
+# 1. Trova il PID del processo Flask
+ps aux | grep -i python | grep app.py
+
+# 2. Termina il processo che non risponde
+kill <PID>
+
+# 3. Riavvia Flask API con environment attivo
+source MLOps/bin/activate
+python app.py
+```
+
+**Verifica risoluzione**:
+```bash
+# 1. Testa Flask API direttamente
+curl -s http://localhost:5000/metrics | head -5
+
+# 2. Verifica target Prometheus
 curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
 # Dovrebbe restituire: "health":"up"
+
+# 3. Controlla i log Flask - dovresti vedere richieste da container Prometheus:
+# 172.18.0.2 - - [timestamp] "GET /metrics HTTP/1.1" 200 -
+```
+
+### Docker permissions (permessi negati)
+**Problema**: Errore "permission denied" sui comandi Docker
+
+**Soluzione**: Risolvi i permessi Docker
+```bash
+# 1. Aggiungi utente al gruppo docker
+sudo usermod -aG docker $USER
+
+# 2. Riavvia il terminale o fai logout/login
+
+# 3. Oppure usa sudo temporaneamente
+sudo docker ps
+sudo docker-compose restart prometheus
+```
+
+### Prometheus target health check
+**Comando utile**: Verifica rapida dello stato dei target
+```bash
+# Verifica immediata dello stato target
+curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
+# Dovrebbe restituire: "health":"up"
+
+# Se il target è "down", verifica Flask API
+curl -s http://localhost:5000/metrics | head -3
 ```
 
 ### Errori import librerie Python
