@@ -11,7 +11,7 @@
 
 Questo progetto implementa un sistema di monitoraggio per modelli di Machine Learning utilizzando Prometheus e Grafana, come parte di un framework MLOps per il testing continuo.
 
-## 📋 Prerequisiti
+## Prerequisiti
 
 - **Sistema Operativo**: Linux (testato su Fedora 42)
 - **Docker**: Per eseguire Prometheus e Grafana
@@ -19,9 +19,9 @@ Questo progetto implementa un sistema di monitoraggio per modelli di Machine Lea
 - **Python 3.8+**: Per l'applicazione ML
 - **Dataset**: [Credit Card Fraud Detection Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
 
-## 🚀 Setup Iniziale
+## Setup Iniziale
 
-### 🐧 **Setup per Linux (Testato su Fedora 42)**
+### Setup per Linux (Testato su Fedora 42)
 
 #### 1. Configurazione Docker
 
@@ -93,7 +93,7 @@ docker --version
 docker-compose --version
 ```
 
-### 🪟 **Setup per Windows (Windows 10/11)**
+### Setup per Windows (Windows 10/11)
 
 #### 1. Installazione Docker Desktop
 
@@ -142,11 +142,6 @@ scrape_configs:
 
 1. **Scarica Python** da [python.org](https://www.python.org/downloads/)
 2. **Durante l'installazione**, seleziona "Add Python to PATH"
-3. **Verifica installazione**:
-```cmd
-python --version
-pip --version
-```
 
 #### 6. Creazione Environment Virtuale
 
@@ -164,7 +159,7 @@ MLOps\Scripts\Activate.ps1
 ```
 
 
-## ✅ Configurazione Completata e Testata
+## Configurazione Completata e Testata
 
 Questo setup è stato completamente testato su **Fedora 42** con tutte le problematiche risolte:
 
@@ -181,11 +176,11 @@ Questo setup è stato completamente testato su **Fedora 42** con tutte le proble
 - ✅ **Flask API**: http://localhost:5000 (modello ML attivo)
 - ✅ **Connessione**: Prometheus → Flask API (health: up)
 
-## 🏗️ Struttura del Progetto
+## Struttura del Progetto
 
 Il progetto è organizzato come segue:
 
-### **📁 File Versionati (nel repository)**
+### File Versionati (nel repository)
 ```
 MLOps/
 ├── README.md                 # Questa guida
@@ -197,7 +192,7 @@ MLOps/
     └── prometheus.yml       # Configurazione Prometheus
 ```
 
-### **📁 File Generati/Scaricati (esclusi dal repository)**
+### File Generati/Scaricati (esclusi dal repository)
 ```
 MLOps/
 ├── creditcard.csv          # 🔽 Dataset da scaricare da Kaggle (150MB)
@@ -210,11 +205,11 @@ MLOps/
 
 > 📝 **Nota Git**: I file grandi (dataset, modelli) e temporanei sono esclusi dal version control tramite `.gitignore` per mantenere il repository leggero e pulito.
 
-## 🔧 Configurazione Servizi
+## Configurazione Servizi
 
 ### 1. Avvio Container
 
-#### 🐧 **Linux:**
+#### Linux:
 ```bash
 # Avvia Prometheus e Grafana
 sudo docker-compose up -d
@@ -223,7 +218,7 @@ sudo docker-compose up -d
 sudo docker ps
 ```
 
-#### 🪟 **Windows:**
+#### Windows:
 ```cmd
 # Avvia Prometheus e Grafana
 docker-compose up -d
@@ -241,7 +236,7 @@ prometheus   Up X minutes    0.0.0.0:9090->9090/tcp
 
 ### 2. Verifica Connessione Prometheus → Flask
 
-#### 🐧 **Linux:**
+#### Linux:
 ```bash
 # Verifica che Prometheus veda l'app Flask
 curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
@@ -249,7 +244,7 @@ curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
 # Dovrebbe restituire: "health":"up"
 ```
 
-#### 🪟 **Windows (PowerShell):**
+#### Windows (PowerShell):
 ```powershell
 # Verifica che Prometheus veda l'app Flask
 Invoke-RestMethod -Uri "http://localhost:9090/api/v1/targets" | Select-String '"health":"[^"]*"'
@@ -272,7 +267,7 @@ curl -s "http://localhost:9090/api/v1/targets" | findstr "health"
   - Endpoint: `POST /predict` per predizioni
   - Endpoint: `GET /metrics` per metriche Prometheus
 
-## 📊 Primo Accesso a Grafana
+## Primo Accesso a Grafana
 
 ### 1. Login Iniziale
 1. Vai su http://localhost:3000
@@ -290,7 +285,7 @@ curl -s "http://localhost:9090/api/v1/targets" | findstr "health"
 2. **Add visualization**
 3. Configura i pannelli come descritto nel notebook
 
-## 🤖 Setup Modello ML
+## Setup Modello ML
 
 ### 1. Download Dataset
 
@@ -315,7 +310,7 @@ MLOps/
 
 ### 2. Attivazione Environment Virtuale
 
-#### 🐧 **Linux:**
+#### Linux:
 ```bash
 # SEMPRE attiva l'environment virtuale prima di qualsiasi operazione Python
 source MLOps/bin/activate
@@ -323,7 +318,7 @@ source MLOps/bin/activate
 # Dovresti vedere (MLOps) nel prompt del terminale
 ```
 
-#### 🪟 **Windows:**
+#### Windows:
 ```cmd
 # CMD
 MLOps\Scripts\activate
@@ -397,13 +392,13 @@ $body = @{
 Invoke-RestMethod -Uri "http://localhost:5000/predict" -Method POST -Body $body -ContentType "application/json"
 ```
 
-#### 🪟 **Windows (CMD con curl):**
+#### Windows (CMD con curl):
 ```cmd
 # Se hai curl installato su Windows
 curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -d "{\"Time\": 0, \"V1\": -1.36, \"V2\": -0.07, \"V3\": 2.54, \"V4\": 1.38, \"V5\": -0.34, \"V6\": 0.46, \"V7\": 0.24, \"V8\": 0.10, \"V9\": 0.36, \"V10\": 0.09, \"V11\": -0.55, \"V12\": -0.62, \"V13\": -0.99, \"V14\": -0.31, \"V15\": 1.47, \"V16\": -0.47, \"V17\": 0.21, \"V18\": 0.03, \"V19\": 0.40, \"V20\": 0.25, \"V21\": -0.02, \"V22\": 0.28, \"V23\": -0.11, \"V24\": 0.07, \"V25\": 0.13, \"V26\": -0.19, \"V27\": 0.13, \"V28\": -0.02, \"Amount\": 149.62}"
 ```
 
-## 🔍 Metriche Monitorate
+## Metriche Monitorate
 
 Il sistema traccia le seguenti metriche:
 
@@ -457,9 +452,9 @@ docker ps
 docker logs prometheus
 ```
 
-## 🚨 Risoluzione Problemi
+## Risoluzione Problemi
 
-### 🐧 **Problemi Specifici Linux**
+### Problemi Specifici Linux
 
 #### Docker daemon non in esecuzione
 ```bash
@@ -481,7 +476,7 @@ sudo setsebool -P container_use_cephfs on
 sudo docker-compose restart prometheus
 ```
 
-### 🪟 **Problemi Specifici Windows**
+### Problemi Specifici Windows
 
 #### Docker Desktop non si avvia
 1. **Verifica WSL2**: Assicurati che WSL2 sia installato e funzionante
@@ -507,22 +502,82 @@ Su Windows, se `host.docker.internal` non funziona:
 ```
 
 #### Python non trovato
-```cmd
-# Verifica installazione Python
-python --version
+**Problema**: Comando python non riconosciuto
 
+**Soluzione**: Verifica installazione Python
+```cmd
 # Se non funziona, prova:
 py --version
 
-# Assicurati che Python sia nel PATH
+# Assicurati che Python sia nel PATH durante l'installazione
 ```
 
-### 🔧 **Problemi Comuni (Linux & Windows)**
+### Problemi Comuni (Linux & Windows)
 
-### Prometheus non si connette all'API Flask
-**Problema**: Target health "down" in Prometheus
+### Target Prometheus mostra "health":"down"
+**Problema**: Prometheus non riesce a raggiungere l'API Flask
 
-**Soluzione**: Configura IP dell'host invece di `host.docker.internal`
+**Cause possibili**:
+1. **Flask API non in esecuzione**: Il servizio Flask non è attivo
+2. **Configurazione IP errata**: Prometheus configurato con IP sbagliato
+3. **Porta bloccata**: La porta 5000 è occupata da altro processo
+
+**Diagnosi**:
+```bash
+# 1. Verifica se Flask API è in esecuzione
+ps aux | grep -i python | grep app.py
+
+# 2. Verifica stato target Prometheus
+curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
+
+# 3. Verifica che la porta 5000 sia libera
+netstat -tlnp | grep :5000
+```
+
+**Soluzioni**:
+
+#### A. Avvia Flask API (se non in esecuzione)
+```bash
+# Attiva environment virtuale
+source MLOps/bin/activate
+
+# Avvia Flask API
+python app.py
+```
+
+#### B. Risolvi conflitto porta (se porta 5000 occupata)
+```bash
+# Trova processo che usa porta 5000
+lsof -i :5000
+
+# Termina processo se necessario
+kill -9 <PID>
+
+# Oppure cambia porta in app.py
+# app.run(host='0.0.0.0', port=5001)
+```
+
+#### C. Configura IP corretto (Linux)
+```bash
+# 1. Trova IP dell'host
+HOST_IP=$(hostname -I | awk '{print $1}')
+echo "IP dell'host: $HOST_IP"
+
+# 2. Modifica prometheus.yml
+sed -i "s/host.docker.internal:5000/${HOST_IP}:5000/" prometheus/prometheus.yml
+
+# 3. Riavvia Prometheus
+sudo docker-compose restart prometheus
+
+# 4. Verifica connessione
+curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
+# Dovrebbe restituire: "health":"up"
+```
+
+### Errore "Address already in use" (Porta 5000 occupata)
+**Problema**: Flask non può avviarsi perché la porta 5000 è già in uso
+
+**Soluzione**: Identifica e risolvi il conflitto
 ```bash
 # 1. Trova IP dell'host
 HOST_IP=$(hostname -I | awk '{print $1}')
@@ -619,23 +674,23 @@ sudo docker-compose down && sudo docker-compose up -d
 - ✅ **Corretta**: `http://prometheus:9090` (da Grafana)
 - ❌ **Sbagliata**: `http://localhost:9090` (da Grafana)
 
-## 📝 Note Importanti
+## Note Importanti
 
-### **🐧 Linux (Testato su Fedora 42)**
+### Linux (Testato su Fedora 42)
 - **Tutte le configurazioni** sono state testate e funzionano correttamente
 - **SELinux**: Su Fedora/RHEL, SELinux deve essere configurato per permettere l'accesso ai file
 - **Docker networking**: Usa IP dell'host invece di `host.docker.internal`
 - **Environment virtuale**: SEMPRE attiva `source MLOps/bin/activate` prima di operazioni Python
 - **Sudo**: Richiesto per comandi Docker fino al riavvio del terminale
 
-### **🪟 Windows (Windows 10/11)**
+### Windows (Windows 10/11)
 - **Docker Desktop**: Richiede WSL2 o Hyper-V
 - **Docker networking**: `host.docker.internal` funziona correttamente
 - **Environment virtuale**: Usa `MLOps\Scripts\activate` (CMD) o `MLOps\Scripts\Activate.ps1` (PowerShell)
 - **PowerShell**: Potrebbe richiedere modifica Execution Policy
 - **Python**: Assicurati che sia nel PATH durante l'installazione
 
-### **🔧 Generale (Entrambi i Sistemi)**
+### Generale (Entrambi i Sistemi)
 - **Persistenza dati**: I dati di Grafana e Prometheus non sono persistenti. Per produzione, configura volumi Docker appropriati.
 - **Sicurezza**: Le configurazioni sono per sviluppo/test. In produzione, configura autenticazione e HTTPS.
 - **Monitoraggio**: Questo è un esempio educativo. In produzione, considera metriche aggiuntive come drift detection e model performance.
@@ -644,7 +699,7 @@ sudo docker-compose down && sudo docker-compose up -d
   - Da Grafana: `http://prometheus:9090` (data source Prometheus)
 - **Porte**: Assicurati che le porte 3000, 5000, e 9090 siano libere
 
-## 🎯 Prossimi Passi
+## Prossimi Passi
 
 1. **Alerting**: Configura alert in Grafana per soglie critiche
 2. **A/B Testing**: Implementa versioning del modello
@@ -652,48 +707,48 @@ sudo docker-compose down && sudo docker-compose up -d
 4. **Logging**: Integra logging strutturato
 5. **CI/CD**: Automatizza deployment con pipeline
 
-## 📚 Risorse Utili
+## Risorse Utili
 
 - [Prometheus Documentation](https://prometheus.io/docs/)
 - [Grafana Documentation](https://grafana.com/docs/)
 - [Flask Documentation](https://flask.palletsprojects.com/)
 - [Scikit-learn Documentation](https://scikit-learn.org/stable/)
 
-## ✅ Checklist di Verifica
+## Checklist di Verifica
 
 Prima di considerare il setup completo, verifica che tutti questi elementi funzionino:
 
-### **Container Docker**
+### Container Docker
 
-#### 🐧 **Linux:**
+#### Linux:
 ```bash
 sudo docker ps
 # Dovresti vedere 'grafana' e 'prometheus' in esecuzione
 ```
 
-#### 🪟 **Windows:**
+#### Windows:
 ```cmd
 docker ps
 # Dovresti vedere 'grafana' e 'prometheus' in esecuzione
 ```
 
-### **Connessione Prometheus → Flask**
+### Connessione Prometheus → Flask
 
-#### 🐧 **Linux:**
+#### Linux:
 ```bash
 curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
 # Dovrebbe restituire: "health":"up"
 ```
 
-#### 🪟 **Windows:**
+#### Windows:
 ```powershell
 Invoke-RestMethod -Uri "http://localhost:9090/api/v1/targets" | Select-String "health"
 # Dovrebbe mostrare: "health":"up"
 ```
 
-### **API Flask**
+### API Flask
 
-#### 🐧 **Linux:**
+#### Linux:
 ```bash
 # Test endpoint metrics
 curl http://localhost:5000/metrics | head -5
