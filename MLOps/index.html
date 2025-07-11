@@ -755,11 +755,13 @@ jobs:
         <!-- Chatbot Container -->
         <div class="chatbot-container">
             <div class="chatbot-header">
-                🤖 MLOps Testing Assistant
+                🤖 AI Assistant (API Powered)
             </div>
             <div class="chatbot-messages" id="chatMessages">
                 <div class="message bot">
-                    Ciao! Sono il tuo assistente AI personale. Posso aiutarti con:
+                    🤖 <strong>Assistente AI con API Reale</strong>
+                    <br><br>
+                    Ciao! Sono alimentato da intelligenza artificiale avanzata e posso aiutarti con qualsiasi domanda su:
                     <br><br>
                     🤖 <strong>AI & Machine Learning</strong>: algoritmi, deep learning, MLOps
                     <br>💻 <strong>Programmazione</strong>: Python, JavaScript, web development
@@ -768,11 +770,13 @@ jobs:
                     <br>🔬 <strong>Scienza</strong>: matematica, fisica, metodologie di ricerca
                     <br>🎨 <strong>Creatività</strong>: problem solving, innovazione, design thinking
                     <br><br>
-                    Cosa vorresti approfondire? Puoi farmi qualsiasi domanda!
+                    <strong>💡 Novità</strong>: Rispondo usando API AI reali come OpenAI, Claude, o Groq!
+                    <br>Configura la tua API cliccando ⚙️ per iniziare.
                 </div>
             </div>
             <div class="chatbot-input">
                 <input type="text" id="chatInput" placeholder="Fai una domanda...">
+                <button id="configBtn" title="Configura API" style="background: #667eea; margin-right: 0.5rem; padding: 0.75rem;">⚙️</button>
                 <button id="clearBtn" title="Pulisci chat" style="background: #dc2626; margin-right: 0.5rem; padding: 0.75rem;">🗑️</button>
                 <button id="sendBtn">Invia</button>
             </div>
@@ -881,435 +885,237 @@ jobs:
             document.getElementById('progressBar').style.width = progressPercentage + '%';
         }
 
-        // Enhanced AI Assistant with comprehensive knowledge base
-        const comprehensiveKnowledge = {
-            // MLOps and AI/ML Topics
-            mlops: {
-                "data drift": {
-                    definition: "cambiamento nella distribuzione dei dati nel tempo",
-                    causes: ["evoluzione del comportamento utenti", "cambiamenti stagionali", "modifiche al sistema di raccolta dati"],
-                    detection: ["test statistici (KS, Chi-square)", "monitoraggio distribuzioni", "confronto con baseline"],
-                    solutions: ["retraining periodico", "alert automatici", "data validation continua"]
-                },
-                "model decay": {
-                    definition: "degradazione delle performance del modello nel tempo",
-                    symptoms: ["calo accuracy", "aumento false positive", "predizioni sbilanciate"],
-                    monitoring: ["tracking metriche in real-time", "confronto con soglie", "analisi trend"],
-                    mitigation: ["retraining automatico", "ensemble models", "continuous learning"]
-                },
-                "ci/cd": {
-                    definition: "automazione del processo di integrazione e deployment",
-                    components: ["data validation", "model training", "testing", "deployment", "monitoring"],
-                    tools: ["GitHub Actions", "GitLab CI", "Jenkins", "Kubeflow"],
-                    benefits: ["rilasci più rapidi", "meno errori", "rollback veloci"]
-                },
-                "testing": {
-                    types: ["unit test", "integration test", "data quality test", "model performance test"],
-                    frameworks: ["pytest", "unittest", "Great Expectations"],
-                    best_practices: ["automatizzare tutto", "test in ogni fase", "documentare risultati"]
-                },
-                "monitoring": {
-                    metrics: ["accuracy", "latency", "throughput", "error rate", "data quality"],
-                    tools: ["Prometheus", "Grafana", "Evidently AI", "WhyLabs"],
-                    alerts: ["degradazione performance", "data drift", "system failures"]
-                },
-                "machine learning": {
-                    definition: "campo dell'intelligenza artificiale che si concentra sulla creazione di algoritmi che apprendono dai dati",
-                    types: ["supervised learning", "unsupervised learning", "reinforcement learning"],
-                    algorithms: ["linear regression", "decision trees", "neural networks", "SVM", "clustering"],
-                    applications: ["computer vision", "natural language processing", "recommendation systems", "predictive analytics"]
-                },
-                "deep learning": {
-                    definition: "sottocampo del machine learning che utilizza reti neurali profonde",
-                    architectures: ["CNN", "RNN", "LSTM", "Transformer", "GAN"],
-                    frameworks: ["TensorFlow", "PyTorch", "Keras", "JAX"],
-                    applications: ["riconoscimento immagini", "traduzione automatica", "generazione testi", "sintesi vocale"]
-                }
-            },
-            
-            // Programming and Technology
-            programming: {
-                "python": {
-                    definition: "linguaggio di programmazione ad alto livello, interpretato e orientato agli oggetti",
-                    features: ["sintassi semplice", "tipizzazione dinamica", "librerie extensive", "multiparadigma"],
-                    uses: ["web development", "data science", "AI/ML", "automation", "scripting"],
-                    libraries: ["pandas", "numpy", "scikit-learn", "flask", "django"]
-                },
-                "javascript": {
-                    definition: "linguaggio di programmazione interpretato, principalmente usato per lo sviluppo web",
-                    features: ["dinamico", "event-driven", "prototipale", "first-class functions"],
-                    uses: ["frontend web", "backend (Node.js)", "mobile apps", "desktop apps"],
-                    frameworks: ["React", "Vue.js", "Angular", "Node.js", "Express"]
-                },
-                "web development": {
-                    definition: "processo di creazione di applicazioni web",
-                    frontend: ["HTML", "CSS", "JavaScript", "React", "Vue", "Angular"],
-                    backend: ["Node.js", "Python", "Java", "C#", "PHP", "Ruby"],
-                    databases: ["MySQL", "PostgreSQL", "MongoDB", "Redis"],
-                    tools: ["Git", "Docker", "Kubernetes", "CI/CD pipelines"]
-                },
-                "database": {
-                    definition: "sistema organizzato per memorizzare e gestire dati",
-                    types: ["relazionali (SQL)", "NoSQL", "graph databases", "time series"],
-                    concepts: ["normalization", "indexing", "transactions", "ACID properties"],
-                    popular: ["MySQL", "PostgreSQL", "MongoDB", "Redis", "Cassandra"]
-                }
-            },
-            
-            // Science and Mathematics
-            science: {
-                "statistics": {
-                    definition: "branca della matematica che studia la raccolta e l'analisi dei dati",
-                    concepts: ["media", "mediana", "deviazione standard", "distribuzione", "correlazione"],
-                    tests: ["t-test", "chi-square", "ANOVA", "regression analysis"],
-                    applications: ["ricerca scientifica", "business analytics", "qualità controllo"]
-                },
-                "mathematics": {
-                    definition: "scienza che studia numeri, forme, strutture e cambiamenti",
-                    branches: ["algebra", "geometria", "calcolo", "statistica", "logica"],
-                    concepts: ["funzioni", "derivate", "integrali", "matrici", "vettori"],
-                    applications: ["fisica", "ingegneria", "informatica", "economia"]
-                },
-                "physics": {
-                    definition: "scienza che studia la materia, l'energia e le loro interazioni",
-                    branches: ["meccanica", "termodinamica", "elettromagnetismo", "ottica", "fisica quantistica"],
-                    concepts: ["forza", "energia", "momento", "onde", "particelle"],
-                    applications: ["tecnologia", "medicina", "astronomia", "ingegneria"]
-                }
-            },
-            
-            // Business and Economics
-            business: {
-                "digital transformation": {
-                    definition: "integrazione di tecnologia digitale in tutte le aree di business",
-                    components: ["cloud computing", "AI/ML", "IoT", "big data", "automation"],
-                    benefits: ["efficienza operativa", "customer experience", "innovation", "competitive advantage"],
-                    challenges: ["change management", "skills gap", "security", "investment costs"]
-                },
-                "project management": {
-                    definition: "disciplina che applica processi e metodologie per raggiungere obiettivi",
-                    methodologies: ["Agile", "Scrum", "Waterfall", "Kanban", "Lean"],
-                    phases: ["iniziazione", "pianificazione", "esecuzione", "monitoraggio", "chiusura"],
-                    tools: ["Jira", "Trello", "Asana", "Microsoft Project", "Slack"]
-                }
-            },
-            
-            // General Knowledge
-            general: {
-                "creativity": {
-                    definition: "capacità di generare idee originali e innovative",
-                    techniques: ["brainstorming", "mind mapping", "design thinking", "lateral thinking"],
-                    domains: ["arte", "scrittura", "problem solving", "innovation", "design"],
-                    factors: ["curiosità", "apertura mentale", "esperienza", "conoscenza trasversale"]
-                },
-                "communication": {
-                    definition: "processo di trasmissione e ricezione di informazioni",
-                    types: ["verbale", "non verbale", "scritta", "visiva", "digitale"],
-                    skills: ["ascolto attivo", "empatia", "chiarezza", "persuasione", "storytelling"],
-                    tools: ["presentazioni", "email", "social media", "video calls", "documentation"]
-                }
-            },
-            
-            // Code Examples
-            examples: {
-                "python basics": `# Esempio Python - Analisi dati
-import pandas as pd
-import numpy as np
-
-# Carica dataset
-df = pd.read_csv('data.csv')
-
-# Analisi esplorativa
-print(df.describe())
-print(df.info())
-
-# Pulizia dati
-df_clean = df.dropna()
-df_clean['new_column'] = df_clean['col1'] * 2
-
-# Visualizzazione
-import matplotlib.pyplot as plt
-plt.figure(figsize=(10, 6))
-plt.hist(df_clean['column'], bins=30)
-plt.title('Distribuzione dei dati')
-plt.show()`,
-                
-                "javascript basics": `// Esempio JavaScript - API REST
-const fetchData = async (url) => {
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Errore:', error);
-        return null;
-    }
-};
-
-// Utilizzo
-fetchData('https://api.example.com/data')
-    .then(data => {
-        console.log('Dati ricevuti:', data);
-        // Processa i dati
-    });
-
-// Event handling
-document.addEventListener('DOMContentLoaded', () => {
-    const button = document.getElementById('myButton');
-    button.addEventListener('click', () => {
-        alert('Bottone cliccato!');
-    });
-});`,
-                
-                "sql basics": `-- Esempio SQL - Query complessa
-SELECT 
-    u.name,
-    u.email,
-    COUNT(o.id) as total_orders,
-    SUM(o.amount) as total_spent,
-    AVG(o.amount) as avg_order_value
-FROM users u
-LEFT JOIN orders o ON u.id = o.user_id
-WHERE u.created_at >= '2023-01-01'
-GROUP BY u.id, u.name, u.email
-HAVING COUNT(o.id) > 5
-ORDER BY total_spent DESC
-LIMIT 10;`,
-                
-                "data validation": `# Esempio con Great Expectations
-import great_expectations as ge
-
-df = ge.read_csv("data.csv")
-df.expect_column_values_to_be_between("age", 0, 120)
-df.expect_column_values_to_not_be_null("user_id")
-df.expect_column_mean_to_be_between("score", 0.5, 0.8)`,
-                
-                "model testing": `# Test delle performance del modello
-def test_model_accuracy(model, X_test, y_test):
-    predictions = model.predict(X_test)
-    accuracy = accuracy_score(y_test, predictions)
-    assert accuracy > 0.85, f"Accuracy {accuracy} sotto soglia"
-    
-def test_model_robustness(model, X_test):
-    # Aggiungi rumore
-    X_noisy = X_test + np.random.normal(0, 0.1, X_test.shape)
-    pred_original = model.predict(X_test)
-    pred_noisy = model.predict(X_noisy)
-    consistency = np.mean(pred_original == pred_noisy)
-    assert consistency > 0.9`
-            }
-        };
-
-        // Advanced AI Response Generator
-        function generateDynamicResponse(message) {
-            const lowerMessage = message.toLowerCase();
-            const words = lowerMessage.split(' ');
-            
-            // Enhanced intent analysis
-            const intents = {
-                question: message.includes('?') || words.some(w => ['come', 'cosa', 'quando', 'dove', 'perché', 'quale', 'quali', 'chi'].includes(w)),
-                example: words.some(w => ['esempio', 'esempi', 'codice', 'mostra', 'mostrami', 'demo', 'tutorial'].includes(w)),
-                list: words.some(w => ['elenca', 'lista', 'elenco', 'quali sono', 'dimmi', 'tipi', 'tipologie'].includes(w)),
-                howTo: words.some(w => ['come fare', 'come si fa', 'come creare', 'come implementare', 'step', 'passaggi'].includes(w)),
-                comparison: words.some(w => ['differenza', 'confronto', 'vs', 'meglio', 'peggio', 'confronta'].includes(w)),
-                explanation: words.some(w => ['spiegami', 'spiega', 'cos\'è', 'cosa è', 'definizione', 'significato'].includes(w)),
-                advice: words.some(w => ['consiglio', 'consigli', 'suggerimento', 'best practice', 'raccomandazione'].includes(w)),
-                problem: words.some(w => ['problema', 'errore', 'bug', 'issue', 'non funziona', 'aiuto', 'help'].includes(w))
-            };
-            
-            // Find relevant topics from comprehensive knowledge
-            let relevantTopics = [];
-            let bestMatch = null;
-            let maxScore = 0;
-            
-            // Search through all categories
-            for (const [category, topics] of Object.entries(comprehensiveKnowledge)) {
-                if (category === 'examples') continue;
-                
-                for (const [topicName, topicData] of Object.entries(topics)) {
-                    let score = 0;
-                    
-                    // Check direct topic name match
-                    if (lowerMessage.includes(topicName)) score += 10;
-                    
-                    // Check keywords in definition
-                    if (topicData.definition && lowerMessage.split(' ').some(word => 
-                        topicData.definition.toLowerCase().includes(word) && word.length > 3)) {
-                        score += 5;
-                    }
-                    
-                    // Check other properties
-                    for (const [key, value] of Object.entries(topicData)) {
-                        if (Array.isArray(value)) {
-                            value.forEach(item => {
-                                if (lowerMessage.includes(item.toLowerCase())) score += 3;
-                            });
-                        } else if (typeof value === 'string') {
-                            if (lowerMessage.includes(value.toLowerCase())) score += 2;
-                        }
-                    }
-                    
-                    if (score > maxScore) {
-                        maxScore = score;
-                        bestMatch = { category, topicName, topicData, score };
-                    }
-                    
-                    if (score > 0) {
-                        relevantTopics.push({ category, topicName, topicData, score });
-                    }
-                }
-            }
-            
-            // Sort by relevance
-            relevantTopics.sort((a, b) => b.score - a.score);
-            
-            // Generate response
-            let response = "";
-            
-            // Dynamic introduction
-            const intros = [
-                "Ottima domanda! ",
-                "Interessante che tu chieda questo. ",
-                "Parliamo di questo argomento. ",
-                "Ti spiego volentieri. ",
-                "Ecco cosa posso dirti: ",
-                "Questa è una domanda importante. ",
-                "Perfetto, posso aiutarti con questo. ",
-                "Analizziamo questo insieme. "
-            ];
-            
-            if (bestMatch && bestMatch.score > 5) {
-                response += intros[Math.floor(Math.random() * intros.length)];
-                
-                const topic = bestMatch.topicData;
-                const topicName = bestMatch.topicName;
-                const category = bestMatch.category;
-                
-                // Main explanation
-                response += `\n\n**${topicName.charAt(0).toUpperCase() + topicName.slice(1)}** è ${topic.definition}.\n\n`;
-                
-                // Intent-based detailed response
-                if (intents.example) {
-                    // Show code example if available
-                    const example = comprehensiveKnowledge.examples[topicName] || 
-                                  comprehensiveKnowledge.examples[`${topicName} basics`];
-                    if (example) {
-                        response += "Ecco un esempio pratico:\n\n```\n" + example + "\n```\n\n";
-                    }
-                } else if (intents.list) {
-                    // List relevant information
-                    for (const [key, value] of Object.entries(topic)) {
-                        if (Array.isArray(value) && key !== 'definition') {
-                            response += `**${key.charAt(0).toUpperCase() + key.slice(1)}:**\n`;
-                            value.forEach(item => response += `• ${item}\n`);
-                            response += "\n";
-                        }
-                    }
-                } else if (intents.howTo) {
-                    // Provide step-by-step guidance
-                    response += "Per iniziare, ecco i passaggi principali:\n\n";
-                    if (topic.phases) {
-                        topic.phases.forEach((phase, index) => {
-                            response += `${index + 1}. ${phase}\n`;
-                        });
-                    } else if (topic.steps) {
-                        topic.steps.forEach((step, index) => {
-                            response += `${index + 1}. ${step}\n`;
-                        });
-                    } else {
-                        response += "1. Comprendi i concetti base\n";
-                        response += "2. Studia gli strumenti necessari\n";
-                        response += "3. Pratica con esempi semplici\n";
-                        response += "4. Implementa progetti reali\n";
-                    }
-                } else if (intents.comparison) {
-                    // Show comparisons or alternatives
-                    if (topic.types) {
-                        response += "Tipologie principali:\n";
-                        topic.types.forEach(type => response += `• ${type}\n`);
-                    }
-                    if (topic.alternatives) {
-                        response += "\nAlternative:\n";
-                        topic.alternatives.forEach(alt => response += `• ${alt}\n`);
-                    }
-                } else {
-                    // General detailed information
-                    let addedSections = 0;
-                    for (const [key, value] of Object.entries(topic)) {
-                        if (key === 'definition') continue;
-                        if (Array.isArray(value) && value.length > 0 && addedSections < 3) {
-                            response += `**${key.charAt(0).toUpperCase() + key.slice(1)}:**\n`;
-                            value.slice(0, 5).forEach(item => response += `• ${item}\n`);
-                            response += "\n";
-                            addedSections++;
-                        }
-                    }
-                }
-                
-                // Add relevant examples
-                if (!intents.example && Object.keys(comprehensiveKnowledge.examples).some(key => 
-                    key.includes(topicName) || topicName.includes(key))) {
-                    response += "\n💡 Vuoi vedere un esempio di codice? Chiedimi: 'mostra esempio " + topicName + "'\n";
-                }
-                
-            } else if (intents.problem) {
-                // Problem-solving response
-                response += "Capisco che hai un problema. ";
-                response += "Anche se non ho identificato il problema specifico, posso aiutarti con:\n\n";
-                response += "🔧 **Debugging**: Identificare la causa del problema\n";
-                response += "📚 **Documentazione**: Consultare risorse appropriate\n";
-                response += "🧪 **Testing**: Verificare soluzioni step-by-step\n";
-                response += "🤝 **Support**: Guidarti verso la soluzione\n\n";
-                response += "Puoi fornirmi più dettagli sul problema? Ad esempio:\n";
-                response += "• Cosa stai cercando di fare?\n";
-                response += "• Che errore ricevi?\n";
-                response += "• In che contesto?\n";
-                
-            } else if (intents.advice) {
-                // General advice response
-                response += "Ecco alcuni consigli generali che possono esserti utili:\n\n";
-                response += "✅ **Pianifica prima di agire**: Definisci obiettivi chiari\n";
-                response += "📖 **Continua ad imparare**: Mantieniti aggiornato sulle novità\n";
-                response += "🔄 **Pratica regolarmente**: L'esperienza è fondamentale\n";
-                response += "🤝 **Collabora**: Lavora con altri e condividi conoscenze\n";
-                response += "🧪 **Sperimenta**: Prova approcci diversi\n";
-                response += "📊 **Misura i risultati**: Monitora i progressi\n\n";
-                
-            } else {
-                // General conversational response
-                response += "Ciao! Sono qui per aiutarti con qualsiasi domanda. ";
-                response += "Posso assistere con:\n\n";
-                response += "🤖 **AI & Machine Learning**: algoritmi, deep learning, MLOps\n";
-                response += "💻 **Programmazione**: Python, JavaScript, web development\n";
-                response += "📊 **Data Science**: statistiche, analisi dati, visualizzazione\n";
-                response += "🏢 **Business**: project management, digital transformation\n";
-                response += "🔬 **Scienza**: matematica, fisica, metodologie di ricerca\n";
-                response += "🎨 **Creatività**: problem solving, innovazione, design thinking\n\n";
-                response += "Cosa ti interesserebbe approfondire?";
-            }
-            
-            // Add contextual follow-up suggestions
-            const followUps = [
-                "\n\nVuoi che approfondisca qualche aspetto specifico?",
-                "\n\nHai domande su come applicare questo in pratica?",
-                "\n\nTi interesserebbe vedere esempi concreti?",
-                "\n\nCi sono altri argomenti correlati che vorresti esplorare?",
-                "\n\nPosso spiegarti meglio qualche punto particolare?",
-                "\n\nHai bisogno di chiarimenti su aspetti tecnici?",
-                "\n\nVuoi sapere come iniziare concretamente?",
-                "\n\nTi servirebbe una guida step-by-step?"
-            ];
-            
-            if (Math.random() > 0.3 && bestMatch && bestMatch.score > 5) {
-                response += followUps[Math.floor(Math.random() * followUps.length)];
-            }
-            
-            return response;
-        }
+        // Note: La knowledge base statica è stata rimossa - ora usiamo API AI per risposte dinamiche
 
         // Conversation context tracking
         let conversationContext = [];
         let conversationHistory = [];
+        
+        // API Configuration
+        const API_CONFIG = {
+            // Puoi cambiare questo per usare diverse API
+            provider: 'openai', // 'openai', 'anthropic', 'groq', 'gemini'
+            
+            // OpenAI Configuration
+            openai: {
+                endpoint: 'https://api.openai.com/v1/chat/completions',
+                model: 'gpt-3.5-turbo',
+                apiKey: 'YOUR_OPENAI_API_KEY' // Sostituisci con la tua chiave
+            },
+            
+            // Groq Configuration (spesso gratuito e veloce)
+            groq: {
+                endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+                model: 'llama3-8b-8192',
+                apiKey: 'YOUR_GROQ_API_KEY' // Sostituisci con la tua chiave
+            },
+            
+            // Anthropic Configuration
+            anthropic: {
+                endpoint: 'https://api.anthropic.com/v1/messages',
+                model: 'claude-3-sonnet-20240229',
+                apiKey: 'YOUR_ANTHROPIC_API_KEY' // Sostituisci con la tua chiave
+            },
+            
+            // Gemini Configuration
+            gemini: {
+                endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+                apiKey: 'YOUR_GEMINI_API_KEY' // Sostituisci con la tua chiave
+            }
+        };
+        
+        // API Helper Functions
+        
+        // OpenAI API Call
+        async function callOpenAI(messages) {
+            const config = API_CONFIG.openai;
+            const response = await fetch(config.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    messages: messages,
+                    max_tokens: 1000,
+                    temperature: 0.7,
+                    stream: false
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`OpenAI API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+        
+        // Groq API Call
+        async function callGroq(messages) {
+            const config = API_CONFIG.groq;
+            const response = await fetch(config.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    messages: messages,
+                    max_tokens: 1000,
+                    temperature: 0.7
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Groq API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+        
+        // Anthropic API Call
+        async function callAnthropic(messages) {
+            const config = API_CONFIG.anthropic;
+            const systemMessage = messages.find(m => m.role === 'system');
+            const userMessages = messages.filter(m => m.role !== 'system');
+            
+            const response = await fetch(config.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`,
+                    'anthropic-version': '2023-06-01'
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    max_tokens: 1000,
+                    system: systemMessage ? systemMessage.content : "Sei un assistente AI utile e competente.",
+                    messages: userMessages.map(m => ({
+                        role: m.role === 'assistant' ? 'assistant' : 'user',
+                        content: m.content
+                    }))
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Anthropic API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.content[0].text;
+        }
+        
+        // Gemini API Call
+        async function callGemini(messages) {
+            const config = API_CONFIG.gemini;
+            const prompt = messages.map(m => m.content).join('\n\n');
+            
+            const response = await fetch(`${config.endpoint}?key=${config.apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: prompt }]
+                    }]
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Gemini API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+        
+        // Generic API Call Router
+        async function callAI(userMessage) {
+            try {
+                // Prepara i messaggi per l'API
+                const messages = [
+                    {
+                        role: 'system',
+                        content: `Sei un assistente AI molto competente e amichevole. Rispondi sempre in italiano. 
+                        Puoi aiutare con qualsiasi argomento: programmazione, scienza, matematica, business, creatività, 
+                        e molto altro. Fornisci risposte dettagliate, pratiche e utili. Usa esempi quando appropriato.
+                        Se ti vengono chiesti esempi di codice, forniscili in formato markdown con i giusti linguaggi.`
+                    },
+                    // Aggiungi gli ultimi messaggi della conversazione per contesto
+                    ...conversationHistory.slice(-6).map(msg => ({
+                        role: msg.role === 'user' ? 'user' : 'assistant',
+                        content: msg.content
+                    })),
+                    {
+                        role: 'user',
+                        content: userMessage
+                    }
+                ];
+                
+                // Chiama l'API appropriata
+                let response;
+                switch (API_CONFIG.provider) {
+                    case 'openai':
+                        response = await callOpenAI(messages);
+                        break;
+                    case 'groq':
+                        response = await callGroq(messages);
+                        break;
+                    case 'anthropic':
+                        response = await callAnthropic(messages);
+                        break;
+                    case 'gemini':
+                        response = await callGemini(messages);
+                        break;
+                    default:
+                        throw new Error(`Provider non supportato: ${API_CONFIG.provider}`);
+                }
+                
+                return response;
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                
+                // Fallback a risposta di errore utile
+                if (error.message.includes('401') || error.message.includes('403')) {
+                    return `❌ **Errore di autenticazione**: Sembra che la chiave API non sia valida. 
+                    
+Per configurare il chatbot:
+1. Ottieni una chiave API da uno di questi provider:
+   - **OpenAI**: https://platform.openai.com/api-keys
+   - **Groq**: https://console.groq.com/keys (spesso gratuito)
+   - **Anthropic**: https://console.anthropic.com/
+   - **Google Gemini**: https://makersuite.google.com/app/apikey
+
+2. Sostituisci "YOUR_API_KEY" nella configurazione con la tua chiave reale.
+
+3. Cambia \`API_CONFIG.provider\` per scegliere quale API utilizzare.
+
+**Suggerimento**: Groq è spesso gratuito e molto veloce! 🚀`;
+                    
+                } else if (error.message.includes('429')) {
+                    return `⏳ **Rate limit raggiunto**: Troppe richieste. Riprova tra qualche secondo.`;
+                    
+                } else if (error.message.includes('500')) {
+                    return `🔧 **Errore del server**: Il servizio è temporaneamente non disponibile. Riprova più tardi.`;
+                    
+                } else {
+                    return `❌ **Errore di connessione**: ${error.message}
+                    
+Assicurati di avere:
+- Una connessione internet stabile
+- Una chiave API valida
+- Il provider corretto configurato
+
+Prova a ricaricare la pagina o cambiare provider nelle impostazioni.`;
+                }
+            }
+        }
         
         // Enhanced greeting and farewell detection
         function detectGreeting(message) {
@@ -1322,8 +1128,8 @@ def test_model_robustness(model, X_test):
             return farewells.some(farewell => message.toLowerCase().includes(farewell));
         }
         
-        // Enhanced chatbot functions
-        function sendMessage() {
+        // Enhanced chatbot functions with API integration
+        async function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             
@@ -1344,7 +1150,9 @@ def test_model_robustness(model, X_test):
                 'Elaborando la risposta...',
                 'Analizzando la domanda...',
                 'Un momento...',
-                'Cerco le informazioni...'
+                'Cerco le informazioni...',
+                'Consultando l\'AI...',
+                'Preparando la risposta...'
             ];
             
             const typingDiv = document.createElement('div');
@@ -1354,54 +1162,199 @@ def test_model_robustness(model, X_test):
             typingDiv.id = 'typing-indicator';
             document.getElementById('chatMessages').appendChild(typingDiv);
             
-            // Generate and send response
-            setTimeout(() => {
+            // Generate and send response using AI API
+            try {
+                // Disable input during processing
+                input.disabled = true;
+                
+                let response;
+                
+                // Use AI API for all responses
+                response = await callAI(message);
+                
                 // Remove typing indicator
                 const indicator = document.getElementById('typing-indicator');
                 if (indicator) indicator.remove();
                 
-                // Generate contextual response
-                let response;
-                
-                if (detectGreeting(message) && conversationHistory.length <= 2) {
-                    response = generateGreetingResponse(message);
-                } else if (detectFarewell(message)) {
-                    response = generateFarewellResponse(message);
-                } else {
-                    response = generateDynamicResponse(message);
-                }
-                
                 // Add to conversation history
-                conversationHistory.push({ role: 'bot', content: response, timestamp: Date.now() });
+                conversationHistory.push({ role: 'assistant', content: response, timestamp: Date.now() });
                 
                 addMessage(response, 'bot');
-            }, 800 + Math.random() * 1200); // Variable delay for realism
+                
+            } catch (error) {
+                console.error('Error generating response:', error);
+                
+                // Remove typing indicator
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) indicator.remove();
+                
+                // Show error message
+                const errorResponse = `❌ **Ops, qualcosa è andato storto!**
+                
+Sembra che ci sia un problema con la connessione all'AI. Questo potrebbe essere dovuto a:
+- Chiave API non configurata o non valida
+- Problemi di connessione internet
+- Limiti di rate dell'API raggiunti
+
+**Per risolvere:**
+1. Verifica che la tua chiave API sia configurata correttamente
+2. Controlla la tua connessione internet
+3. Riprova tra qualche secondo
+
+Se il problema persiste, prova a cambiare provider API nelle impostazioni! 🔧`;
+                
+                addMessage(errorResponse, 'bot');
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                input.focus();
+            }
         }
         
-        // Generate contextual greeting responses
-        function generateGreetingResponse(message) {
-            const greetingResponses = [
-                "Ciao! Sono il tuo assistente AI personale. Come posso aiutarti oggi?",
-                "Salve! Sono qui per rispondere alle tue domande su qualsiasi argomento. Cosa ti interessa?",
-                "Ciao! Benvenuto! Posso aiutarti con programmazione, scienza, business, creatività e molto altro. Di cosa parliamo?",
-                "Salve! Sono un assistente AI versatile. Puoi chiedermi qualsiasi cosa: da questioni tecniche a curiosità generali!",
-                "Ciao! Pronto ad aiutarti con le tue domande. Hai qualcosa di specifico in mente o vuoi esplorare un argomento particolare?"
-            ];
+        // API Configuration Panel
+        function showAPIConfig() {
+            const configHTML = `
+                <div id="apiConfigModal" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                ">
+                    <div style="
+                        background: #1a1a1a;
+                        border-radius: 12px;
+                        padding: 2rem;
+                        max-width: 600px;
+                        width: 90%;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                        border: 1px solid #3a3a3a;
+                    ">
+                        <h2 style="color: #667eea; margin-bottom: 1rem;">🔧 Configurazione API</h2>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Provider API:</label>
+                            <select id="apiProvider" style="
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 1px solid #3a3a3a;
+                                border-radius: 8px;
+                                background: #2a2a2a;
+                                color: #fff;
+                                font-size: 1rem;
+                            ">
+                                <option value="openai">OpenAI (GPT-3.5/GPT-4)</option>
+                                <option value="groq">Groq (Veloce e spesso gratuito)</option>
+                                <option value="anthropic">Anthropic (Claude)</option>
+                                <option value="gemini">Google Gemini</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Chiave API:</label>
+                            <input type="password" id="apiKey" placeholder="Inserisci la tua chiave API..." style="
+                                width: 100%;
+                                padding: 0.75rem;
+                                border: 1px solid #3a3a3a;
+                                border-radius: 8px;
+                                background: #2a2a2a;
+                                color: #fff;
+                                font-size: 1rem;
+                            ">
+                        </div>
+                        
+                        <div style="background: #2a2a2a; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                            <h3 style="color: #4ade80; margin-bottom: 0.5rem;">Come ottenere le chiavi API:</h3>
+                            <ul style="color: #ddd; margin-left: 1rem;">
+                                <li><strong>OpenAI:</strong> https://platform.openai.com/api-keys</li>
+                                <li><strong>Groq:</strong> https://console.groq.com/keys (spesso gratuito!)</li>
+                                <li><strong>Anthropic:</strong> https://console.anthropic.com/</li>
+                                <li><strong>Gemini:</strong> https://makersuite.google.com/app/apikey</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button onclick="closeAPIConfig()" style="
+                                background: #6b7280;
+                                color: white;
+                                border: none;
+                                padding: 0.75rem 1.5rem;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                font-weight: 500;
+                            ">Annulla</button>
+                            <button onclick="saveAPIConfig()" style="
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                                border: none;
+                                padding: 0.75rem 1.5rem;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                font-weight: 500;
+                            ">Salva</button>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            return greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
+            document.body.insertAdjacentHTML('beforeend', configHTML);
+            
+            // Load current values
+            document.getElementById('apiProvider').value = API_CONFIG.provider;
+            document.getElementById('apiKey').value = API_CONFIG[API_CONFIG.provider].apiKey;
         }
         
-        // Generate contextual farewell responses
-        function generateFarewellResponse(message) {
-            const farewellResponses = [
-                "È stato un piacere aiutarti! Torna quando vuoi per altre domande. Buona giornata! 👋",
-                "Arrivederci! Spero di essere stato utile. Sono sempre qui se hai altre domande! 😊",
-                "Grazie per la conversazione! Non esitare a tornare se hai bisogno di aiuto. A presto! 🚀",
-                "Ciao! È stato interessante parlare con te. Ricorda che sono sempre disponibile per nuove domande! ✨",
-                "Salutami! Spero di aver risposto alle tue domande. Ci sentiamo presto! 🎯"
-            ];
+        function closeAPIConfig() {
+            const modal = document.getElementById('apiConfigModal');
+            if (modal) modal.remove();
+        }
+        
+        function saveAPIConfig() {
+            const provider = document.getElementById('apiProvider').value;
+            const apiKey = document.getElementById('apiKey').value;
             
-            return farewellResponses[Math.floor(Math.random() * farewellResponses.length)];
+            if (!apiKey || apiKey.includes('YOUR_')) {
+                alert('Inserisci una chiave API valida!');
+                return;
+            }
+            
+            // Update configuration
+            API_CONFIG.provider = provider;
+            API_CONFIG[provider].apiKey = apiKey;
+            
+            // Save to localStorage
+            localStorage.setItem('mlops_api_config', JSON.stringify({
+                provider: provider,
+                apiKey: apiKey
+            }));
+            
+            closeAPIConfig();
+            
+            // Update chatbot message
+            addMessage(`✅ **Configurazione salvata!**
+            
+Provider: **${provider.toUpperCase()}**
+API configurata correttamente. Ora puoi farmi qualsiasi domanda! 🚀`, 'bot');
+        }
+        
+        // Load API configuration from localStorage
+        function loadAPIConfig() {
+            const saved = localStorage.getItem('mlops_api_config');
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    API_CONFIG.provider = config.provider;
+                    API_CONFIG[config.provider].apiKey = config.apiKey;
+                } catch (e) {
+                    console.error('Error loading API config:', e);
+                }
+            }
         }
 
         function addMessage(text, sender) {
@@ -1547,6 +1500,9 @@ def test_model_robustness(model, X_test):
         window.checkAnswer = checkAnswer;
         window.nextQuestion = nextQuestion;
         window.resetQuiz = resetQuiz;
+        window.showAPIConfig = showAPIConfig;
+        window.closeAPIConfig = closeAPIConfig;
+        window.saveAPIConfig = saveAPIConfig;
 
         // Save and load progress
         function saveProgress() {
@@ -1576,7 +1532,9 @@ def test_model_robustness(model, X_test):
             // Keep only the initial bot message
             messagesContainer.innerHTML = `
                 <div class="message bot">
-                    Ciao! Sono il tuo assistente AI personale. Posso aiutarti con:
+                    🤖 <strong>Assistente AI con API Reale</strong>
+                    <br><br>
+                    Ciao! Sono alimentato da intelligenza artificiale avanzata e posso aiutarti con qualsiasi domanda su:
                     <br><br>
                     🤖 <strong>AI & Machine Learning</strong>: algoritmi, deep learning, MLOps
                     <br>💻 <strong>Programmazione</strong>: Python, JavaScript, web development
@@ -1585,15 +1543,17 @@ def test_model_robustness(model, X_test):
                     <br>🔬 <strong>Scienza</strong>: matematica, fisica, metodologie di ricerca
                     <br>🎨 <strong>Creatività</strong>: problem solving, innovazione, design thinking
                     <br><br>
-                    Cosa vorresti approfondire? Puoi farmi qualsiasi domanda!
+                    <strong>💡 Novità</strong>: Rispondo usando API AI reali come OpenAI, Claude, o Groq!
+                    <br>Configura la tua API cliccando ⚙️ per iniziare.
                 </div>
             `;
         }
         
         // Initialize application
         function initializeApp() {
-            // Load progress
+            // Load progress and API configuration
             loadProgress();
+            loadAPIConfig();
             
             // Setup navigation event listeners
             document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1607,11 +1567,16 @@ def test_model_robustness(model, X_test):
             const chatInput = document.getElementById('chatInput');
             const sendBtn = document.getElementById('sendBtn');
             const clearBtn = document.getElementById('clearBtn');
+            const configBtn = document.getElementById('configBtn');
             
             sendBtn.addEventListener('click', sendMessage);
             
             if (clearBtn) {
                 clearBtn.addEventListener('click', clearChat);
+            }
+            
+            if (configBtn) {
+                configBtn.addEventListener('click', showAPIConfig);
             }
             
             chatInput.addEventListener('keypress', function(e) {
@@ -1636,6 +1601,30 @@ def test_model_robustness(model, X_test):
                     placeholderIndex = (placeholderIndex + 1) % placeholders.length;
                 }
             }, 3000);
+            
+            // Check if API is configured
+            if (API_CONFIG[API_CONFIG.provider].apiKey.includes('YOUR_')) {
+                // Show configuration prompt
+                setTimeout(() => {
+                    addMessage(`🔧 **Configurazione richiesta**
+
+Per utilizzare il chatbot AI, devi prima configurare una chiave API.
+
+Clicca sul pulsante ⚙️ per configurare l'API, oppure usa uno di questi provider:
+
+🚀 **Consigliato**: Groq (gratuito e veloce)
+- Vai su: https://console.groq.com/keys
+- Crea un account gratuito
+- Genera una chiave API
+
+🧠 **Alternativa**: OpenAI (a pagamento)
+- Vai su: https://platform.openai.com/api-keys
+- Accedi al tuo account
+- Genera una chiave API
+
+Una volta ottenuta la chiave, clicca ⚙️ per configurarla!`, 'bot');
+                }, 1000);
+            }
             
             // Initial progress update
             updateProgress();
