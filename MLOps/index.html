@@ -759,18 +759,21 @@ jobs:
             </div>
             <div class="chatbot-messages" id="chatMessages">
                 <div class="message bot">
-                    Ciao! Sono il tuo assistente per MLOps Testing. Posso aiutarti con:
+                    Ciao! Sono il tuo assistente AI personale. Posso aiutarti con:
                     <br><br>
-                    • Chiarimenti sui concetti
-                    <br>• Esempi di codice
-                    <br>• Best practices
-                    <br>• Risoluzione problemi
+                    🤖 <strong>AI & Machine Learning</strong>: algoritmi, deep learning, MLOps
+                    <br>💻 <strong>Programmazione</strong>: Python, JavaScript, web development
+                    <br>📊 <strong>Data Science</strong>: statistiche, analisi dati, visualizzazione
+                    <br>🏢 <strong>Business</strong>: project management, digital transformation
+                    <br>🔬 <strong>Scienza</strong>: matematica, fisica, metodologie di ricerca
+                    <br>🎨 <strong>Creatività</strong>: problem solving, innovazione, design thinking
                     <br><br>
-                    Cosa vorresti approfondire?
+                    Cosa vorresti approfondire? Puoi farmi qualsiasi domanda!
                 </div>
             </div>
             <div class="chatbot-input">
                 <input type="text" id="chatInput" placeholder="Fai una domanda...">
+                <button id="clearBtn" title="Pulisci chat" style="background: #dc2626; margin-right: 0.5rem; padding: 0.75rem;">🗑️</button>
                 <button id="sendBtn">Invia</button>
             </div>
         </div>
@@ -878,9 +881,10 @@ jobs:
             document.getElementById('progressBar').style.width = progressPercentage + '%';
         }
 
-        // Enhanced chatbot with dynamic responses
-        const mlopsKnowledge = {
-            concepts: {
+        // Enhanced AI Assistant with comprehensive knowledge base
+        const comprehensiveKnowledge = {
+            // MLOps and AI/ML Topics
+            mlops: {
                 "data drift": {
                     definition: "cambiamento nella distribuzione dei dati nel tempo",
                     causes: ["evoluzione del comportamento utenti", "cambiamenti stagionali", "modifiche al sistema di raccolta dati"],
@@ -908,33 +912,170 @@ jobs:
                     metrics: ["accuracy", "latency", "throughput", "error rate", "data quality"],
                     tools: ["Prometheus", "Grafana", "Evidently AI", "WhyLabs"],
                     alerts: ["degradazione performance", "data drift", "system failures"]
+                },
+                "machine learning": {
+                    definition: "campo dell'intelligenza artificiale che si concentra sulla creazione di algoritmi che apprendono dai dati",
+                    types: ["supervised learning", "unsupervised learning", "reinforcement learning"],
+                    algorithms: ["linear regression", "decision trees", "neural networks", "SVM", "clustering"],
+                    applications: ["computer vision", "natural language processing", "recommendation systems", "predictive analytics"]
+                },
+                "deep learning": {
+                    definition: "sottocampo del machine learning che utilizza reti neurali profonde",
+                    architectures: ["CNN", "RNN", "LSTM", "Transformer", "GAN"],
+                    frameworks: ["TensorFlow", "PyTorch", "Keras", "JAX"],
+                    applications: ["riconoscimento immagini", "traduzione automatica", "generazione testi", "sintesi vocale"]
                 }
             },
             
-            tools: {
-                "great expectations": {
-                    purpose: "data validation e quality testing",
-                    features: ["expectation suite", "data docs", "CI/CD integration"],
-                    use_cases: ["validazione schema", "controllo distribuzioni", "data profiling"]
+            // Programming and Technology
+            programming: {
+                "python": {
+                    definition: "linguaggio di programmazione ad alto livello, interpretato e orientato agli oggetti",
+                    features: ["sintassi semplice", "tipizzazione dinamica", "librerie extensive", "multiparadigma"],
+                    uses: ["web development", "data science", "AI/ML", "automation", "scripting"],
+                    libraries: ["pandas", "numpy", "scikit-learn", "flask", "django"]
                 },
-                "pytest": {
-                    purpose: "framework di testing Python",
-                    features: ["fixtures", "parametrization", "plugins"],
-                    ml_usage: ["test model performance", "test data pipelines", "test API endpoints"]
+                "javascript": {
+                    definition: "linguaggio di programmazione interpretato, principalmente usato per lo sviluppo web",
+                    features: ["dinamico", "event-driven", "prototipale", "first-class functions"],
+                    uses: ["frontend web", "backend (Node.js)", "mobile apps", "desktop apps"],
+                    frameworks: ["React", "Vue.js", "Angular", "Node.js", "Express"]
                 },
-                "mlflow": {
-                    purpose: "gestione ciclo di vita ML",
-                    features: ["experiment tracking", "model registry", "deployment"],
-                    integration: ["con CI/CD", "con cloud providers", "con monitoring tools"]
+                "web development": {
+                    definition: "processo di creazione di applicazioni web",
+                    frontend: ["HTML", "CSS", "JavaScript", "React", "Vue", "Angular"],
+                    backend: ["Node.js", "Python", "Java", "C#", "PHP", "Ruby"],
+                    databases: ["MySQL", "PostgreSQL", "MongoDB", "Redis"],
+                    tools: ["Git", "Docker", "Kubernetes", "CI/CD pipelines"]
                 },
-                "prometheus": {
-                    purpose: "monitoring e alerting",
-                    features: ["time series database", "query language", "alert manager"],
-                    ml_metrics: ["prediction latency", "model accuracy", "request rate"]
+                "database": {
+                    definition: "sistema organizzato per memorizzare e gestire dati",
+                    types: ["relazionali (SQL)", "NoSQL", "graph databases", "time series"],
+                    concepts: ["normalization", "indexing", "transactions", "ACID properties"],
+                    popular: ["MySQL", "PostgreSQL", "MongoDB", "Redis", "Cassandra"]
                 }
             },
             
+            // Science and Mathematics
+            science: {
+                "statistics": {
+                    definition: "branca della matematica che studia la raccolta e l'analisi dei dati",
+                    concepts: ["media", "mediana", "deviazione standard", "distribuzione", "correlazione"],
+                    tests: ["t-test", "chi-square", "ANOVA", "regression analysis"],
+                    applications: ["ricerca scientifica", "business analytics", "qualità controllo"]
+                },
+                "mathematics": {
+                    definition: "scienza che studia numeri, forme, strutture e cambiamenti",
+                    branches: ["algebra", "geometria", "calcolo", "statistica", "logica"],
+                    concepts: ["funzioni", "derivate", "integrali", "matrici", "vettori"],
+                    applications: ["fisica", "ingegneria", "informatica", "economia"]
+                },
+                "physics": {
+                    definition: "scienza che studia la materia, l'energia e le loro interazioni",
+                    branches: ["meccanica", "termodinamica", "elettromagnetismo", "ottica", "fisica quantistica"],
+                    concepts: ["forza", "energia", "momento", "onde", "particelle"],
+                    applications: ["tecnologia", "medicina", "astronomia", "ingegneria"]
+                }
+            },
+            
+            // Business and Economics
+            business: {
+                "digital transformation": {
+                    definition: "integrazione di tecnologia digitale in tutte le aree di business",
+                    components: ["cloud computing", "AI/ML", "IoT", "big data", "automation"],
+                    benefits: ["efficienza operativa", "customer experience", "innovation", "competitive advantage"],
+                    challenges: ["change management", "skills gap", "security", "investment costs"]
+                },
+                "project management": {
+                    definition: "disciplina che applica processi e metodologie per raggiungere obiettivi",
+                    methodologies: ["Agile", "Scrum", "Waterfall", "Kanban", "Lean"],
+                    phases: ["iniziazione", "pianificazione", "esecuzione", "monitoraggio", "chiusura"],
+                    tools: ["Jira", "Trello", "Asana", "Microsoft Project", "Slack"]
+                }
+            },
+            
+            // General Knowledge
+            general: {
+                "creativity": {
+                    definition: "capacità di generare idee originali e innovative",
+                    techniques: ["brainstorming", "mind mapping", "design thinking", "lateral thinking"],
+                    domains: ["arte", "scrittura", "problem solving", "innovation", "design"],
+                    factors: ["curiosità", "apertura mentale", "esperienza", "conoscenza trasversale"]
+                },
+                "communication": {
+                    definition: "processo di trasmissione e ricezione di informazioni",
+                    types: ["verbale", "non verbale", "scritta", "visiva", "digitale"],
+                    skills: ["ascolto attivo", "empatia", "chiarezza", "persuasione", "storytelling"],
+                    tools: ["presentazioni", "email", "social media", "video calls", "documentation"]
+                }
+            },
+            
+            // Code Examples
             examples: {
+                "python basics": `# Esempio Python - Analisi dati
+import pandas as pd
+import numpy as np
+
+# Carica dataset
+df = pd.read_csv('data.csv')
+
+# Analisi esplorativa
+print(df.describe())
+print(df.info())
+
+# Pulizia dati
+df_clean = df.dropna()
+df_clean['new_column'] = df_clean['col1'] * 2
+
+# Visualizzazione
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10, 6))
+plt.hist(df_clean['column'], bins=30)
+plt.title('Distribuzione dei dati')
+plt.show()`,
+                
+                "javascript basics": `// Esempio JavaScript - API REST
+const fetchData = async (url) => {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Errore:', error);
+        return null;
+    }
+};
+
+// Utilizzo
+fetchData('https://api.example.com/data')
+    .then(data => {
+        console.log('Dati ricevuti:', data);
+        // Processa i dati
+    });
+
+// Event handling
+document.addEventListener('DOMContentLoaded', () => {
+    const button = document.getElementById('myButton');
+    button.addEventListener('click', () => {
+        alert('Bottone cliccato!');
+    });
+});`,
+                
+                "sql basics": `-- Esempio SQL - Query complessa
+SELECT 
+    u.name,
+    u.email,
+    COUNT(o.id) as total_orders,
+    SUM(o.amount) as total_spent,
+    AVG(o.amount) as avg_order_value
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.created_at >= '2023-01-01'
+GROUP BY u.id, u.name, u.email
+HAVING COUNT(o.id) > 5
+ORDER BY total_spent DESC
+LIMIT 10;`,
+                
                 "data validation": `# Esempio con Great Expectations
 import great_expectations as ge
 
@@ -955,216 +1096,241 @@ def test_model_robustness(model, X_test):
     pred_original = model.predict(X_test)
     pred_noisy = model.predict(X_noisy)
     consistency = np.mean(pred_original == pred_noisy)
-    assert consistency > 0.9`,
-                
-                "drift detection": `# Rilevamento drift con Evidently
-from evidently import DataDriftReport
-
-report = DataDriftReport()
-report.run(reference_data=train_data, current_data=prod_data)
-
-# Controlla se c'è drift significativo
-if report.get_drift_score() > 0.1:
-    send_alert("Data drift detected!")
-    trigger_retraining()`,
-                
-                "monitoring setup": `# Setup monitoring con Prometheus
-from prometheus_client import Counter, Histogram, Gauge
-
-# Metriche custom
-prediction_counter = Counter('ml_predictions_total', 'Total predictions')
-prediction_latency = Histogram('ml_prediction_duration_seconds', 'Prediction latency')
-model_accuracy = Gauge('ml_model_accuracy', 'Current model accuracy')
-
-# Uso nelle predizioni
-@prediction_latency.time()
-def predict(model, data):
-    prediction = model.predict(data)
-    prediction_counter.inc()
-    return prediction`
-            },
-            
-            best_practices: [
-                "Automatizza ogni test ripetitivo",
-                "Monitora metriche in tempo reale",
-                "Documenta test e risultati",
-                "Esegui test end-to-end",
-                "Valida fairness e bias",
-                "Implementa rollback automatici",
-                "Usa canary deployments",
-                "Mantieni version control di tutto"
-            ],
-            
-            common_issues: {
-                "performance degradation": {
-                    causes: ["data drift", "concept drift", "feature changes"],
-                    solutions: ["retraining", "feature engineering", "model update"]
-                },
-                "deployment failures": {
-                    causes: ["dependency conflicts", "resource limits", "API changes"],
-                    solutions: ["containerization", "thorough testing", "blue-green deployment"]
-                },
-                "data quality": {
-                    causes: ["schema changes", "missing values", "outliers"],
-                    solutions: ["validation pipelines", "data contracts", "monitoring"]
-                }
+    assert consistency > 0.9`
             }
         };
 
-        // Dynamic response generator
+        // Advanced AI Response Generator
         function generateDynamicResponse(message) {
             const lowerMessage = message.toLowerCase();
             const words = lowerMessage.split(' ');
             
-            // Analyze intent
-            const isQuestion = message.includes('?') || 
-                             words.some(w => ['come', 'cosa', 'quando', 'dove', 'perché', 'quale', 'quali'].includes(w));
-            const wantsExample = words.some(w => ['esempio', 'esempi', 'codice', 'mostra', 'mostrami'].includes(w));
-            const wantsList = words.some(w => ['elenca', 'lista', 'elenco', 'quali sono'].includes(w));
-            const wantsTool = words.some(w => ['tool', 'strumento', 'framework', 'libreria'].includes(w));
+            // Enhanced intent analysis
+            const intents = {
+                question: message.includes('?') || words.some(w => ['come', 'cosa', 'quando', 'dove', 'perché', 'quale', 'quali', 'chi'].includes(w)),
+                example: words.some(w => ['esempio', 'esempi', 'codice', 'mostra', 'mostrami', 'demo', 'tutorial'].includes(w)),
+                list: words.some(w => ['elenca', 'lista', 'elenco', 'quali sono', 'dimmi', 'tipi', 'tipologie'].includes(w)),
+                howTo: words.some(w => ['come fare', 'come si fa', 'come creare', 'come implementare', 'step', 'passaggi'].includes(w)),
+                comparison: words.some(w => ['differenza', 'confronto', 'vs', 'meglio', 'peggio', 'confronta'].includes(w)),
+                explanation: words.some(w => ['spiegami', 'spiega', 'cos\'è', 'cosa è', 'definizione', 'significato'].includes(w)),
+                advice: words.some(w => ['consiglio', 'consigli', 'suggerimento', 'best practice', 'raccomandazione'].includes(w)),
+                problem: words.some(w => ['problema', 'errore', 'bug', 'issue', 'non funziona', 'aiuto', 'help'].includes(w))
+            };
             
-            // Find relevant topics
+            // Find relevant topics from comprehensive knowledge
             let relevantTopics = [];
-            let relevantTools = [];
+            let bestMatch = null;
+            let maxScore = 0;
             
-            // Check for concept matches
-            for (const [concept, data] of Object.entries(mlopsKnowledge.concepts)) {
-                if (lowerMessage.includes(concept) || 
-                    (data.definition && lowerMessage.includes(data.definition.split(' ')[0]))) {
-                    relevantTopics.push({ type: 'concept', name: concept, data });
+            // Search through all categories
+            for (const [category, topics] of Object.entries(comprehensiveKnowledge)) {
+                if (category === 'examples') continue;
+                
+                for (const [topicName, topicData] of Object.entries(topics)) {
+                    let score = 0;
+                    
+                    // Check direct topic name match
+                    if (lowerMessage.includes(topicName)) score += 10;
+                    
+                    // Check keywords in definition
+                    if (topicData.definition && lowerMessage.split(' ').some(word => 
+                        topicData.definition.toLowerCase().includes(word) && word.length > 3)) {
+                        score += 5;
+                    }
+                    
+                    // Check other properties
+                    for (const [key, value] of Object.entries(topicData)) {
+                        if (Array.isArray(value)) {
+                            value.forEach(item => {
+                                if (lowerMessage.includes(item.toLowerCase())) score += 3;
+                            });
+                        } else if (typeof value === 'string') {
+                            if (lowerMessage.includes(value.toLowerCase())) score += 2;
+                        }
+                    }
+                    
+                    if (score > maxScore) {
+                        maxScore = score;
+                        bestMatch = { category, topicName, topicData, score };
+                    }
+                    
+                    if (score > 0) {
+                        relevantTopics.push({ category, topicName, topicData, score });
+                    }
                 }
             }
             
-            // Check for tool matches
-            for (const [tool, data] of Object.entries(mlopsKnowledge.tools)) {
-                if (lowerMessage.includes(tool)) {
-                    relevantTools.push({ type: 'tool', name: tool, data });
-                }
-            }
+            // Sort by relevance
+            relevantTopics.sort((a, b) => b.score - a.score);
             
-            // Build response
+            // Generate response
             let response = "";
             
-            // Introduction based on context
+            // Dynamic introduction
             const intros = [
                 "Ottima domanda! ",
                 "Interessante che tu chieda questo. ",
                 "Parliamo di questo argomento. ",
                 "Ti spiego volentieri. ",
-                "Ecco cosa posso dirti: "
+                "Ecco cosa posso dirti: ",
+                "Questa è una domanda importante. ",
+                "Perfetto, posso aiutarti con questo. ",
+                "Analizziamo questo insieme. "
             ];
-            response += intros[Math.floor(Math.random() * intros.length)];
             
-            // Main content
-            if (relevantTopics.length > 0) {
-                const topic = relevantTopics[0];
-                const data = topic.data;
+            if (bestMatch && bestMatch.score > 5) {
+                response += intros[Math.floor(Math.random() * intros.length)];
                 
-                response += `\n\n**${topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}** è ${data.definition}.\n\n`;
+                const topic = bestMatch.topicData;
+                const topicName = bestMatch.topicName;
+                const category = bestMatch.category;
                 
-                if (wantsExample && mlopsKnowledge.examples[topic.name]) {
-                    response += "Ecco un esempio pratico:\n\n```python\n" + mlopsKnowledge.examples[topic.name] + "\n```\n\n";
-                } else if (wantsList) {
+                // Main explanation
+                response += `\n\n**${topicName.charAt(0).toUpperCase() + topicName.slice(1)}** è ${topic.definition}.\n\n`;
+                
+                // Intent-based detailed response
+                if (intents.example) {
+                    // Show code example if available
+                    const example = comprehensiveKnowledge.examples[topicName] || 
+                                  comprehensiveKnowledge.examples[`${topicName} basics`];
+                    if (example) {
+                        response += "Ecco un esempio pratico:\n\n```\n" + example + "\n```\n\n";
+                    }
+                } else if (intents.list) {
                     // List relevant information
-                    if (data.types) {
+                    for (const [key, value] of Object.entries(topic)) {
+                        if (Array.isArray(value) && key !== 'definition') {
+                            response += `**${key.charAt(0).toUpperCase() + key.slice(1)}:**\n`;
+                            value.forEach(item => response += `• ${item}\n`);
+                            response += "\n";
+                        }
+                    }
+                } else if (intents.howTo) {
+                    // Provide step-by-step guidance
+                    response += "Per iniziare, ecco i passaggi principali:\n\n";
+                    if (topic.phases) {
+                        topic.phases.forEach((phase, index) => {
+                            response += `${index + 1}. ${phase}\n`;
+                        });
+                    } else if (topic.steps) {
+                        topic.steps.forEach((step, index) => {
+                            response += `${index + 1}. ${step}\n`;
+                        });
+                    } else {
+                        response += "1. Comprendi i concetti base\n";
+                        response += "2. Studia gli strumenti necessari\n";
+                        response += "3. Pratica con esempi semplici\n";
+                        response += "4. Implementa progetti reali\n";
+                    }
+                } else if (intents.comparison) {
+                    // Show comparisons or alternatives
+                    if (topic.types) {
                         response += "Tipologie principali:\n";
-                        data.types.forEach(type => response += `• ${type}\n`);
-                    } else if (data.causes) {
-                        response += "Cause comuni:\n";
-                        data.causes.forEach(cause => response += `• ${cause}\n`);
-                    } else if (data.solutions) {
-                        response += "Soluzioni consigliate:\n";
-                        data.solutions.forEach(sol => response += `• ${sol}\n`);
+                        topic.types.forEach(type => response += `• ${type}\n`);
+                    }
+                    if (topic.alternatives) {
+                        response += "\nAlternative:\n";
+                        topic.alternatives.forEach(alt => response += `• ${alt}\n`);
                     }
                 } else {
-                    // Provide contextual information
-                    if (lowerMessage.includes('come')) {
-                        if (data.detection) {
-                            response += "Per rilevarlo puoi usare:\n";
-                            data.detection.forEach(method => response += `• ${method}\n`);
-                        } else if (data.monitoring) {
-                            response += "Per monitorarlo:\n";
-                            data.monitoring.forEach(method => response += `• ${method}\n`);
-                        }
-                    } else if (lowerMessage.includes('perché') || lowerMessage.includes('causa')) {
-                        if (data.causes) {
-                            response += "Le cause principali sono:\n";
-                            data.causes.forEach(cause => response += `• ${cause}\n`);
-                        }
-                    } else if (lowerMessage.includes('soluzione') || lowerMessage.includes('risolvere')) {
-                        if (data.solutions || data.mitigation) {
-                            response += "Per risolvere questo problema:\n";
-                            (data.solutions || data.mitigation).forEach(sol => response += `• ${sol}\n`);
+                    // General detailed information
+                    let addedSections = 0;
+                    for (const [key, value] of Object.entries(topic)) {
+                        if (key === 'definition') continue;
+                        if (Array.isArray(value) && value.length > 0 && addedSections < 3) {
+                            response += `**${key.charAt(0).toUpperCase() + key.slice(1)}:**\n`;
+                            value.slice(0, 5).forEach(item => response += `• ${item}\n`);
+                            response += "\n";
+                            addedSections++;
                         }
                     }
                 }
-            } else if (relevantTools.length > 0) {
-                const tool = relevantTools[0];
-                const data = tool.data;
                 
-                response += `\n\n**${tool.name}** è uno strumento per ${data.purpose}.\n\n`;
-                
-                if (data.features) {
-                    response += "Caratteristiche principali:\n";
-                    data.features.forEach(feature => response += `• ${feature}\n`);
+                // Add relevant examples
+                if (!intents.example && Object.keys(comprehensiveKnowledge.examples).some(key => 
+                    key.includes(topicName) || topicName.includes(key))) {
+                    response += "\n💡 Vuoi vedere un esempio di codice? Chiedimi: 'mostra esempio " + topicName + "'\n";
                 }
                 
-                if (wantsExample) {
-                    // Find relevant example
-                    for (const [exampleName, code] of Object.entries(mlopsKnowledge.examples)) {
-                        if (code.toLowerCase().includes(tool.name)) {
-                            response += "\n\nEsempio di utilizzo:\n\n```python\n" + code + "\n```";
-                            break;
-                        }
-                    }
-                }
-            } else if (lowerMessage.includes('best practice') || lowerMessage.includes('consigli')) {
-                response += "\n\nEcco alcune best practices per MLOps Testing:\n\n";
-                // Select random subset of best practices
-                const practices = mlopsKnowledge.best_practices
-                    .sort(() => 0.5 - Math.random())
-                    .slice(0, 5);
-                practices.forEach(practice => response += `✅ ${practice}\n`);
-            } else if (lowerMessage.includes('problema') || lowerMessage.includes('errore')) {
-                response += "\n\nProblemi comuni in MLOps e come risolverli:\n\n";
-                for (const [issue, data] of Object.entries(mlopsKnowledge.common_issues)) {
-                    response += `**${issue}**:\n`;
-                    response += `Cause: ${data.causes.join(', ')}\n`;
-                    response += `Soluzioni: ${data.solutions.join(', ')}\n\n`;
-                }
+            } else if (intents.problem) {
+                // Problem-solving response
+                response += "Capisco che hai un problema. ";
+                response += "Anche se non ho identificato il problema specifico, posso aiutarti con:\n\n";
+                response += "🔧 **Debugging**: Identificare la causa del problema\n";
+                response += "📚 **Documentazione**: Consultare risorse appropriate\n";
+                response += "🧪 **Testing**: Verificare soluzioni step-by-step\n";
+                response += "🤝 **Support**: Guidarti verso la soluzione\n\n";
+                response += "Puoi fornirmi più dettagli sul problema? Ad esempio:\n";
+                response += "• Cosa stai cercando di fare?\n";
+                response += "• Che errore ricevi?\n";
+                response += "• In che contesto?\n";
+                
+            } else if (intents.advice) {
+                // General advice response
+                response += "Ecco alcuni consigli generali che possono esserti utili:\n\n";
+                response += "✅ **Pianifica prima di agire**: Definisci obiettivi chiari\n";
+                response += "📖 **Continua ad imparare**: Mantieniti aggiornato sulle novità\n";
+                response += "🔄 **Pratica regolarmente**: L'esperienza è fondamentale\n";
+                response += "🤝 **Collabora**: Lavora con altri e condividi conoscenze\n";
+                response += "🧪 **Sperimenta**: Prova approcci diversi\n";
+                response += "📊 **Misura i risultati**: Monitora i progressi\n\n";
+                
             } else {
-                // Generic helpful response
-                response += "\n\nNon sono sicuro di aver capito completamente la tua domanda. ";
-                response += "Posso aiutarti con:\n\n";
-                response += "📊 **Concetti**: data drift, model decay, testing strategies\n";
-                response += "🛠️ **Tool**: Great Expectations, pytest, MLflow, Prometheus\n";
-                response += "💻 **Esempi di codice**: validazione dati, test modelli, monitoring\n";
-                response += "✅ **Best practices**: automazione, CI/CD, monitoring\n\n";
-                response += "Prova a essere più specifico o chiedimi un esempio!";
+                // General conversational response
+                response += "Ciao! Sono qui per aiutarti con qualsiasi domanda. ";
+                response += "Posso assistere con:\n\n";
+                response += "🤖 **AI & Machine Learning**: algoritmi, deep learning, MLOps\n";
+                response += "💻 **Programmazione**: Python, JavaScript, web development\n";
+                response += "📊 **Data Science**: statistiche, analisi dati, visualizzazione\n";
+                response += "🏢 **Business**: project management, digital transformation\n";
+                response += "🔬 **Scienza**: matematica, fisica, metodologie di ricerca\n";
+                response += "🎨 **Creatività**: problem solving, innovazione, design thinking\n\n";
+                response += "Cosa ti interesserebbe approfondire?";
             }
             
-            // Add follow-up suggestions
+            // Add contextual follow-up suggestions
             const followUps = [
-                "\n\nVuoi che approfondisca qualche aspetto in particolare?",
-                "\n\nPosso mostrarti un esempio di codice se ti interessa.",
-                "\n\nHai bisogno di altri chiarimenti su questo argomento?",
-                "\n\nTi interesserebbe conoscere i tool correlati?",
-                "\n\nVuoi sapere le best practices per questo scenario?"
+                "\n\nVuoi che approfondisca qualche aspetto specifico?",
+                "\n\nHai domande su come applicare questo in pratica?",
+                "\n\nTi interesserebbe vedere esempi concreti?",
+                "\n\nCi sono altri argomenti correlati che vorresti esplorare?",
+                "\n\nPosso spiegarti meglio qualche punto particolare?",
+                "\n\nHai bisogno di chiarimenti su aspetti tecnici?",
+                "\n\nVuoi sapere come iniziare concretamente?",
+                "\n\nTi servirebbe una guida step-by-step?"
             ];
             
-            if (Math.random() > 0.5) {
+            if (Math.random() > 0.3 && bestMatch && bestMatch.score > 5) {
                 response += followUps[Math.floor(Math.random() * followUps.length)];
             }
             
             return response;
         }
 
-        // Chatbot functions
+        // Conversation context tracking
+        let conversationContext = [];
+        let conversationHistory = [];
+        
+        // Enhanced greeting and farewell detection
+        function detectGreeting(message) {
+            const greetings = ['ciao', 'hello', 'salve', 'buongiorno', 'buonasera', 'hey', 'salut'];
+            return greetings.some(greeting => message.toLowerCase().includes(greeting));
+        }
+        
+        function detectFarewell(message) {
+            const farewells = ['arrivederci', 'addio', 'bye', 'ciao', 'grazie', 'ci sentiamo', 'a presto'];
+            return farewells.some(farewell => message.toLowerCase().includes(farewell));
+        }
+        
+        // Enhanced chatbot functions
         function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
             
             if (!message) return;
+            
+            // Add to conversation history
+            conversationHistory.push({ role: 'user', content: message, timestamp: Date.now() });
             
             // Add user message
             addMessage(message, 'user');
@@ -1172,10 +1338,19 @@ def predict(model, data):
             // Clear input
             input.value = '';
             
-            // Show typing indicator
+            // Show typing indicator with varied messages
+            const typingMessages = [
+                'Sto pensando...',
+                'Elaborando la risposta...',
+                'Analizzando la domanda...',
+                'Un momento...',
+                'Cerco le informazioni...'
+            ];
+            
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message bot';
-            typingDiv.innerHTML = '<span class="loading"></span> Sto pensando...';
+            typingDiv.innerHTML = '<span class="loading"></span> ' + 
+                typingMessages[Math.floor(Math.random() * typingMessages.length)];
             typingDiv.id = 'typing-indicator';
             document.getElementById('chatMessages').appendChild(typingDiv);
             
@@ -1185,10 +1360,48 @@ def predict(model, data):
                 const indicator = document.getElementById('typing-indicator');
                 if (indicator) indicator.remove();
                 
-                // Generate dynamic response
-                const response = generateDynamicResponse(message);
+                // Generate contextual response
+                let response;
+                
+                if (detectGreeting(message) && conversationHistory.length <= 2) {
+                    response = generateGreetingResponse(message);
+                } else if (detectFarewell(message)) {
+                    response = generateFarewellResponse(message);
+                } else {
+                    response = generateDynamicResponse(message);
+                }
+                
+                // Add to conversation history
+                conversationHistory.push({ role: 'bot', content: response, timestamp: Date.now() });
+                
                 addMessage(response, 'bot');
             }, 800 + Math.random() * 1200); // Variable delay for realism
+        }
+        
+        // Generate contextual greeting responses
+        function generateGreetingResponse(message) {
+            const greetingResponses = [
+                "Ciao! Sono il tuo assistente AI personale. Come posso aiutarti oggi?",
+                "Salve! Sono qui per rispondere alle tue domande su qualsiasi argomento. Cosa ti interessa?",
+                "Ciao! Benvenuto! Posso aiutarti con programmazione, scienza, business, creatività e molto altro. Di cosa parliamo?",
+                "Salve! Sono un assistente AI versatile. Puoi chiedermi qualsiasi cosa: da questioni tecniche a curiosità generali!",
+                "Ciao! Pronto ad aiutarti con le tue domande. Hai qualcosa di specifico in mente o vuoi esplorare un argomento particolare?"
+            ];
+            
+            return greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
+        }
+        
+        // Generate contextual farewell responses
+        function generateFarewellResponse(message) {
+            const farewellResponses = [
+                "È stato un piacere aiutarti! Torna quando vuoi per altre domande. Buona giornata! 👋",
+                "Arrivederci! Spero di essere stato utile. Sono sempre qui se hai altre domande! 😊",
+                "Grazie per la conversazione! Non esitare a tornare se hai bisogno di aiuto. A presto! 🚀",
+                "Ciao! È stato interessante parlare con te. Ricorda che sono sempre disponibile per nuove domande! ✨",
+                "Salutami! Spero di aver risposto alle tue domande. Ci sentiamo presto! 🎯"
+            ];
+            
+            return farewellResponses[Math.floor(Math.random() * farewellResponses.length)];
         }
 
         function addMessage(text, sender) {
@@ -1196,15 +1409,52 @@ def predict(model, data):
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
             
-            // Convert markdown-style code blocks and formatting
+            // Enhanced markdown-style formatting
             let formattedText = text
-                .replace(/```python\n([\s\S]*?)```/g, '<pre style="background: #0a0a0a; padding: 1rem; border-radius: 8px; margin: 0.5rem 0; overflow-x: auto;">$1</pre>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Code blocks with language detection
+                .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+                    const language = lang || 'code';
+                    const langLabel = language.charAt(0).toUpperCase() + language.slice(1);
+                    return `<div style="position: relative; background: #0a0a0a; border-radius: 8px; margin: 0.5rem 0; overflow: hidden;">
+                        <div style="background: #667eea; color: white; padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: 500;">${langLabel}</div>
+                        <pre style="padding: 1rem; margin: 0; overflow-x: auto; color: #e5e5e5; font-family: 'Courier New', monospace;">${code}</pre>
+                    </div>`;
+                })
+                // Simple code blocks
+                .replace(/```\n([\s\S]*?)```/g, '<pre style="background: #0a0a0a; padding: 1rem; border-radius: 8px; margin: 0.5rem 0; overflow-x: auto; color: #e5e5e5; font-family: \'Courier New\', monospace;">$1</pre>')
+                // Inline code
+                .replace(/`([^`]+)`/g, '<code style="background: #2a2a2a; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: \'Courier New\', monospace; color: #e5e5e5;">$1</code>')
+                // Bold text
+                .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #4ade80;">$1</strong>')
+                // Italic text
+                .replace(/\*(.*?)\*/g, '<em style="color: #f0f0f0;">$1</em>')
+                // Links (basic detection)
+                .replace(/https?:\/\/[^\s<>"]+/g, '<a href="$&" target="_blank" style="color: #667eea; text-decoration: underline;">$&</a>')
+                // Lists
+                .replace(/^• (.+)$/gm, '<div style="margin: 0.3rem 0; padding-left: 1rem; position: relative;"><span style="position: absolute; left: 0; color: #4ade80;">•</span>$1</div>')
+                // Line breaks
                 .replace(/\n/g, '<br>');
             
             messageDiv.innerHTML = formattedText;
             messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Smooth scroll to bottom
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+            
+            // Add slight delay for better UX
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(10px)';
+                messageDiv.style.transition = 'opacity 0.3s, transform 0.3s';
+                
+                requestAnimationFrame(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0)';
+                });
+            }, 50);
         }
 
         // Quiz functions
@@ -1317,6 +1567,29 @@ def predict(model, data):
             }
         }
 
+        // Clear chat function
+        function clearChat() {
+            const messagesContainer = document.getElementById('chatMessages');
+            conversationHistory = [];
+            conversationContext = [];
+            
+            // Keep only the initial bot message
+            messagesContainer.innerHTML = `
+                <div class="message bot">
+                    Ciao! Sono il tuo assistente AI personale. Posso aiutarti con:
+                    <br><br>
+                    🤖 <strong>AI & Machine Learning</strong>: algoritmi, deep learning, MLOps
+                    <br>💻 <strong>Programmazione</strong>: Python, JavaScript, web development
+                    <br>📊 <strong>Data Science</strong>: statistiche, analisi dati, visualizzazione
+                    <br>🏢 <strong>Business</strong>: project management, digital transformation
+                    <br>🔬 <strong>Scienza</strong>: matematica, fisica, metodologie di ricerca
+                    <br>🎨 <strong>Creatività</strong>: problem solving, innovazione, design thinking
+                    <br><br>
+                    Cosa vorresti approfondire? Puoi farmi qualsiasi domanda!
+                </div>
+            `;
+        }
+        
         // Initialize application
         function initializeApp() {
             // Load progress
@@ -1333,14 +1606,36 @@ def predict(model, data):
             // Setup chatbot event listeners
             const chatInput = document.getElementById('chatInput');
             const sendBtn = document.getElementById('sendBtn');
+            const clearBtn = document.getElementById('clearBtn');
             
             sendBtn.addEventListener('click', sendMessage);
+            
+            if (clearBtn) {
+                clearBtn.addEventListener('click', clearChat);
+            }
             
             chatInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     sendMessage();
                 }
             });
+            
+            // Add some helpful placeholder text rotation
+            const placeholders = [
+                "Fai una domanda...",
+                "Cosa vuoi sapere?",
+                "Chiedimi qualsiasi cosa...",
+                "Come posso aiutarti?",
+                "Hai una domanda per me?"
+            ];
+            
+            let placeholderIndex = 0;
+            setInterval(() => {
+                if (chatInput.value === '') {
+                    chatInput.placeholder = placeholders[placeholderIndex];
+                    placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+                }
+            }, 3000);
             
             // Initial progress update
             updateProgress();
