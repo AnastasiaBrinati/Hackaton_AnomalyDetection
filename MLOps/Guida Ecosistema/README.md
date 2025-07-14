@@ -7,10 +7,10 @@
 ## Architettura del Sistema
 
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│ Applicazioni│────▶│  Prometheus  │────▶│   Grafana   │
-│   (Target)  │     │   (Storage)  │     │(Visualization)│
-└─────────────┘     └──────────────┘     └─────────────┘
+┌─────────────┐      ┌──────────────┐      ┌───────────────┐
+│ Applicazioni│────▶│  Prometheus  │────▶│    Grafana    │
+│   (Target)  │      │   (Storage)  │      │(Visualization)│
+└─────────────┘      └──────────────┘      └───────────────┘
 ```
 
 ## Installazione
