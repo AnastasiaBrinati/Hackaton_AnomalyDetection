@@ -2,10 +2,10 @@ global:
   scrape_interval: 15s # Frequenza con cui raccogliere le metriche
 
 scrape_configs:
-  - job_name: 'ml-model-app'
-    # L'host 'host.docker.internal' è una keyword speciale di Docker
-    # che permette al container di raggiungere i servizi in esecuzione sulla macchina host (il tuo PC)
+  - job_name: 'railway-mlops-app'
     static_configs:
-      - targets: ['host.docker.internal:5000']
-    scrape_interval: 5s # Raccolta più frequente per vedere i dati in tempo reale
-    metrics_path: /metrics
+      - targets: ['mlopsgrafana-production.up.railway.app:443']
+    scheme: https
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
