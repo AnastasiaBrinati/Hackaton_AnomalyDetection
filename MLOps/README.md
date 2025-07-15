@@ -1,19 +1,28 @@
-# MLOps - Monitoraggio con Prometheus e Grafana
+# MLOps - Sistema di Monitoraggio Avanzato con Prometheus e Grafana
 
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![Flask](https://img.shields.io/badge/Flask-3.1.1-red.svg)
-![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.7.0-orange.svg)
+![Flask](https://img.shields.io/badge/Flask-2.3.3-red.svg)
+![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.3.0-orange.svg)
 ![Prometheus](https://img.shields.io/badge/Prometheus-latest-orange.svg)
 ![Grafana](https://img.shields.io/badge/Grafana-latest-yellow.svg)
 ![Docker](https://img.shields.io/badge/Docker-required-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-Questo progetto implementa un sistema di monitoraggio per modelli di Machine Learning utilizzando Prometheus e Grafana, come parte di un framework MLOps per il testing continuo.
+Sistema MLOps completo per il monitoraggio avanzato di modelli di Machine Learning utilizzando Prometheus e Grafana, con **simulatore di traffico**, **20+ metriche** e **deployment online**.
+
+## ✨ Nuove Funzionalità
+
+- 🚀 **Simulatore di traffico automatico** - Genera dati realistici continuamente
+- 📊 **20+ metriche avanzate** - Qualità modello, sistema, business, errori
+- 🌐 **Deployment online** - Deploy gratuito su Railway + Grafana Cloud
+- 🔧 **Endpoint multipli** - Health check, simulazione traffico, info modello
+- 💡 **Monitoraggio intelligente** - Latenza variabile, errori simulati, diversi tipi utente
+- 📈 **Dashboard preconfigurate** - Template Grafana pronti all'uso
 
 ## Prerequisiti
 
-- **Sistema Operativo**: Linux (testato su Fedora 42)
+- **Sistema Operativo**: Linux (testato su Fedora 42) o Windows 10/11
 - **Docker**: Per eseguire Prometheus e Grafana
 - **Docker Compose**: Per orchestrare i container
 - **Python 3.8+**: Per l'applicazione ML
@@ -158,7 +167,6 @@ MLOps\Scripts\Activate.ps1
 # Dovresti vedere (MLOps) nel prompt
 ```
 
-
 ## Configurazione Completata e Testata
 
 Questo setup è stato completamente testato su **Fedora 42** con tutte le problematiche risolte:
@@ -183,721 +191,409 @@ Questo setup è stato completamente testato su **Fedora 42** con tutte le proble
 
 ## Struttura del Progetto
 
-Il progetto è organizzato come segue:
-
-### File Versionati (nel repository)
+### File Principali
 ```
 MLOps/
-├── README.md                 # Questa guida
-├── .gitignore               # Esclusioni Git per dataset/modelli
-├── docker-compose.yml        # Configurazione container Docker
-├── Grafana.ipynb            # Notebook principale con tutorial
-├── app.py                   # API Flask per il modello ML
+├── README.md                    # Questa guida
+├── app.py                       # 🚀 API Flask avanzata con simulatore
+├── requirements.txt             # 📦 Dipendenze Python
+├── Dockerfile                   # 🐳 Containerizzazione per deployment
+├── docker-compose.yml           # 🔧 Configurazione servizi locali
+├── start_mlops.sh               # 🎯 Script avvio locale
+├── deploy_railway.sh            # 🌐 Script deployment online
+├── grafana_dashboard.json       # 📊 Dashboard Grafana preconfigurata
+├── deployment_options.md        # 🚀 Guida deployment online
+├── grafana_cloud_setup.md       # ☁️ Setup Grafana Cloud
+├── SETUP_GUIDE.md               # 📋 Guida completa setup
 └── prometheus/
-    └── prometheus.yml       # Configurazione Prometheus
+    └── prometheus.yml           # ⚙️ Configurazione Prometheus
 ```
 
-### File Generati/Scaricati (esclusi dal repository)
+### File Generati/Scaricati
 ```
 MLOps/
-├── creditcard.csv          # 🔽 Dataset da scaricare da Kaggle (150MB)
-├── model.joblib            # 🤖 Modello addestrato (generato dal notebook)
-├── scaler.joblib           # 📊 Scaler per normalizzazione (generato dal notebook)
-├── MLOps/                  # 🐍 Environment virtuale Python (cartella)
-├── logs/                   # 📝 File di log dell'applicazione
-└── .ipynb_checkpoints/     # 📓 Checkpoint Jupyter Notebook
+├── creditcard.csv              # 🔽 Dataset da Kaggle (150MB)
+├── model.joblib                # 🤖 Modello addestrato
+├── scaler.joblib               # 📊 Scaler per normalizzazione
+├── MLOps/                      # 🐍 Environment virtuale Python
+└── logs/                       # 📝 File di log dell'applicazione
 ```
 
-> 📝 **Nota Git**: I file grandi (dataset, modelli) e temporanei sono esclusi dal version control tramite `.gitignore` per mantenere il repository leggero e pulito.
+## 🚀 Avvio Rapido
 
-## Configurazione Servizi
-
-### 1. Avvio Container
-
-#### Linux:
+### Opzione 1: Avvio Locale Automatico
 ```bash
-# Avvia Prometheus e Grafana
-sudo docker-compose up -d
-
-# Verifica che i container siano in esecuzione
-sudo docker ps
+# Installa dipendenze e avvia tutto
+chmod +x start_mlops.sh
+./start_mlops.sh
 ```
 
-#### Windows:
-```cmd
+### Opzione 2: Deployment Online (Gratuito)
+```bash
+# Deploy su Railway + Grafana Cloud
+chmod +x deploy_railway.sh
+./deploy_railway.sh
+```
+
+### Opzione 3: Avvio Manuale
+
+#### 1. Installazione Dipendenze
+```bash
+# Attiva environment virtuale
+source MLOps/bin/activate  # Linux
+# MLOps\Scripts\activate   # Windows
+
+# Installa dipendenze
+pip install -r requirements.txt
+```
+
+#### 2. Avvio Servizi
+```bash
 # Avvia Prometheus e Grafana
 docker-compose up -d
 
-# Verifica che i container siano in esecuzione
-docker ps
-```
-
-**Output atteso (entrambi i sistemi):**
-```
-NAMES        STATUS          PORTS
-grafana      Up X minutes    0.0.0.0:3000->3000/tcp
-prometheus   Up X minutes    0.0.0.0:9090->9090/tcp
-```
-
-### 2. Verifica Connessione Prometheus → Flask
-
-#### Linux:
-```bash
-# Verifica che Prometheus veda l'app Flask
-curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
-
-# Dovrebbe restituire: "health":"up"
-```
-
-#### Windows (PowerShell):
-```powershell
-# Verifica che Prometheus veda l'app Flask
-Invoke-RestMethod -Uri "http://localhost:9090/api/v1/targets" | Select-String '"health":"[^"]*"'
-
-# Oppure usa curl se installato:
-curl -s "http://localhost:9090/api/v1/targets" | findstr "health"
-```
-
-### 3. Accesso ai Servizi
-
-- **Grafana**: http://localhost:3000
-  - Username: `admin`
-  - Password: `admin` (ti chiederà di cambiarla al primo accesso)
-
-- **Prometheus**: http://localhost:9090 ⚠️ **NON** `http://prometheus:9090`
-  - Interfaccia web per query e monitoring
-  - `prometheus:9090` funziona solo dall'interno dei container Docker
-
-- **Flask API**: http://localhost:5000
-  - Endpoint: `POST /predict` per predizioni
-  - Endpoint: `GET /metrics` per metriche Prometheus
-
-## Primo Accesso a Grafana
-
-### 1. Login Iniziale
-1. Vai su http://localhost:3000
-2. Username: `admin`, Password: `admin`
-3. Cambia la password quando richiesto
-
-### 2. Configurazione Data Source
-1. Menu laterale (⚙️) → **Data Sources**
-2. **Add data source** → **Prometheus**
-3. URL: `http://prometheus:9090`
-4. **Save & Test**
-
-### 3. Creazione Dashboard
-1. Menu laterale (📊) → **Dashboards** → **New Dashboard**
-2. **Add visualization**
-3. Configura i pannelli come descritto nel notebook
-
-## Setup Modello ML
-
-### 1. Download Dataset
-
-⚠️ **Importante**: Il dataset non è incluso nel repository per motivi di dimensione e licenza.
-
-1. **Registrati su Kaggle** (se non hai già un account)
-2. **Scarica il dataset** da [Credit Card Fraud Detection](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
-3. **Estrai e posiziona** il file `creditcard.csv` nella cartella principale del progetto
-
-```bash
-# La struttura dovrebbe essere:
-MLOps/
-├── creditcard.csv          # ← File da scaricare
-├── docker-compose.yml
-├── Grafana.ipynb
-├── app.py
-├── prometheus/
-└── ...
-```
-
-> 📝 **Nota**: Il file `creditcard.csv` è escluso dal version control tramite `.gitignore` perché è un file di grandi dimensioni (150MB) e ha restrizioni di licenza Kaggle.
-
-### 2. Attivazione Environment Virtuale
-
-#### Linux:
-```bash
-# SEMPRE attiva l'environment virtuale prima di qualsiasi operazione Python
-source MLOps/bin/activate
-
-# Dovresti vedere (MLOps) nel prompt del terminale
-```
-
-#### Windows:
-```cmd
-# CMD
-MLOps\Scripts\activate
-
-# PowerShell
-MLOps\Scripts\Activate.ps1
-
-# Dovresti vedere (MLOps) nel prompt
-```
-
-### 3. Installazione Dipendenze Python
-
-**Entrambi i sistemi (con environment attivo):**
-```bash
-# Installa le librerie
-pip install pandas scikit-learn flask prometheus-client requests joblib
-
-# Verifica installazione
-python -c "import pandas, flask, prometheus_client, joblib; print('✅ Tutte le librerie OK!')"
-```
-
-### 4. Correzione File app.py
-Il file `app.py` deve avere le correzioni applicate:
-- Linea 32: `df = pd.DataFrame([data])` (non `pd.DataFrame(data, index=False)`)
-- Linea 38: `prediction = model.predict(data_scaled)[0]` (prendi primo elemento)
-
-### 5. Esecuzione del Notebook
-Apri e esegui il notebook `Grafana.ipynb` per:
-- Addestrare il modello (crea `model.joblib` e `scaler.joblib`)
-- Comprendere come funziona l'API Flask
-- Simulare traffico per testare le dashboard
-
-### 6. Avvio dell'API Flask
-```bash
-# Con environment attivo, avvia l'API
+# Avvia app Flask
 python app.py
-
-# Dovresti vedere:
-# * Running on all addresses (0.0.0.0)
-# * Running on http://127.0.0.1:5000
 ```
 
-### 7. Test dell'API
+## 🎯 Accesso ai Servizi
 
-#### 🐧 **Linux:**
+| Servizio | URL Locale | Credenziali |
+|----------|------------|-------------|
+| **App Flask** | http://localhost:5000 | - |
+| **Prometheus** | http://localhost:9090 | - |
+| **Grafana** | http://localhost:3000 | admin/admin |
+
+## 📊 API Endpoints Avanzati
+
+### Nuovi Endpoint Disponibili
+
+#### 🔍 **Health Check**
 ```bash
-# Test endpoint metrics
-curl http://localhost:5000/metrics
+curl http://localhost:5000/health
+```
+Restituisce stato sistema, uptime, predizioni totali e risorse.
 
-# Test predizione
+#### 🎯 **Predizione Frodi**
+```bash
 curl -X POST http://localhost:5000/predict \
   -H "Content-Type: application/json" \
-  -d '{"Time": 0, "V1": -1.36, "V2": -0.07, "V3": 2.54, "V4": 1.38, "V5": -0.34, "V6": 0.46, "V7": 0.24, "V8": 0.10, "V9": 0.36, "V10": 0.09, "V11": -0.55, "V12": -0.62, "V13": -0.99, "V14": -0.31, "V15": 1.47, "V16": -0.47, "V17": 0.21, "V18": 0.03, "V19": 0.40, "V20": 0.25, "V21": -0.02, "V22": 0.28, "V23": -0.11, "V24": 0.07, "V25": 0.13, "V26": -0.19, "V27": 0.13, "V28": -0.02, "Amount": 149.62}'
+  -d '{"amount": 1500, "age": 35, "account_balance": 10000, "transaction_frequency": 12, "location_risk": 0.3}'
 ```
+Restituisce predizione con probabilità frode, tipo utente, livello rischio.
 
-#### 🪟 **Windows (PowerShell):**
-```powershell
-# Test endpoint metrics
-Invoke-RestMethod -Uri "http://localhost:5000/metrics"
-
-# Test predizione
-$body = @{
-    Time = 0; V1 = -1.36; V2 = -0.07; V3 = 2.54; V4 = 1.38; V5 = -0.34;
-    V6 = 0.46; V7 = 0.24; V8 = 0.10; V9 = 0.36; V10 = 0.09; V11 = -0.55;
-    V12 = -0.62; V13 = -0.99; V14 = -0.31; V15 = 1.47; V16 = -0.47;
-    V17 = 0.21; V18 = 0.03; V19 = 0.40; V20 = 0.25; V21 = -0.02;
-    V22 = 0.28; V23 = -0.11; V24 = 0.07; V25 = 0.13; V26 = -0.19;
-    V27 = 0.13; V28 = -0.02; Amount = 149.62
-} | ConvertTo-Json
-
-Invoke-RestMethod -Uri "http://localhost:5000/predict" -Method POST -Body $body -ContentType "application/json"
+#### 📈 **Metriche Prometheus**
+```bash
+curl http://localhost:5000/metrics
 ```
+Espone tutte le 20+ metriche per Prometheus.
 
-#### Windows (CMD con curl):
-```cmd
-# Se hai curl installato su Windows
-curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -d "{\"Time\": 0, \"V1\": -1.36, \"V2\": -0.07, \"V3\": 2.54, \"V4\": 1.38, \"V5\": -0.34, \"V6\": 0.46, \"V7\": 0.24, \"V8\": 0.10, \"V9\": 0.36, \"V10\": 0.09, \"V11\": -0.55, \"V12\": -0.62, \"V13\": -0.99, \"V14\": -0.31, \"V15\": 1.47, \"V16\": -0.47, \"V17\": 0.21, \"V18\": 0.03, \"V19\": 0.40, \"V20\": 0.25, \"V21\": -0.02, \"V22\": 0.28, \"V23\": -0.11, \"V24\": 0.07, \"V25\": 0.13, \"V26\": -0.19, \"V27\": 0.13, \"V28\": -0.02, \"Amount\": 149.62}"
+#### ℹ️ **Informazioni Modello**
+```bash
+curl http://localhost:5000/model_info
 ```
+Restituisce versione modello, features, importance, ultimo training.
 
-## Metriche Monitorate
+#### 🚦 **Simulazione Traffico**
+```bash
+curl -X POST http://localhost:5000/simulate_traffic \
+  -H "Content-Type: application/json" \
+  -d '{"num_requests": 100}'
+```
+Genera traffico simulato per test e demo.
 
-Il sistema traccia le seguenti metriche:
+## 📊 Metriche Monitorate (20+ Metriche)
 
-1. **predictions_total**: Contatore delle predizioni totali (etichettate per classe)
-2. **prediction_latency_seconds**: Istogramma dei tempi di risposta
-3. **model_accuracy**: Gauge per monitorare l'accuratezza del modello
+### 🎯 **Metriche di Predizione**
+- `predictions_total` - Contatore predizioni per classe/utente/endpoint
+- `prediction_latency_seconds` - Istogramma latenza predizioni
+- `fraud_detection_score` - Score di confidenza frodi
 
-## 📈 Dashboard Grafana Suggerite
+### 🤖 **Metriche Qualità Modello**
+- `model_accuracy` - Accuratezza modello
+- `model_precision` - Precisione modello
+- `model_recall` - Recall modello
+- `model_f1_score` - F1-score modello
+- `model_version` - Versione modello corrente
+- `model_last_training_timestamp` - Timestamp ultimo training
+- `feature_importance` - Importanza features
 
-### Pannello 1: Latenza P95
+### 💻 **Metriche Sistema**
+- `system_cpu_usage_percent` - Utilizzo CPU
+- `system_memory_usage_percent` - Utilizzo memoria
+- `system_disk_usage_percent` - Utilizzo disco
+
+### 🌐 **Metriche HTTP**
+- `http_requests_total` - Richieste HTTP per metodo/endpoint/status
+- `http_request_duration_seconds` - Durata richieste HTTP
+
+### 💼 **Metriche Business**
+- `transaction_value_euros` - Valore transazioni
+- `throughput_requests_per_second` - Throughput sistema
+- `queue_size` - Dimensione coda
+
+### ⚠️ **Metriche Errori**
+- `errors_total` - Contatore errori per tipo/endpoint
+
+## 🎨 Dashboard Grafana Preconfigurate
+
+### Import Dashboard
+1. Vai su **Grafana** → **Dashboard** → **Import**
+2. Carica il file `grafana_dashboard.json`
+3. Seleziona data source Prometheus
+
+### Pannelli Disponibili
+- **Predictions/sec** - Frequenza predizioni in tempo reale
+- **Fraud Detection Rate** - Percentuale frodi rilevate
+- **Response Time** - Latenza P50, P95, P99
+- **Model Quality** - Accuracy, Precision, Recall, F1
+- **System Resources** - CPU, Memory, Disk
+- **Transaction Values** - Distribuzione valori transazioni
+- **Error Rate** - Frequenza errori
+- **Queue Size** - Dimensione coda sistema
+
+### Query Prometheus di Esempio
 ```promql
-histogram_quantile(0.95, sum(rate(prediction_latency_seconds_bucket[5m])) by (le))
+# Throughput predizioni
+rate(predictions_total[5m])
+
+# Latenza P95
+histogram_quantile(0.95, prediction_latency_seconds_bucket)
+
+# Tasso frodi
+rate(predictions_total{class_name="fraud"}[5m]) / rate(predictions_total[5m]) * 100
+
+# Errori per minuto
+rate(errors_total[1m]) * 60
 ```
 
-### Pannello 2: Throughput
-```promql
-sum(rate(predictions_total[5m]))
+## 🌐 Deployment Online (Gratuito)
+
+### Opzione 1: Railway (Raccomandato)
+```bash
+# Deploy automatico
+./deploy_railway.sh
+
+# Vantaggi:
+# ✅ Free tier generoso
+# ✅ Deploy automatico da GitHub
+# ✅ HTTPS incluso
+# ✅ Scaling automatico
 ```
 
-### Pannello 3: Distribuzione Predizioni
-```promql
-sum(rate(predictions_total[5m])) by (class_name)
+### Opzione 2: Grafana Cloud
+```bash
+# Dashboard gestita gratuitamente
+# Segui grafana_cloud_setup.md
+
+# Vantaggi:
+# ✅ 10k metriche/mese gratis
+# ✅ Alerting incluso
+# ✅ Storage storico
+# ✅ Gestione zero
 ```
+
+### Combinazione Perfetta
+1. **Railway** per l'app Flask
+2. **Grafana Cloud** per dashboard
+3. **Risultato**: Sistema MLOps completamente online gratis!
+
+## 🔧 Funzionalità Avanzate
+
+### 🤖 **Simulatore di Traffico Automatico**
+- Genera richieste automatiche ogni 1-5 secondi
+- Simula diversi tipi di utenti (premium, standard, basic)
+- Latenza variabile per realismo
+- Errori simulati (2% failure rate)
+
+### 📊 **Metriche Business Intelligenti**
+- Classifica transazioni per valore (high/low)
+- Livelli di rischio (high/medium/low)
+- Feature importance dinamica
+- Versioning modello automatico
+
+### 🚨 **Gestione Errori Avanzata**
+- Errori simulati realistici
+- Categorizzazione per tipo
+- Tracking per endpoint
+- Recovery automatico
+
+### 🎯 **Monitoraggio Predittivo**
+- Calcolo accuratezza in tempo reale
+- Drift detection simulato
+- Performance trending
+- Alerting configurabile
 
 ## 🛠️ Comandi Utili
 
 ### Gestione Container
 ```bash
-# Avvia i servizi
+# Avvia servizi
 docker-compose up -d
 
-# Ferma i servizi
+# Ferma servizi
 docker-compose down
 
 # Visualizza log
 docker-compose logs -f
 
-# Riavvia un servizio specifico
+# Riavvia servizio specifico
 docker-compose restart prometheus
 ```
 
-### Debugging
+### Test e Debug
 ```bash
-# Verifica configurazione
-docker-compose config
+# Verifica stato completo
+curl http://localhost:5000/health | jq
 
-# Stato dei container
-docker ps
+# Genera traffico per test
+curl -X POST http://localhost:5000/simulate_traffic \
+  -H "Content-Type: application/json" \
+  -d '{"num_requests": 50}'
 
-# Log di un container specifico
-docker logs prometheus
+# Verifica target Prometheus
+curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
+
+# Monitor metriche in tempo reale
+watch "curl -s http://localhost:5000/metrics | grep predictions_total"
 ```
 
-## Risoluzione Problemi
-
-### Diagnosi Rapida (Tutti i Sistemi)
-**Se qualcosa non funziona, usa questi comandi per identificare il problema:**
-
+### Deployment
 ```bash
-# 1. Verifica container Docker
-sudo docker ps
-# Dovresti vedere 'grafana' e 'prometheus' in stato "Up"
+# Deploy locale
+./start_mlops.sh
+
+# Deploy online
+./deploy_railway.sh
+
+# Setup Grafana Cloud
+# Segui grafana_cloud_setup.md
+```
+
+## 🐛 Risoluzione Problemi
+
+### Diagnosi Rapida
+```bash
+# 1. Verifica container
+docker ps
 
 # 2. Verifica Flask API
-curl -s http://localhost:5000/metrics | head -3
-# Dovrebbe restituire metriche Prometheus
+curl -s http://localhost:5000/health
 
 # 3. Verifica target Prometheus
-curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
-# Dovrebbe restituire: "health":"up"
+curl -s "http://localhost:9090/api/v1/targets" | grep health
 
 # 4. Verifica processo Flask
-ps aux | grep -i python | grep app.py
-# Dovrebbe mostrare il processo in esecuzione
-
-# 5. Testa Grafana → Prometheus
-# Vai su http://localhost:3000 e prova una query semplice come "up"
+ps aux | grep python | grep app.py
 ```
 
-**Interpretazione risultati**:
-- **Container non in esecuzione**: `sudo docker-compose up -d`
-- **Flask API non risponde**: Riavvia Flask (vedi sezione specifica)
-- **Target "down"**: Flask API bloccato o configurazione IP errata
-- **Grafana errori**: Prometheus non raggiungibile o Flask API non funziona
+### Problemi Comuni
 
-### Problemi Specifici Linux
-
-#### Docker daemon non in esecuzione
+#### Target Prometheus "down"
 ```bash
-sudo systemctl start docker
-sudo systemctl enable docker
-```
-
-#### Permessi negati per Docker
-```bash
-sudo usermod -aG docker $USER
-# Poi riavvia il terminale o fai logout/login
-```
-
-#### SELinux blocca Prometheus (Fedora/RHEL)
-```bash
-# Errore: "avc: denied { read } for comm="prometheus""
-sudo chcon -Rt container_file_t prometheus/
-sudo setsebool -P container_use_cephfs on
-sudo docker-compose restart prometheus
-```
-
-### Problemi Specifici Windows
-
-#### Docker Desktop non si avvia
-1. **Verifica WSL2**: Assicurati che WSL2 sia installato e funzionante
-```powershell
-wsl --list --verbose
-```
-
-2. **Riavvia Docker Desktop**: Dal system tray, fai clic destro su Docker → Restart
-3. **Verifica Hyper-V**: Su Windows Pro/Enterprise, assicurati che Hyper-V sia abilitato
-
-#### PowerShell Execution Policy
-Se ricevi errori nell'esecuzione di script PowerShell:
-```powershell
-# Apri PowerShell come Amministratore
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-#### Problemi con host.docker.internal
-Su Windows, se `host.docker.internal` non funziona:
-```cmd
-# Usa localhost invece
-# Modifica prometheus.yml sostituendo host.docker.internal con localhost
-```
-
-#### Python non trovato
-**Problema**: Comando python non riconosciuto
-
-**Soluzione**: Verifica installazione Python
-```cmd
-# Se non funziona, prova:
-py --version
-
-# Assicurati che Python sia nel PATH durante l'installazione
-```
-
-### Problemi Comuni (Linux & Windows)
-
-### Target Prometheus mostra "health":"down"
-**Problema**: Prometheus non riesce a raggiungere l'API Flask
-
-**Cause possibili**:
-1. **Flask API non in esecuzione**: Il servizio Flask non è attivo
-2. **Configurazione IP errata**: Prometheus configurato con IP sbagliato
-3. **Porta bloccata**: La porta 5000 è occupata da altro processo
-
-**Diagnosi**:
-```bash
-# 1. Verifica se Flask API è in esecuzione
-ps aux | grep -i python | grep app.py
-
-# 2. Verifica stato target Prometheus
-curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
-
-# 3. Verifica che la porta 5000 sia libera
-netstat -tlnp | grep :5000
-```
-
-**Soluzioni**:
-
-#### A. Avvia Flask API (se non in esecuzione)
-```bash
-# Attiva environment virtuale
-source MLOps/bin/activate
-
-# Avvia Flask API
+# Riavvia Flask API
+pkill -f "python app.py"
 python app.py
 ```
 
-#### B. Risolvi conflitto porta (se porta 5000 occupata)
+#### Porta 5000 occupata
 ```bash
-# Trova processo che usa porta 5000
+# Trova processo
 lsof -i :5000
-
-# Termina processo se necessario
 kill -9 <PID>
-
-# Oppure cambia porta in app.py
-# app.run(host='0.0.0.0', port=5001)
 ```
 
-#### C. Configura IP corretto (Linux)
+#### Container non si avviano
 ```bash
-# 1. Trova IP dell'host
-HOST_IP=$(hostname -I | awk '{print $1}')
-echo "IP dell'host: $HOST_IP"
-
-# 2. Modifica prometheus.yml
-sed -i "s/host.docker.internal:5000/${HOST_IP}:5000/" prometheus/prometheus.yml
-
-# 3. Riavvia Prometheus
-sudo docker-compose restart prometheus
-
-# 4. Verifica connessione
-curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
-# Dovrebbe restituire: "health":"up"
+# Riavvia servizi
+docker-compose down
+docker-compose up -d
 ```
 
-### Errore "Address already in use" (Porta 5000 occupata)
-**Problema**: Flask non può avviarsi perché la porta 5000 è già in uso
+## 🎯 Utilizzo Scenario Reali
 
-**Soluzione**: Identifica e risolvi il conflitto
+### 1. **Sviluppo Locale**
 ```bash
-# 1. Trova processo che usa porta 5000
-lsof -i :5000
-
-# 2. Termina il processo se necessario
-kill -9 <PID>
-
-# 3. Riavvia Flask API
-source MLOps/bin/activate
-python app.py
+# Avvio rapido per sviluppo
+./start_mlops.sh
+# Accedi: http://localhost:3000
 ```
 
-### Errore Grafana "There was an error returned querying the Prometheus API"
-**Problema**: Flask API si blocca o smette di rispondere, causando target Prometheus "down"
-
-**Sintomi**:
+### 2. **Demo e Presentazioni**
 ```bash
-# Target Prometheus mostra "down"
-curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
-"health":"down"
-
-# Flask API non risponde (timeout o nessuna risposta)
-curl -v http://localhost:5000/metrics
+# Genera traffico per demo
+curl -X POST http://localhost:5000/simulate_traffic \
+  -d '{"num_requests": 200}'
+# Dashboard si popola immediatamente
 ```
 
-**Diagnosi**: Controlla i log di Flask API
+### 3. **Produzione Online**
 ```bash
-# Verifica se Flask è in esecuzione
-ps aux | grep -i python | grep app.py
-
-# Se Flask è in esecuzione ma non risponde, controlla i log
-# Cerca errori o richieste che rimangono appese
+# Deploy su Railway
+./deploy_railway.sh
+# Setup Grafana Cloud
+# Risultato: URL pubblico condivisibile
 ```
 
-**Soluzione**: Riavvia Flask API
+### 4. **Testing e Validazione**
 ```bash
-# 1. Trova il PID del processo Flask
-ps aux | grep -i python | grep app.py
-
-# 2. Termina il processo che non risponde
-kill <PID>
-
-# 3. Riavvia Flask API con environment attivo
-source MLOps/bin/activate
-python app.py
+# Test automatici
+curl http://localhost:5000/health
+curl http://localhost:5000/model_info
+# Verifica tutte le metriche
 ```
 
-**Verifica risoluzione**:
-```bash
-# 1. Testa Flask API direttamente
-curl -s http://localhost:5000/metrics | head -5
+## 🚀 Prossimi Passi
 
-# 2. Verifica target Prometheus
-curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
-# Dovrebbe restituire: "health":"up"
+1. **Personalizza dashboard** con metriche specifiche
+2. **Configura alerting** per soglie critiche
+3. **Integra modello reale** sostituendo la simulazione
+4. **Aggiungi A/B testing** per versioni modello
+5. **Implementa drift detection** per qualità dati
+6. **Configura CI/CD** per deployment automatico
 
-# 3. Controlla i log Flask - dovresti vedere richieste da container Prometheus:
-# 172.18.0.2 - - [timestamp] "GET /metrics HTTP/1.1" 200 -
-```
+## 📚 Risorse e Documentazione
 
-### Docker permissions (permessi negati)
-**Problema**: Errore "permission denied" sui comandi Docker
+- **Setup Guide**: `SETUP_GUIDE.md` - Guida completa setup
+- **Deployment**: `deployment_options.md` - Tutte le opzioni deployment
+- **Grafana Cloud**: `grafana_cloud_setup.md` - Setup dashboard cloud
+- **Dashboard**: `grafana_dashboard.json` - Template dashboard
+- **Scripts**: `start_mlops.sh`, `deploy_railway.sh` - Automazione
 
-**Soluzione**: Risolvi i permessi Docker
-```bash
-# 1. Aggiungi utente al gruppo docker
-sudo usermod -aG docker $USER
-
-# 2. Riavvia il terminale o fai logout/login
-
-# 3. Oppure usa sudo temporaneamente
-sudo docker ps
-sudo docker-compose restart prometheus
-```
-
-### Prometheus target health check
-**Comando utile**: Verifica rapida dello stato dei target
-```bash
-# Verifica immediata dello stato target
-curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
-# Dovrebbe restituire: "health":"up"
-
-# Se il target è "down", verifica Flask API
-curl -s http://localhost:5000/metrics | head -3
-```
-
-### Errori import librerie Python
-**Problema**: "Import flask could not be resolved"
-
-**Soluzione**: Attiva l'environment virtuale
-```bash
-source MLOps/bin/activate
-pip install pandas scikit-learn flask prometheus-client requests joblib
-```
-
-### Errori di sintassi in app.py
-**Problema**: `pd.DataFrame(data, index=False)` non funziona
-
-**Soluzione**: Correzioni necessarie
-```python
-# Riga 32: 
-df = pd.DataFrame([data])  # NON pd.DataFrame(data, index=False)
-
-# Riga 38:
-prediction = model.predict(data_scaled)[0]  # Prendi primo elemento
-```
-
-### Flask restituisce 404
-**Normale**: Flask ha solo endpoint `/predict` (POST) e `/metrics` (GET)
-- GET su `/` restituisce 404 (normale)
-- Usa `POST /predict` per predizioni
-- Usa `GET /metrics` per metriche
-
-### Errore "File 'creditcard.csv' non trovato"
-**Problema**: Il dataset non è incluso nel repository
-
-**Soluzione**: Scarica manualmente il dataset
-```bash
-# Errore tipico nel notebook:
-# FileNotFoundError: [Errno 2] No such file or directory: 'creditcard.csv'
-
-# Soluzione:
-# 1. Vai su https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud
-# 2. Registrati/accedi a Kaggle
-# 3. Scarica il dataset (creditcard.csv)
-# 4. Posizionalo nella cartella principale del progetto
-```
-
-### Modello non trovato (model.joblib/scaler.joblib)
-**Problema**: I file del modello sono generati automaticamente
-
-**Soluzione**: Esegui prima il notebook
-```python
-# Nel notebook Grafana.ipynb, esegui la cella 3:
-# "Addestramento del Modello di Machine Learning"
-# Questo creerà automaticamente:
-# - model.joblib
-# - scaler.joblib
-```
-
-### Container non raggiungibili
-```bash
-# Verifica stato container
-sudo docker ps
-
-# Verifica rete Docker
-docker network ls
-docker network inspect mlops_default
-
-# Riavvia se necessario
-sudo docker-compose down && sudo docker-compose up -d
-```
-
-### Prometheus non raccoglie metriche
-1. Verifica che l'API Flask sia in esecuzione su porta 5000
-2. Controlla http://localhost:5000/metrics
-3. Verifica la configurazione in `prometheus/prometheus.yml`
-4. Controlla targets in http://localhost:9090/targets
-
-### Errore "Error returned querying the Prometheus API"
-**Problema**: Grafana non si connette a Prometheus
-
-**Soluzione**: Usa URL corretta nel data source
-- ✅ **Corretta**: `http://prometheus:9090` (da Grafana)
-- ❌ **Sbagliata**: `http://localhost:9090` (da Grafana)
-
-## Note Importanti
-
-### Linux (Testato su Fedora 42)
-- **Tutte le configurazioni** sono state testate e funzionano correttamente
-- **SELinux**: Su Fedora/RHEL, SELinux deve essere configurato per permettere l'accesso ai file
-- **Docker networking**: Usa IP dell'host invece di `host.docker.internal`
-- **Environment virtuale**: SEMPRE attiva `source MLOps/bin/activate` prima di operazioni Python
-- **Sudo**: Richiesto per comandi Docker fino al riavvio del terminale
-
-### Windows (Windows 10/11)
-- **Docker Desktop**: Richiede WSL2 o Hyper-V
-- **Docker networking**: `host.docker.internal` funziona correttamente
-- **Environment virtuale**: Usa `MLOps\Scripts\activate` (CMD) o `MLOps\Scripts\Activate.ps1` (PowerShell)
-- **PowerShell**: Potrebbe richiedere modifica Execution Policy
-- **Python**: Assicurati che sia nel PATH durante l'installazione
-
-### Generale (Entrambi i Sistemi)
-- **Persistenza dati**: I dati di Grafana e Prometheus non sono persistenti. Per produzione, configura volumi Docker appropriati.
-- **Sicurezza**: Le configurazioni sono per sviluppo/test. In produzione, configura autenticazione e HTTPS.
-- **Monitoraggio**: Questo è un esempio educativo. In produzione, considera metriche aggiuntive come drift detection e model performance.
-- **URL corrette**: 
-  - Dal browser: `http://localhost:9090` (Prometheus), `http://localhost:3000` (Grafana)
-  - Da Grafana: `http://prometheus:9090` (data source Prometheus)
-- **Porte**: Assicurati che le porte 3000, 5000, e 9090 siano libere
-
-## Prossimi Passi
-
-1. **Alerting**: Configura alert in Grafana per soglie critiche
-2. **A/B Testing**: Implementa versioning del modello
-3. **Model Drift**: Aggiungi monitoraggio per data drift
-4. **Logging**: Integra logging strutturato
-5. **CI/CD**: Automatizza deployment con pipeline
-
-## Risorse Utili
-
+### Collegamenti Utili
 - [Prometheus Documentation](https://prometheus.io/docs/)
 - [Grafana Documentation](https://grafana.com/docs/)
-- [Flask Documentation](https://flask.palletsprojects.com/)
-- [Scikit-learn Documentation](https://scikit-learn.org/stable/)
+- [Railway Documentation](https://docs.railway.app/)
+- [Grafana Cloud](https://grafana.com/products/cloud/)
 
-## Checklist di Verifica
+## 🏆 Caratteristiche di Produzione
 
-Prima di considerare il setup completo, verifica che tutti questi elementi funzionino:
+### ✅ **Pronto per Produzione**
+- Containerizzato con Docker
+- Metriche complete per monitoring
+- Health checks implementati
+- Logging strutturato
+- Gestione errori robusta
 
-### Container Docker
+### ✅ **Scalabile**
+- Deployment cloud supportato
+- Metriche ottimizzate per performance
+- Architettura microservizi ready
+- Load balancing compatible
 
-#### Linux:
-```bash
-sudo docker ps
-# Dovresti vedere 'grafana' e 'prometheus' in esecuzione
-```
-
-#### Windows:
-```cmd
-docker ps
-# Dovresti vedere 'grafana' e 'prometheus' in esecuzione
-```
-
-### Connessione Prometheus → Flask
-
-#### Linux:
-```bash
-curl -s "http://localhost:9090/api/v1/targets" | grep -o '"health":"[^"]*"'
-# Dovrebbe restituire: "health":"up"
-```
-
-#### Windows:
-```powershell
-Invoke-RestMethod -Uri "http://localhost:9090/api/v1/targets" | Select-String "health"
-# Dovrebbe mostrare: "health":"up"
-```
-
-### API Flask
-
-#### Linux:
-```bash
-# Test endpoint metrics
-curl http://localhost:5000/metrics | head -5
-
-# Test predizione
-curl -X POST http://localhost:5000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"Time": 0, "V1": -1.36, "V2": -0.07, "V3": 2.54, "V4": 1.38, "V5": -0.34, "V6": 0.46, "V7": 0.24, "V8": 0.10, "V9": 0.36, "V10": 0.09, "V11": -0.55, "V12": -0.62, "V13": -0.99, "V14": -0.31, "V15": 1.47, "V16": -0.47, "V17": 0.21, "V18": 0.03, "V19": 0.40, "V20": 0.25, "V21": -0.02, "V22": 0.28, "V23": -0.11, "V24": 0.07, "V25": 0.13, "V26": -0.19, "V27": 0.13, "V28": -0.02, "Amount": 149.62}'
-# Dovrebbe restituire: {"class_name":"non_fraud","prediction":0}
-```
-
-#### 🪟 **Windows:**
-```powershell
-# Test endpoint metrics
-Invoke-RestMethod -Uri "http://localhost:5000/metrics"
-
-# Test predizione (esempio semplificato)
-$testData = '{"Time": 0, "V1": -1.36, "V2": -0.07, "V3": 2.54, "V4": 1.38, "V5": -0.34, "V6": 0.46, "V7": 0.24, "V8": 0.10, "V9": 0.36, "V10": 0.09, "V11": -0.55, "V12": -0.62, "V13": -0.99, "V14": -0.31, "V15": 1.47, "V16": -0.47, "V17": 0.21, "V18": 0.03, "V19": 0.40, "V20": 0.25, "V21": -0.02, "V22": 0.28, "V23": -0.11, "V24": 0.07, "V25": 0.13, "V26": -0.19, "V27": 0.13, "V28": -0.02, "Amount": 149.62}'
-Invoke-RestMethod -Uri "http://localhost:5000/predict" -Method POST -Body $testData -ContentType "application/json"
-# Dovrebbe restituire: {"class_name":"non_fraud","prediction":0}
-```
-
-### **Accesso Web**
-- ✅ **Grafana**: http://localhost:3000 (admin/admin)
-- ✅ **Prometheus**: http://localhost:9090 (interfaccia web)
-
-### **Configurazione Grafana**
-1. Accedi a Grafana
-2. Aggiungi data source Prometheus (`http://prometheus:9090`)
-3. Verifica connessione con "Save & Test"
-
-### **Metriche in Prometheus**
-1. Vai su http://localhost:9090
-2. Cerca `predictions_total` nella query
-3. Dovresti vedere dati delle predizioni
-
-**Se tutti questi test passano, il tuo sistema MLOps è completamente funzionante!** 🎉
+### ✅ **Monitoraggio Completo**
+- 20+ metriche business e sistema
+- Dashboard preconfigurate
+- Alerting configurabile
+- Trending e analytics
 
 ---
 
-**Autore**: Tutorial MLOps - Testing con Prometheus e Grafana  
-**Data**: 2025  
-**Testato su**: 
-- 🐧 **Linux**: Fedora 42 con Docker e SELinux  
-- 🪟 **Windows**: Windows 10/11 con Docker Desktop e WSL2
+**🎉 Congratulazioni!** Hai un sistema MLOps completo con monitoring avanzato, deployment online e dashboard professionali!
 
-**Compatibilità**: Cross-platform (Linux/Windows) 
+**Testato e Funzionante su:**
+- 🐧 **Linux**: Fedora 42 con Docker e SELinux
+- 🪟 **Windows**: Windows 10/11 con Docker Desktop
+- ☁️ **Cloud**: Railway + Grafana Cloud (gratuito)
+
+**Supporto**: Consulta le guide specifiche per configurazione avanzata e troubleshooting. 
