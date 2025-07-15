@@ -1,0 +1,143 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "MLOps - Fraud Detection Dashboard",
+    "tags": ["mlops", "fraud", "machine-learning"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Predictions per Second",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(predictions_total[5m])",
+            "legendFormat": "Predictions/sec"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Fraud Detection Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(predictions_total{class_name=\"fraud\"}[5m]) / rate(predictions_total[5m]) * 100",
+            "legendFormat": "Fraud Rate %"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Prediction Latency",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, prediction_latency_seconds_bucket)",
+            "legendFormat": "50th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.95, prediction_latency_seconds_bucket)",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.99, prediction_latency_seconds_bucket)",
+            "legendFormat": "99th percentile"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Model Quality Metrics",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "model_accuracy",
+            "legendFormat": "Accuracy"
+          },
+          {
+            "expr": "model_precision",
+            "legendFormat": "Precision"
+          },
+          {
+            "expr": "model_recall",
+            "legendFormat": "Recall"
+          },
+          {
+            "expr": "model_f1_score",
+            "legendFormat": "F1 Score"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 16}
+      },
+      {
+        "id": 5,
+        "title": "System Resources",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "system_cpu_usage_percent",
+            "legendFormat": "CPU %"
+          },
+          {
+            "expr": "system_memory_usage_percent",
+            "legendFormat": "Memory %"
+          },
+          {
+            "expr": "system_disk_usage_percent",
+            "legendFormat": "Disk %"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 6,
+        "title": "Transaction Values",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, transaction_value_euros_bucket)",
+            "legendFormat": "Median Transaction Value"
+          },
+          {
+            "expr": "histogram_quantile(0.95, transaction_value_euros_bucket)",
+            "legendFormat": "95th Percentile"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 7,
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(errors_total[5m])",
+            "legendFormat": "Errors/sec"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32}
+      },
+      {
+        "id": 8,
+        "title": "Queue Size",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "queue_size",
+            "legendFormat": "Queue Size"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "5s"
+  }
+} 
