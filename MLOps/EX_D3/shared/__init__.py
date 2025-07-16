@@ -1,0 +1,1 @@
+# Questo file rende la directory shared un modulo Python 

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Redis: Servizio di coda di messaggi 
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379" # Lo teniamo per debug
+
+  # API: Servizio API Flask che invia le immagini al worker
+  api:
+    build:
+      context: .
+      dockerfile: api_services/Dockerfile
+    depends_on:
+      - redis
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./api_services:/usr/src/app/api_services
+    environment:
+      - FLASK_ENV=development
+
+  # Worker: Servizio che esegue l'inferenza in modo asincrono
+  ml_worker:
+    build:
+      context: .
+      dockerfile: ml_worker/Dockerfile
+    depends_on:
+      - redis
+    volumes:
+      - ./ml_worker:/usr/src/app/ml_worker
+    
