@@ -1,6 +1,4 @@
-# 🎓 SIAE - Società Italiana degli Autori ed Editori
-## Piattaforma Educativa per AI, Etica e Governance
-
+# 🎓 GenAI Academy per SIAE - Società Italiana degli Autori ed Editori
 ![GitHub stars](https://img.shields.io/github/stars/Rkomi98/SIAE?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/Rkomi98/SIAE?style=social)
 ![GitHub issues](https://img.shields.io/github/issues/Rkomi98/SIAE)
@@ -18,12 +16,8 @@
 ![Tailwind](https://img.shields.io/badge/Tailwind-3.0-blueviolet.svg)
 
 ![Educational](https://img.shields.io/badge/purpose-educational-purple.svg)
-![Age](https://img.shields.io/badge/age-10+-orange.svg)
 ![Language](https://img.shields.io/badge/language-Italian-brightgreen.svg)
 ![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-![Security](https://img.shields.io/badge/security-education-red.svg)
-![AI Safety](https://img.shields.io/badge/AI-safety-blueviolet.svg)
 ![Gamification](https://img.shields.io/badge/type-gamification-yellow.svg)
 ![Responsive](https://img.shields.io/badge/responsive-yes-blue.svg)
 ![Accessibility](https://img.shields.io/badge/accessibility-WCAG%202.1-green.svg)
@@ -50,7 +44,7 @@
 
 ## 🎯 Panoramica
 
-**SIAE** è una piattaforma educativa completa progettata per il corso erogato per la Società Italiana degli Autori ed Editori (SIAE). Il repository contiene materiali didattici interattivi, sistemi di hackathon, dashboard educative e strumenti per l'apprendimento di concetti avanzati di AI, Machine Learning, etica e governance.
+Questo repo contiene parte del materiale usato durante l'Academy per il corso erogato per la Società Italiana degli Autori ed Editori (SIAE). Contiene materiali didattici interattivi, sistemi di hackathon, dashboard educative e strumenti per l'apprendimento di concetti avanzati di AI, Machine Learning, etica e governance.
 
 ### 🎓 Obiettivi Educativi
 
@@ -375,19 +369,15 @@ I contributori verranno riconosciuti nella sezione Contributors e potranno ricev
 ## 📞 Contatti
 
 ### 📧 Informazioni Generali
-- **Email**: info@siae-edu.it
-- **Website**: [www.siae-edu.it](https://www.siae-edu.it)
-- **LinkedIn**: [SIAE Educational](https://linkedin.com/company/siae-educational)
+
+Se vuoi un corso disegnato per la formazione di personale nella tua azienda:
+
+- **Email**: mirkocalcaterra@datapizza.tech
+- **Website**: [Datapizza](https://datapizza.tech/it/)
+- **LinkedIn**: [Datapizza Linkedin](https://linkedin.com/company/datapizza/)
 
 ### 🔧 Supporto Tecnico
 - **GitHub Issues**: [Segnala problemi](https://github.com/Rkomi98/SIAE/issues)
-- **Discord**: [Community SIAE](https://discord.gg/siae-community)
-- **Email**: support@siae-edu.it
-
-### 🎓 Uso Didattico
-- **Formazione**: courses@siae-edu.it
-- **Partnership**: partnership@siae-edu.it
-- **Hackathon**: hackathon@siae-edu.it
 
 ---
 
@@ -402,10 +392,9 @@ Questo progetto è distribuito sotto la licenza MIT. Vedi il file `LICENSE` per 
 ## 🙏 Ringraziamenti
 
 Un ringraziamento speciale a:
-- **SIAE** per aver fornito il contesto e i requisiti educativi
+- **SIAE** per la fiducia per questo progetto
 - **Comunità open source** per le librerie e i framework utilizzati
-- **Educatori e studenti** che hanno testato e fornito feedback
-- **Contributori** che hanno migliorato il progetto
+- **Altri colleghi e studenti** che hanno testato e fornito feedback
 
 ---
 
