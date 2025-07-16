@@ -319,11 +319,12 @@ cd ../MLOps
 
 ### 🎯 Learning Path Consigliato
 
-1. **Settimana 1**: Fondamenti AI Agent (AgentAI)
-2. **Settimana 2**: Etica e Governance (Ethics)
-3. **Settimana 3-4**: Hackathon Anomaly Detection
+1. **Settimana 1**: Fondamenti di Git, Python, LLM e RAG.
+2. **Settimana 2**: RAG in deep: Come funziona a livello avanzato
+3. **Settimana 3**: AI Agent (AgentAI), Sistemi multiagente, Etica e Governance (Ethics)
+3. **Settimana 4**: Vibe Coding, MCP e Hackathon 
 4. **Settimana 5**: MLOps e Deployment
-5. **Settimana 6**: Sistemi Multi-Agente avanzati
+5. **Settimana 6**: Anomaly Detection
 
 ### 📊 Valutazione Studenti
 
@@ -356,13 +357,6 @@ cd ../MLOps
 - 🌐 **Traduzioni** in altre lingue
 - 🔧 **Ottimizzazioni** tecniche e bug fix
 - 📊 **Nuove dashboard** educative
-
-### 🏆 Riconoscimenti
-
-I contributori verranno riconosciuti nella sezione Contributors e potranno ricevere:
-- 🥇 **Contributor Badge** nel profilo GitHub
-- 🎓 **Certificato di partecipazione** al progetto educativo SIAE
-- 🎯 **Menzioni speciali** nelle presentazioni e corsi
 
 ---
 
