@@ -1,4 +1,4 @@
-# 🚀 MLOps SageMaker Project
+# 🚀 MLOps Enterprise SageMaker Project
 
 <!-- Badges -->
 ![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)
@@ -11,381 +11,293 @@
 ![boto3](https://img.shields.io/badge/boto3-1.34.34-lightblue)
 ![sagemaker](https://img.shields.io/badge/sagemaker-2.196.0-lightgreen)
 ![numpy](https://img.shields.io/badge/numpy-1.24.3-lightcoral)
-![matplotlib](https://img.shields.io/badge/matplotlib-3.7.2-purple)
+![flask](https://img.shields.io/badge/flask-2.2.2-purple)
 
-**Progetto MLOps enterprise-grade per classificazione di immagini Fashion MNIST utilizzando AWS SageMaker.**
+**Progetto MLOps enterprise-grade completo: Fashion MNIST → CNN Training → SageMaker Deploy → Lambda API → Production**
 
-## 🎯 Obiettivi dell'Esercizio
+## 🎯 Obiettivi del Progetto
 
-Questo progetto ti guida attraverso la creazione di un **sistema MLOps completo** che include:
+Questo progetto implementa un **pipeline MLOps enterprise completo** che dimostra:
 
-- 📊 **Training** di una CNN su Fashion MNIST con SageMaker
-- 🐳 **Containerizzazione** con Docker personalizzato
-- 🚀 **Deploy** di endpoint real-time per inferenza
-- ⚡ **Integrazione** con AWS Lambda per API serverless
-- 🔧 **Test** automatizzati end-to-end
-- 📈 **Monitoring** e validazione del modello
+- 📊 **Training CNN** su dataset Fashion MNIST (60K immagini)
+- 🐳 **Containerizzazione** con Docker e BYOC (Bring Your Own Container)
+- ⚡ **Training GPU** su SageMaker con ml.g4dn.xlarge
+- 🔧 **Deploy endpoint** real-time per inferenza
+- 🔗 **Integrazione Lambda** per API serverless
+- 📈 **Monitoring** e gestione costi enterprise
+
+## 🏗️ Architettura del Sistema
+
+```
+[Fashion MNIST] → [Docker CNN] → [SageMaker GPU] → [Endpoint] → [Lambda] → [API]
+   60K images     TensorFlow      ml.g4dn.xlarge   Real-time    AWS        REST
+```
 
 ## 📋 Prerequisiti
 
 ### 🖥️ Sistema
 - **Python**: 3.8, 3.9, 3.10, o 3.11
-- **Docker**: Installato e funzionante
+- **Docker**: Desktop attivo e funzionante
 - **Git**: Per clonare il repository
-- **Account AWS**: Con credenziali di accesso
+- **Jupyter**: Per eseguire il notebook
+- **Account AWS**: Con credenziali attive
 
 ### 🔑 Permessi AWS
-- **SageMaker**: Full access per training e deployment
+- **SageMaker**: FullAccess per training e deploy
 - **ECR**: Push/pull immagini Docker
 - **Lambda**: Creazione e invocazione funzioni
 - **S3**: Lettura/scrittura bucket
-- **IAM**: Gestione ruoli SageMaker
+- **IAM**: Gestione ruoli e policy
 
 ### 💰 Costi Stimati
 - **Training**: ~$2-3 per sessione (GPU ml.g4dn.xlarge)
-- **Endpoint**: ~$1/giorno (ml.t2.medium always-on)
+- **Endpoint**: ~$1/giorno (ml.t2.medium)
 - **Lambda**: ~$0.0001 per invocazione
 - **S3**: ~$0.02/GB/mese
 
-## 🚀 Guida all'Esercizio Passo-Passo
+## 🚀 Guida Rapida
 
-### **Fase 1: Setup Ambiente Locale**
-
-#### 1.1 Clona e Configura Repository
+### **Opzione 1: Notebook Completo (Consigliato)**
 ```bash
+# 1. Clona repository
 git clone <repository-url>
 cd mlops-sagemaker-project
 
-# Crea e attiva virtual environment
-python3 -m venv mlops_env
-source mlops_env/bin/activate  # Linux/Mac
-# mlops_env\Scripts\activate    # Windows
-
-# Installa dipendenze
+# 2. Installa dipendenze
 pip install -r requirements.txt
-```
 
-#### 1.2 Configura Credenziali AWS
-```bash
-# Crea file .env dalle credenziali template
+# 3. Configura credenziali AWS
 cp env.template .env
+# Modifica .env con le tue credenziali
 
-# Modifica .env con le tue credenziali AWS
-nano .env
+# 4. Avvia Jupyter
+jupyter notebook aws_sagemaker_lambda_exercise.ipynb
+
+# 5. Esegui tutte le celle in sequenza
 ```
 
-**Contenuto file .env:**
+### **Opzione 2: Local Development**
 ```bash
-AWS_ACCESS_KEY_ID=AKIA...
-AWS_SECRET_ACCESS_KEY=xyz123...
-AWS_DEFAULT_REGION=eu-west-1
-SAGEMAKER_ROLE_ARN=arn:aws:iam::ACCOUNT:role/service-role/AmazonSageMaker-ExecutionRole-XXXXX
-```
-
-#### 1.3 Verifica Setup
-```bash
-# Testa configurazione
+# Setup locale alternativo
 python mlops_setup_local.py
 
-# Dovrebbe mostrare:
-# ✅ Setup completato con successo!
-# Account ID: 123456789012
-# Bucket S3: sagemaker-fashion-mnist-123456789012
+# Test Lambda
+python test.py
 ```
 
-### **Fase 2: Training del Modello**
+## �� Workflow Completo
 
-#### 2.1 Apri Jupyter Notebook
+### **Fase 1: Setup Ambiente**
+- 🔧 Installazione dipendenze
+- 🔑 Configurazione credenziali AWS
+- 📊 Verifica connessione
+
+### **Fase 2: Preparazione Dati**
+- 📁 Download Fashion MNIST (60K immagini)
+- 🔄 Pre-processing CNN (normalizzazione + reshape)
+- 📤 Upload su S3 bucket
+
+### **Fase 3: Containerizzazione**
+- 📝 Creazione `train.py` (script training)
+- 🌐 Creazione `serve.py` (script serving)
+- 🐳 Build `Dockerfile` ottimizzato
+- 🚢 Push su Amazon ECR
+
+### **Fase 4: Training SageMaker**
+- ⚡ Training CNN su GPU (ml.g4dn.xlarge)
+- 📈 10 epochs con batch size 128
+- 🎯 Accuracy target: ~90%
+- 📤 Salvataggio modello su S3
+
+### **Fase 5: Deploy Endpoint**
+- 🚀 Deploy endpoint SageMaker
+- 📊 Configurazione auto-scaling
+- 🔍 Health check e monitoring
+- ✅ Test inferenza
+
+### **Fase 6: API Lambda**
+- 🔗 Creazione funzione Lambda
+- 🌐 Integrazione con endpoint SageMaker
+- 📝 Gestione input/output JSON
+- 🧪 Test end-to-end
+
+### **Fase 7: Monitoring**
+- 📊 CloudWatch logs
+- 💰 Cost tracking
+- 📈 Performance metrics
+- 🔧 Troubleshooting
+
+### **Fase 8: Cleanup**
+- 🗑️ Eliminazione endpoint
+- 🧹 Cleanup risorse AWS
+- 💰 Ottimizzazione costi
+
+## 📁 Struttura File del Progetto
+
+### **📄 File Essenziali**
+
+| File | Descrizione | Utilizzo |
+|------|-------------|----------|
+| `aws_sagemaker_lambda_exercise.ipynb` | **Notebook principale** | Workflow completo step-by-step |
+| `model/train.py` | **Script training** | Training CNN su SageMaker |
+| `model/serve.py` | **Script serving** | Serving endpoint Flask |
+| `model/Dockerfile` | **Immagine Docker** | Container per SageMaker BYOC |
+| `lambda_function/lambda_function.py` | **Codice Lambda** | API serverless per predizioni |
+| `requirements.txt` | **Dipendenze** | Librerie Python necessarie |
+| `README.md` | **Documentazione** | Guida completa (questo file) |
+| `.gitignore` | **Git ignore** | File da escludere dal repo |
+| `env.template` | **Template credenziali** | Esempio configurazione AWS |
+
+### **🗑️ File da Eliminare (Creati durante troubleshooting)**
+
+| File | Perché Eliminare |
+|------|-----------------|
+| `cleanup_failed_training.py` | Script debug specifico - non educativo |
+| `launch_training.py` | Duplica notebook - confonde workflow |
+| `fix_sagemaker_role.py` | Troubleshooting IAM - dovrebbe essere setup corretto |
+| `test.py` | Test Lambda ridondante - notebook ha già test |
+| `create_lambda_function.py` | Creazione Lambda ridondante - notebook più completo |
+| `change_Lambda.py` | Script non documentato - non fa parte del flow |
+| `mlops_runner.py` | Troppo complesso per principianti - notebook è didattico |
+| `USAGE.md` | Documentazione frammentata - tutto nel README |
+| `main.py` | Preparazione dati ridondante - notebook fa tutto |
+| `requirements-prod.txt` | Troppo specifico - un solo requirements.txt |
+| `mlops_setup_local.py` | Setup complesso - notebook è più didattico |
+| `Sage/` | Virtual environment - non dovrebbe essere nel repo |
+
+## 🧹 Cleanup dei File Inutili
+
+**Esegui questi comandi per pulire il progetto:**
+
 ```bash
-jupyter notebook aws_sagemaker_lambda_exercise.ipynb
+# Elimina file di troubleshooting
+rm -f cleanup_failed_training.py
+rm -f launch_training.py
+rm -f fix_sagemaker_role.py
+rm -f test.py
+rm -f create_lambda_function.py
+rm -f change_Lambda.py
+rm -f mlops_runner.py
+rm -f USAGE.md
+rm -f main.py
+rm -f requirements-prod.txt
+rm -f mlops_setup_local.py
+
+# Elimina directory virtual environment
+rm -rf Sage/
+
+# Elimina dati generati (opzionale - saranno ricreati)
+rm -rf data/
+
+echo "✅ Pulizia completata!"
 ```
 
-#### 2.2 Esegui Celle di Training
-1. **Setup e Configurazione** (Cella 1-2)
-2. **Preparazione Dati** (Cella 3-4)
-3. **Creazione Script Docker** (Cella 5-8)
-4. **Build e Push Immagine** (Locale, seguire istruzioni)
-5. **Training SageMaker** (Cella 9-10)
+## 🔧 Troubleshooting
 
-#### 2.3 Verifica Training
+### **❌ Errori Comuni**
+
+#### **Docker Build Error**
 ```bash
-# Controlla logs su AWS Console
-# Training dovrebbe completarsi in 10-15 minuti
+# Problema: Architettura incompatibile (Mac M1/M2/M3)
+# Soluzione:
+docker buildx build --platform linux/amd64 -t nome-immagine .
 ```
 
-### **Fase 3: Deploy e Test**
-
-#### 3.1 Deploy Endpoint
+#### **SageMaker Role Error**
 ```bash
-# Esegui celle di deploy nel notebook
-# Cella 11-12: Deploy endpoint
+# Problema: Ruolo IAM non trovato
+# Soluzione: Crea ruolo SageMaker nella AWS Console
+# Policies necessarie:
+# - AmazonSageMakerFullAccess
+# - AmazonS3FullAccess
+# - AmazonEC2ContainerRegistryFullAccess
 ```
 
-#### 3.2 Creazione Lambda
+#### **Lambda Function Error**
 ```bash
-# Cella 13-14: Crea funzione Lambda
-# Cella 15: Configurazione e test
+# Problema: Funzione Lambda non trovata
+# Soluzione: Eseguire prima tutte le celle del notebook
+# Il notebook crea automaticamente la funzione Lambda
 ```
 
-#### 3.3 Test Automatizzato
+### **🔍 Comandi di Debug**
+
 ```bash
-# Test rapido
-python quick_test.py
-
-# Test completo
-python mlops_runner.py -l mlops-fashion-classifier-invoker -n 5 -s
-```
-
-### **Fase 4: Monitoraggio e Validazione**
-
-#### 4.1 Visualizza Risultati
-```bash
-# Esegui test con visualizzazione
-python mlops_runner.py -l mlops-fashion-classifier-invoker -n 10 -s
-```
-
-#### 4.2 Monitoring AWS
-- **CloudWatch**: Controlla metriche endpoint
-- **SageMaker Console**: Stato training e endpoint
-- **Lambda Console**: Logs e performance
-
-#### 4.3 Pulizia Risorse
-```bash
-# Esegui ultima cella del notebook per eliminare:
-# - Endpoint SageMaker
-# - Funzione Lambda
-# - Bucket S3
-# - Repository ECR
-```
-
-## 🎯 Obiettivi di Apprendimento
-
-Al completamento dell'esercizio avrai appreso:
-
-✅ **BYOC (Bring Your Own Container)** con SageMaker  
-✅ **GPU Training** per deep learning su cloud  
-✅ **Real-time Inference** con endpoint gestiti  
-✅ **API Serverless** con Lambda integration  
-✅ **Docker** per ML containerization  
-✅ **MLOps Pipeline** end-to-end  
-✅ **Cost Management** per progetti ML  
-✅ **Monitoring** e troubleshooting  
-
-## 📊 Risultati Attesi
-
-### Accuracy del Modello
-- **Training**: ~95% su Fashion MNIST
-- **Validation**: ~90% su dati di test
-- **Tempo di inferenza**: <200ms per immagine
-
-### Performance Sistema
-- **Endpoint**: Ready in 5-8 minuti
-- **Lambda**: Cold start <3 secondi
-- **API**: Risposta completa <1 secondo
-
-## 📁 Struttura Progetto
-
-```
-mlops-sagemaker-project/
-├── 📄 File di Configurazione
-│   ├── .env                          # Credenziali AWS (🚫 non in Git)
-│   ├── .gitignore                    # File da ignorare
-│   ├── requirements.txt              # Dipendenze complete
-│   ├── requirements-prod.txt         # Solo produzione
-│   └── env.template                  # Template credenziali
-├── 📓 Notebook e Script
-│   ├── aws_sagemaker_lambda_exercise.ipynb  # Notebook principale
-│   ├── mlops_setup_local.py          # Setup automatico
-│   ├── mlops_runner.py               # Script test avanzato
-│   └── quick_test.py                 # Test rapido
-├── 📚 Documentazione
-│   ├── README.md                     # Guida principale
-│   └── USAGE.md                      # Guida utilizzo script
-└── 🏗️ Ambiente
-    └── mlops_env/                    # Virtual environment (🚫 non in Git)
-```
-
-## 🛠️ Troubleshooting
-
-### ❌ Errori Comuni e Soluzioni
-
-#### **Errore: "TensorFlow not found"**
-```bash
-# Soluzione per sistema
-pip install tensorflow==2.11.0
-
-# Apple Silicon (M1/M2/M3)
-pip install tensorflow-macos==2.11.0 tensorflow-metal
-
-# Linux ARM64
-pip install tensorflow-cpu==2.11.0
-```
-
-#### **Errore: "AWS credentials not found"**
-```bash
-# Verifica file .env
-cat .env
-
-# Verifica configurazione AWS
+# Verifica connessione AWS
 aws sts get-caller-identity
 
-# Reconfigura se necessario
-aws configure
-```
-
-#### **Errore: "SageMaker role not found"**
-```bash
-# Verifica ruolo esiste
-aws iam get-role --role-name AmazonSageMaker-ExecutionRole-XXXXX
-
-# Crea ruolo se necessario (via AWS Console)
-```
-
-#### **Errore: "Docker build failed"**
-```bash
-# Verifica Docker attivo
-docker --version
-
-# Su Mac M1/M2/M3
-docker buildx build --platform linux/amd64 -t image-name .
-
-# Permissions (Linux)
-sudo usermod -aG docker $USER
-```
-
-#### **Errore: "Lambda function not found"**
-```bash
-# Lista funzioni esistenti
-aws lambda list-functions --query 'Functions[].FunctionName'
-
-# Verifica nome corretto nel codice
-```
-
-### 🔧 Comandi di Debug
-
-#### **Verifica Sistema**
-```bash
-# Python version
-python --version
-
-# Dipendenze installate
-pip list
-
-# Configurazione AWS
-aws configure list
-
-# Docker funzionante
-docker run hello-world
-```
-
-#### **Test Connessione AWS**
-```bash
-# Identity
-aws sts get-caller-identity
-
-# SageMaker
+# Lista training jobs
 aws sagemaker list-training-jobs --max-results 5
 
-# Lambda
-aws lambda list-functions --max-items 5
+# Lista endpoint
+aws sagemaker list-endpoints
+
+# Lista funzioni Lambda
+aws lambda list-functions --max-items 10
 ```
 
-#### **Log e Monitoring**
-```bash
-# CloudWatch logs SageMaker
-aws logs describe-log-groups --log-group-name-prefix '/aws/sagemaker'
+## 📊 Metriche di Performance
 
-# Lambda logs
-aws logs describe-log-groups --log-group-name-prefix '/aws/lambda'
-```
+### **Training Results**
+- **Accuracy**: ~90% (Fashion MNIST)
+- **Training Time**: ~5-8 minuti (GPU)
+- **Model Size**: ~10-20MB
+- **Inference Time**: ~50ms per predizione
 
-## 🔒 Sicurezza e Best Practices
+### **Costs**
+- **Training**: $0.50-2.00 per job
+- **Endpoint**: $1.00/giorno (ml.t2.medium)
+- **Lambda**: $0.0001 per invocazione
+- **Storage**: $0.02/GB/mese
 
-### 🛡️ Sicurezza
-- ⚠️ **MAI** committare il file `.env` in Git
-- 🔐 Usa ruoli IAM invece di credenziali hardcoded
-- 🔄 Rotazione regolare delle credenziali AWS
-- 🚫 Non condividere Access Keys via chat/email
-- 🔒 Usa principio least privilege per ruoli IAM
+## 🏆 Risultati Attesi
 
-### 💰 Gestione Costi
-- 🛑 **Elimina sempre** le risorse dopo l'esercizio
-- 📊 Monitora costi su AWS Cost Explorer
-- ⏰ Imposta budget alerts
-- 🔔 Usa CloudWatch per monitorare risorse
+Al completamento del progetto avrai:
 
-### 🏗️ Best Practices MLOps
-- 📝 Versiona sempre i modelli
-- 🧪 Testa sempre prima di produzione
-- 📈 Monitora performance e drift
-- 🔄 Automatizza pipeline CI/CD
-- 📊 Logga metriche e predizioni
+- ✅ **CNN trainata** su 60K immagini Fashion MNIST
+- ✅ **Endpoint SageMaker** funzionante e scalabile
+- ✅ **API Lambda** serverless per predizioni
+- ✅ **Pipeline completo** enterprise-grade
+- ✅ **Monitoring** e cost management
+- ✅ **Troubleshooting** expertise
 
-## 📞 Supporto e Risorse
+## 🎯 Next Steps
 
-### 🆘 Supporto Immediato
-```bash
-# Verifica configurazione completa
-python mlops_setup_local.py
+### **Estensioni Consigliate**
+1. **Custom Dataset**: Sostituire Fashion MNIST con dataset proprietario
+2. **Model Optimization**: Quantizzazione e ottimizzazione performance
+3. **CI/CD Pipeline**: GitLab/GitHub Actions per deployment automatico
+4. **A/B Testing**: Confronto modelli in produzione
+5. **Data Drift**: Monitoring qualità dati in produzione
 
-# Test veloce sistema
-python quick_test.py
+### **Architetture Alternative**
+1. **Batch Transform**: Per predizioni batch invece di real-time
+2. **Multi-Model**: Hosting multipli modelli su stesso endpoint
+3. **Edge Deploy**: Deploy su dispositivi edge con SageMaker Edge
+4. **Streaming**: Integrazione con Kinesis per dati real-time
 
-# Reset ambiente se necessario
-deactivate
-rm -rf mlops_env
-python -m venv mlops_env
-source mlops_env/bin/activate
-pip install -r requirements.txt
-```
+## 🤝 Contributing
 
-### 📚 Documentazione AWS
-- [AWS SageMaker Developer Guide](https://docs.aws.amazon.com/sagemaker/)
-- [AWS Lambda Developer Guide](https://docs.aws.amazon.com/lambda/)
-- [Amazon ECR User Guide](https://docs.aws.amazon.com/ecr/)
-- [AWS CLI Reference](https://docs.aws.amazon.com/cli/)
+Contributi benvenuti! Per contribuire:
 
-### 🎯 Checklist Completamento
+1. Fork del repository
+2. Crea feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit modifiche (`git commit -m 'Add amazing feature'`)
+4. Push branch (`git push origin feature/amazing-feature`)
+5. Apri Pull Request
 
-#### ✅ **Fase 1: Setup**
-- [ ] Python 3.8-3.11 installato
-- [ ] Virtual environment attivo
-- [ ] Dipendenze installate
-- [ ] File .env configurato
-- [ ] AWS credentials valide
+## 📞 Support
 
-#### ✅ **Fase 2: Training**
-- [ ] Notebook avviato
-- [ ] Dati Fashion MNIST caricati
-- [ ] Script Docker creati
-- [ ] Immagine Docker built e pushed
-- [ ] Training SageMaker completato
+Per domande o problemi:
 
-#### ✅ **Fase 3: Deploy**
-- [ ] Endpoint SageMaker attivo
-- [ ] Funzione Lambda creata
-- [ ] Test end-to-end riuscito
-- [ ] Accuracy >80%
+- 📧 **Email**: support@mlops-project.com
+- 📚 **Documentazione**: [AWS SageMaker Docs](https://docs.aws.amazon.com/sagemaker/)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
 
-#### ✅ **Fase 4: Pulizia**
-- [ ] Endpoint eliminato
-- [ ] Funzione Lambda eliminata
-- [ ] Bucket S3 svuotato
-- [ ] Repository ECR eliminato
-- [ ] Costi verificati
+## 📜 License
 
-## 🎉 Congratulazioni!
+Distribuito sotto licenza MIT. Vedi `LICENSE` per maggiori informazioni.
 
-Se hai completato tutti i passaggi, hai creato con successo un **sistema MLOps enterprise-grade** completo! 
+---
 
-**Competenze acquisite:**
-- 🧠 **Machine Learning**: Training CNN su GPU cloud
-- 🐳 **DevOps**: Containerizzazione e deployment
-- ☁️ **Cloud**: Servizi AWS managed
-- 🔧 **MLOps**: Pipeline automation e monitoring
-
-**Prossimi passi:**
-- Esplora altri dataset e modelli
-- Implementa monitoring avanzato
-- Aggiungi CI/CD pipeline
-- Scala per produzione enterprise 
+**�� Buon MLOps! 🚀** 
