@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-MLOps SageMaker Setup - Versione Locale
-Conversione del notebook Colab per uso locale
+Autor: Mirko Calcaterra
+Descrizione: Script per configurare l'ambiente MLOps SageMaker in locale. 
+Installazione delle dipendenze e configurazione delle credenziali AWS.
 
-Autor: AI Assistant
-Descrizione: Script per configurare l'ambiente MLOps SageMaker in locale
+Per eseguire lo script:
+python mlops_setup_local.py
+
+
 """
 
 import os
