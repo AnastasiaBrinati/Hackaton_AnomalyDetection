@@ -29,8 +29,8 @@ Sviluppare **sistemi di anomaly detection** per identificare comportamenti sospe
 1. **Scegli una Track** (o partecipa a multiple track)
 2. **Esegui lo script** per generare dataset e modello di esempio
 3. **Personalizza l'algoritmo** per migliorare le performance
-4. **Submetti i risultati** attraverso file JSON automatici
-5. **Compete nella leaderboard** in tempo reale
+4. **Submit the results** attraverso file JSON automatici
+5. **Compete in the leaderboard** in tempo reale 
 
 ### 📊 Cosa Devi Calcolare
 Per ogni track devi implementare un modello che:
@@ -162,8 +162,6 @@ python evaluate_submissions.py
 # Aggiorna leaderboard automaticamente
 python update_leaderboard.py
 ```
-
-**🎯 Pronto in 5 minuti!** Tutti i dati vengono generati automaticamente - non servono download manuali.
 
 ### 🛠️ Tech Stack Completo
 
