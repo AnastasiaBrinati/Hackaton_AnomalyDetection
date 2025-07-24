@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografica: Sistema RAG Agentico per Ricette</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F5;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            line-height: 1;
+            color: #0089E2;
+            transform: translateY(4px);
+        }
+        .flow-card {
+            border: 2px solid #004AAD;
+            background-color: #ffffff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .flow-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#004AAD] mb-2">Sistema RAG Agentico Robusto</h1>
+            <p class="text-lg text-[#0089E2]">Visualizzazione di una pipeline avanzata per l'IA culinaria da documenti eterogenei</p>
+        </header>
+
+        <main class="space-y-12">
+
+            <section id="challenges" class="bg-white rounded-lg shadow-md p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#004AAD] mb-4 text-center">Le Sfide Fondamentali</h2>
+                <p class="text-center max-w-3xl mx-auto mb-8 text-gray-600">
+                    L'implementazione di un sistema RAG efficace per documenti di ricette presenta ostacoli unici. Il sistema deve superare la variabilità dei formati PDF e l'ambiguità del linguaggio culinario per fornire risposte precise e affidabili.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+                    <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-[#0089E2]">
+                        <h3 class="text-2xl font-semibold text-[#004AAD] mb-2">PDF Eterogenei</h3>
+                        <p class="text-gray-700">I documenti provengono da fonti diverse (scansioni, blog, appunti) con layout, font e qualità variabili, rendendo l'estrazione del testo una sfida complessa che non può basarsi sulla struttura visiva.</p>
+                    </div>
+                    <div class="bg-blue-50 p-6 rounded-lg border-l-4 border-[#0089E2]">
+                        <h3 class="text-2xl font-semibold text-[#004AAD] mb-2">Vocabolario Ripetitivo</h3>
+                        <p class="text-gray-700">Termini come "sale", "zucchero" o "farina" sono onnipresenti. Questa alta frequenza crea ambiguità semantica, ostacolando il recupero di informazioni contestualmente pertinenti.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="pipeline" class="bg-white rounded-lg shadow-md p-6 md:p-8 md:col-span-2">
+                <h2 class="text-3xl font-bold text-[#004AAD] mb-6 text-center">La Pipeline di Soluzione a 5 Fasi</h2>
+                <p class="text-center max-w-3xl mx-auto mb-10 text-gray-600">
+                    Per affrontare queste sfide, abbiamo progettato un'architettura multifase che trasforma dati grezzi e non strutturati in conoscenza precisa e azionabile, orchestrata da un agente intelligente.
+                </p>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="flow-card p-4 rounded-lg text-center w-full md:w-auto">
+                        <div class="text-2xl font-bold text-[#0089E2]">1</div>
+                        <div class="font-semibold">Ingestione Dati</div>
+                    </div>
+                    <div class="flow-arrow hidden md:block">&rarr;</div>
+                    <div class="flow-arrow block md:hidden">&darr;</div>
+                    <div class="flow-card p-4 rounded-lg text-center w-full md:w-auto">
+                        <div class="text-2xl font-bold text-[#0089E2]">2</div>
+                        <div class="font-semibold">Comprensione</div>
+                    </div>
+                    <div class="flow-arrow hidden md:block">&rarr;</div>
+                    <div class="flow-arrow block md:hidden">&darr;</div>
+                    <div class="flow-card p-4 rounded-lg text-center w-full md:w-auto">
+                        <div class="text-2xl font-bold text-[#0089E2]">3</div>
+                        <div class="font-semibold">Arricchimento</div>
+                    </div>
+                    <div class="flow-arrow hidden md:block">&rarr;</div>
+                    <div class="flow-arrow block md:hidden">&darr;</div>
+                    <div class="flow-card p-4 rounded-lg text-center w-full md:w-auto">
+                        <div class="text-2xl font-bold text-[#0089E2]">4</div>
+                        <div class="font-semibold">Recupero</div>
+                    </div>
+                    <div class="flow-arrow hidden md:block">&rarr;</div>
+                    <div class="flow-arrow block md:hidden">&darr;</div>
+                    <div class="flow-card p-4 rounded-lg text-center w-full md:w-auto">
+                        <div class="text-2xl font-bold text-[#0089E2]">5</div>
+                        <div class="font-semibold">Orchestrazione</div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <section id="extraction" class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-bold text-[#004AAD] mb-4">Fase 1: Estrazione del Testo Indipendente dal Layout</h3>
+                    <p class="mb-6 text-gray-600">La scelta del metodo di estrazione è cruciale. I modelli multimodali (LMM) dimostrano una superiorità complessiva, gestendo PDF scansionati e ricercabili con alta fedeltà senza dipendere dal layout, sebbene a un costo computazionale maggiore.</p>
+                    <div class="chart-container">
+                        <canvas id="extractionChart"></canvas>
+                    </div>
+                </section>
+
+                <section id="chunking" class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-bold text-[#004AAD] mb-4">Fase 2: Strategie di Chunking a Confronto</h3>
+                    <p class="mb-6 text-gray-600">Un chunking efficace è vitale. Le strategie semantiche e consapevoli dei metadati offrono il miglior equilibrio tra conservazione del contesto e precisione, superando metodi più semplici come il chunking a dimensione fissa.</p>
+                    <div class="chart-container">
+                        <canvas id="chunkingChart"></canvas>
+                    </div>
+                </section>
+
+                <section id="knowledge-graph" class="bg-white rounded-lg shadow-md p-6 md:col-span-2">
+                    <h3 class="text-2xl font-bold text-[#004AAD] mb-4 text-center">Fase 3: Il Potere dei Knowledge Graph</h3>
+                    <p class="text-center max-w-3xl mx-auto mb-8 text-gray-600">Per risolvere l'ambiguità del vocabolario, costruiamo un Knowledge Graph (KG). Questo trasforma le parole in entità strutturate, consentendo al sistema di distinguere contesti e comprendere relazioni complesse.</p>
+                    <div class="flex flex-col md:flex-row items-center justify-around space-y-4 md:space-y-0">
+                        <div class="text-center">
+                            <div class="p-4 bg-red-100 border-2 border-red-300 rounded-lg">
+                                <p class="font-semibold">Testo Ambiguo</p>
+                                <p class="text-lg">"Aggiungere il sale"</p>
+                            </div>
+                        </div>
+                        <div class="text-5xl text-[#0089E2] font-sans">&rarr;</div>
+                        <div class="text-center">
+                             <div class="p-4 bg-blue-100 border-2 border-[#6AD5FF] rounded-lg">
+                                <p class="font-semibold">Knowledge Graph</p>
+                                <p class="text-lg">Disambiguazione</p>
+                            </div>
+                        </div>
+                        <div class="text-5xl text-[#0089E2] font-sans">&rarr;</div>
+                        <div class="text-center space-y-2">
+                             <div class="p-4 bg-green-100 border-2 border-green-300 rounded-lg">
+                                <p class="font-semibold">Entità Strutturata</p>
+                                <p class="text-sm">`{entità: "Sale", tipo: "Ingrediente"}`</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="retrieval" class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-bold text-[#004AAD] mb-4">Fase 4: Recupero Ibrido e Reranking</h3>
+                    <p class="mb-6 text-gray-600">Per massimizzare la pertinenza, combiniamo la ricerca per parole chiave (BM25) e la ricerca vettoriale. Un modello di reranking affina ulteriormente i risultati, garantendo che solo le informazioni più rilevanti vengano passate alla fase successiva.</p>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-100 rounded-lg text-center font-semibold">Query Utente</div>
+                        <div class="text-center text-2xl">&darr;</div>
+                        <div class="flex justify-around">
+                            <div class="p-3 bg-blue-100 rounded-lg text-center">BM25<br>(Keyword)</div>
+                            <div class="p-3 bg-purple-100 rounded-lg text-center">Vettoriale<br>(Semantica)</div>
+                        </div>
+                         <div class="text-center text-2xl">&darr;</div>
+                        <div class="p-4 bg-yellow-100 rounded-lg text-center font-semibold">Fusione e Reranking</div>
+                         <div class="text-center text-2xl">&darr;</div>
+                        <div class="p-4 bg-green-100 rounded-lg text-center font-semibold">Risultati Ottimizzati</div>
+                    </div>
+                </section>
+
+                <section id="agent" class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-bold text-[#004AAD] mb-4">Fase 5: L'Agente Intelligente (ReAct)</h3>
+                    <p class="mb-6 text-gray-600">Il cuore del sistema è un agente che utilizza il framework ReAct per ragionare e agire. Scompone le query complesse, utilizza strumenti (come il KG o il retriever) e osserva i risultati per formulare risposte intelligenti.</p>
+                     <div class="space-y-3">
+                        <div class="p-3 bg-blue-100 rounded-lg">
+                            <strong class="text-[#004AAD]">Pensiero:</strong> "Devo trovare sostituti vegani per la lasagna."
+                        </div>
+                        <div class="text-center text-2xl text-[#0089E2]">&darr;</div>
+                        <div class="p-3 bg-yellow-100 rounded-lg">
+                            <strong class="text-orange-600]">Azione:</strong> "Interrogare il Knowledge Graph per sostituti della carne e del formaggio."
+                        </div>
+                        <div class="text-center text-2xl text-[#0089E2]">&darr;</div>
+                        <div class="p-3 bg-green-100 rounded-lg">
+                            <strong class="text-green-600]">Osservazione:</strong> "Trovato: lenticchie per la carne, anacardi per il formaggio."
+                        </div>
+                    </div>
+                </section>
+
+                <section id="evaluation" class="bg-white rounded-lg shadow-md p-6 md:col-span-2">
+                    <h2 class="text-3xl font-bold text-[#004AAD] mb-6 text-center">Misurare il Successo: Metriche di Valutazione RAG</h2>
+                    <p class="text-center max-w-3xl mx-auto mb-8 text-gray-600">
+                        La valutazione continua è fondamentale per garantire l'affidabilità. Monitoriamo metriche chiave per misurare la pertinenza del contesto recuperato e la correttezza fattuale della risposta finale, minimizzando le allucinazioni.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="text-center">
+                            <h4 class="text-xl font-semibold text-[#004AAD] mb-2">Valutazione del Contesto</h4>
+                            <div class="chart-container h-64 max-h-64">
+                                <canvas id="contextEvalChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h4 class="text-xl font-semibold text-[#004AAD] mb-2">Valutazione della Risposta</h4>
+                            <div class="chart-container h-64 max-h-64">
+                                <canvas id="responseEvalChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <footer class="text-center mt-12 pt-8 border-t border-gray-300">
+            <p class="text-gray-500">&copy; 2025 Analisi Sistema RAG. Infografica generata per visualizzazione dati complessi.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const palette = {
+                deepBlue: '#004AAD',
+                brightBlue: '#0089E2',
+                lightBlue: '#6AD5FF',
+                lightGray: '#F5F5F5',
+                darkGray: '#333333',
+                accentGreen: 'rgba(75, 192, 192, 0.8)',
+                accentPurple: 'rgba(153, 102, 255, 0.8)',
+                accentOrange: 'rgba(255, 159, 64, 0.8)',
+                accentYellow: 'rgba(255, 205, 86, 0.8)'
+            };
+
+            const globalTooltipCallback = {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                  return label.join(' ');
+                                } else {
+                                  return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            function wrapLabels(label, maxWidth) {
+                const words = label.split(' ');
+                let lines = [];
+                let currentLine = '';
+                words.forEach(word => {
+                    if ((currentLine + word).length > maxWidth) {
+                        lines.push(currentLine.trim());
+                        currentLine = '';
+                    }
+                    currentLine += word + ' ';
+                });
+                lines.push(currentLine.trim());
+                return lines;
+            }
+
+            if (document.getElementById('extractionChart')) {
+                const ctx = document.getElementById('extractionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['LLM Multimodali', 'PyMuPDF (fitz)', 'Reti Neurali Grafiche (GNN)'],
+                        datasets: [{
+                            label: 'Indipendenza dal Layout',
+                            data: [9, 8, 9],
+                            backgroundColor: palette.deepBlue,
+                        }, {
+                            label: 'Gestione PDF Scansionati',
+                            data: [9, 7, 7],
+                            backgroundColor: palette.brightBlue,
+                        }, {
+                            label: 'Bassa Complessità',
+                            data: [5, 9, 4],
+                            backgroundColor: palette.lightBlue,
+                        }]
+                    },
+                    options: {
+                        ...globalTooltipCallback,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10,
+                                title: { display: true, text: 'Punteggio Efficacia (1-10)' }
+                            }
+                        },
+                        plugins: {
+                            ...globalTooltipCallback.plugins,
+                            title: { display: true, text: 'Confronto Metodi di Estrazione' }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('chunkingChart')) {
+                const ctx = document.getElementById('chunkingChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Preservazione Contesto', 'Adattabilità', 'Bassa Complessità', 'Precisione Recupero'],
+                        datasets: [{
+                            label: 'Semantico',
+                            data: [9, 8, 6, 9],
+                            fill: true,
+                            backgroundColor: 'rgba(0, 74, 173, 0.4)',
+                            borderColor: palette.deepBlue,
+                            pointBackgroundColor: palette.deepBlue,
+                        }, {
+                            label: 'Ricorsivo',
+                            data: [7, 7, 8, 7],
+                            fill: true,
+                            backgroundColor: 'rgba(0, 137, 226, 0.4)',
+                            borderColor: palette.brightBlue,
+                            pointBackgroundColor: palette.brightBlue,
+                        },
+                        {
+                            label: 'A Dimensione Fissa',
+                            data: [4, 3, 9, 4],
+                            fill: true,
+                            backgroundColor: 'rgba(106, 213, 255, 0.4)',
+                            borderColor: palette.lightBlue,
+                            pointBackgroundColor: palette.lightBlue,
+                        }]
+                    },
+                    options: {
+                        ...globalTooltipCallback,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            ...globalTooltipCallback.plugins,
+                            title: { display: true, text: 'Analisi Comparativa del Chunking' }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 10
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('contextEvalChart')) {
+                const ctx = document.getElementById('contextEvalChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pertinenza', 'Sufficienza'],
+                        datasets: [{
+                            data: [65, 35],
+                            backgroundColor: [palette.deepBlue, palette.lightBlue],
+                            borderColor: palette.lightGray,
+                            borderWidth: 4
+                        }]
+                    },
+                    options: {
+                        ...globalTooltipCallback,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                            ...globalTooltipCallback.plugins,
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('responseEvalChart')) {
+                const ctx = document.getElementById('responseEvalChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Correttezza Fattuale', 'Pertinenza', 'No Allucinazioni'],
+                        datasets: [{
+                            data: [50, 30, 20],
+                            backgroundColor: [palette.deepBlue, palette.brightBlue, palette.lightBlue],
+                            borderColor: palette.lightGray,
+                            borderWidth: 4
+                        }]
+                    },
+                    options: {
+                        ...globalTooltipCallback,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                           ...globalTooltipCallback.plugins,
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
