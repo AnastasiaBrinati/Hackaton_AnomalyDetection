@@ -29,6 +29,7 @@ import zipfile
 import json
 import time
 from pathlib import Path
+import sys
 warnings.filterwarnings('ignore')
 
 # Set random seed for reproducibility
@@ -230,6 +231,47 @@ def load_fma_dataset():
     except Exception as e:
         print(f"❌ Errore caricamento FMA: {e}")
         return create_synthetic_fma_dataset()
+
+def load_train_test_datasets():
+    """
+    Carica i dataset di train e test separati per Track 3
+    """
+    print("📥 Caricando dataset train e test...")
+    
+    # Carica dataset di training
+    train_path = '../datasets/track3_music_train.csv'
+    if not os.path.exists(train_path):
+        print(f"❌ File training non trovato: {train_path}")
+        print("💡 Assicurati di aver eseguito generate_datasets.py nella directory principale")
+        sys.exit(1)
+    
+    df_train = pd.read_csv(train_path)
+    print(f"✅ Dataset train caricato: {len(df_train)} tracce")
+    
+    # Carica dataset di test (senza ground truth)
+    test_path = '../datasets/track3_music_test.csv'
+    if not os.path.exists(test_path):
+        print(f"❌ File test non trovato: {test_path}")
+        sys.exit(1)
+    
+    df_test = pd.read_csv(test_path)
+    print(f"✅ Dataset test caricato: {len(df_test)} tracce")
+    
+    # Verifica che i dataset abbiano le stesse colonne (eccetto le target)
+    train_cols = set(df_train.columns)
+    test_cols = set(df_test.columns)
+    
+    # Rimuovi colonne target/anomaly dal confronto
+    target_cols = {'anomaly_type', 'is_anomaly', 'predicted_anomaly'}
+    train_feature_cols = train_cols - target_cols
+    test_feature_cols = test_cols - target_cols
+    
+    if train_feature_cols != test_feature_cols:
+        print("⚠️ Avviso: colonne diverse tra train e test")
+        print(f"Solo in train: {train_feature_cols - test_feature_cols}")
+        print(f"Solo in test: {test_feature_cols - train_feature_cols}")
+    
+    return df_train, df_test
 
 def advanced_feature_engineering(df):
     """
@@ -592,88 +634,109 @@ def generate_submission_track3(df, iso_forest, feature_cols, team_name="Me&Giorg
 
 def main():
     """
-    Funzione principale per Track 3: Music Anomaly Detection
+    Funzione principale per Track 3: Music Anomaly Detection con train/test separati
     """
     print("=== SIAE ANOMALY DETECTION HACKATHON ===")
     print("Track 3: Music Anomaly Detection with FMA")
     print("==========================================\n")
     
-    # 1. Scarica/genera dataset FMA
-    df = download_fma_dataset()
+    # 1. Carica dataset train e test
+    df_train, df_test = load_train_test_datasets()
     
-    # 2. Feature engineering avanzato
-    df = advanced_feature_engineering(df)
+    # 2. Feature engineering avanzato sul training set
+    df_train = advanced_feature_engineering(df_train)
     
-    # 3. Rilevamento anomalie
-    df, iso_forest, scaler, feature_cols = detect_music_anomalies(df)
+    # 3. Rilevamento anomalie sul training
+    df_train, iso_forest, scaler, feature_cols = detect_music_anomalies(df_train)
     
-    # 4. Clustering tracce sospette
-    df = cluster_suspicious_tracks(df)
+    # 4. Applica feature engineering anche al test set
+    df_test = advanced_feature_engineering(df_test)
     
-    # 5. Valutazione performance
-    precision, recall, f1, auc_roc = evaluate_music_anomaly_detection(df)
+    # 5. Fai predizioni sul test set
+    print("🔮 Facendo predizioni sul test set...")
     
-    # 6. Visualizzazioni
-    create_music_visualizations(df)
+    # Assicurati che le feature siano presenti nel test set
+    missing_features = [col for col in feature_cols if col not in df_test.columns]
+    if missing_features:
+        print(f"⚠️ Feature mancanti nel test set: {missing_features}")
+        # Crea feature mancanti con valori default
+        for col in missing_features:
+            df_test[col] = 0
     
-    # 7. Salva risultati
+    # Scala le feature del test set
+    X_test = df_test[feature_cols].fillna(0)
+    X_test_scaled = scaler.transform(X_test)
+    
+    # Predici anomalie
+    test_predictions = iso_forest.predict(X_test_scaled)
+    test_scores = iso_forest.score_samples(X_test_scaled)
+    
+    # Converti da -1/1 a 0/1
+    df_test['predicted_anomaly'] = (test_predictions == -1).astype(int)
+    df_test['anomaly_score'] = test_scores
+    
+    print(f"🎯 Anomalie rilevate nel test set: {df_test['predicted_anomaly'].sum()}/{len(df_test)}")
+    
+    # 6. Clustering tracce sospette (solo training)
+    df_train = cluster_suspicious_tracks(df_train)
+    
+    # 7. Valutazione performance (solo training per debug)
+    if 'is_anomaly' in df_train.columns:
+        precision, recall, f1, auc_roc = evaluate_music_anomaly_detection(df_train)
+        print(f"\n📊 Performance su training set:")
+        print(f"   Precision: {precision:.3f}")
+        print(f"   Recall: {recall:.3f}")
+        print(f"   F1-Score: {f1:.3f}")
+        print(f"   AUC-ROC: {auc_roc:.3f}")
+    
+    # 8. Visualizzazioni (solo training)
+    create_music_visualizations(df_train)
+    
+    # 9. Salva risultati
     print("\n💾 Salvando risultati...")
-    df.to_csv('music_anomaly_detection_results.csv', index=False)
+    df_train.to_csv('music_anomaly_detection_results_train.csv', index=False)
+    df_test.to_csv('music_anomaly_detection_results_test_predictions.csv', index=False)
     
-    # Analisi per genere
-    genre_analysis = df.groupby('genre_top').agg({
-        'predicted_anomaly': ['sum', 'count', 'mean'],
-        'track_listens': 'mean',
-        'track_favorites': 'mean',
-        'audio_complexity': 'mean'
-    }).round(3)
-    genre_analysis.to_csv('genre_anomaly_analysis.csv')
+    # Analisi per genere (solo training)
+    if 'genre_top' in df_train.columns:
+        genre_analysis = df_train.groupby('genre_top').agg({
+            'predicted_anomaly': ['sum', 'count', 'mean'],
+            'track_listens': 'mean',
+            'track_favorites': 'mean',
+            'audio_complexity': 'mean'
+        }).round(3)
+        genre_analysis.to_csv('genre_anomaly_analysis.csv')
     
-    # Analisi artisti sospetti
-    artist_analysis = df.groupby('artist_name').agg({
-        'predicted_anomaly': ['sum', 'count', 'mean'],
-        'artist_genre_diversity': 'first',
-        'track_listens': 'mean'
-    }).round(3)
-    artist_analysis = artist_analysis[artist_analysis[('predicted_anomaly', 'sum')] > 0]
-    artist_analysis.to_csv('suspicious_artists_analysis.csv')
+    # Analisi artisti sospetti (solo training)
+    if 'artist_name' in df_train.columns:
+        artist_analysis = df_train.groupby('artist_name').agg({
+            'predicted_anomaly': ['sum', 'count', 'mean'],
+            'artist_genre_diversity': 'first',
+            'track_listens': 'mean'
+        }).round(3)
+        artist_analysis = artist_analysis[artist_analysis[('predicted_anomaly', 'sum')] > 0]
+        artist_analysis.to_csv('suspicious_artists_analysis.csv')
     
-    print("\n=== RIEPILOGO RISULTATI TRACK 3 ===")
-    print(f"🎵 Tracce analizzate: {len(df):,}")
-    print(f"🎨 Generi musicali: {df['genre_top'].nunique()}")
-    print(f"🎤 Artisti unici: {df['artist_name'].nunique()}")
-    print(f"🚨 Anomalie rilevate: {df['predicted_anomaly'].sum():,}")
-    print(f"📊 Tasso anomalie: {df['predicted_anomaly'].mean():.2%}")
-    
-    if 'is_anomaly' in df.columns:
-        print(f"🎯 Precision: {precision:.3f}")
-        print(f"🎯 Recall: {recall:.3f}")
-        print(f"🎯 F1-Score: {f1:.3f}")
-        print(f"🎯 AUC-ROC: {auc_roc:.3f}")
-    
-    if 'cluster' in df.columns:
-        n_clusters = len(df[df['cluster'] != -2]['cluster'].unique())
-        print(f"🔍 Cluster sospetti: {n_clusters}")
-    
-    # Statistiche anomalie per tipo
-    if 'anomaly_type' in df.columns:
-        print(f"\n📋 Tipi di anomalia rilevati:")
-        anomaly_type_stats = df[df['is_anomaly'] == True]['anomaly_type'].value_counts()
-        for atype, count in anomaly_type_stats.items():
-            print(f"  - {atype}: {count} tracce")
-    
-    # 8. Genera submission
-    team_name = "Me&Giorgio"  # CAMBIA QUI
-    members = ["Mirko", "Giorgio", "Manuel"]  # CAMBIA QUI
+    # 10. Genera submission
+    team_name = "me_giorgio"  # CAMBIA QUI IL NOME DEL TUO TEAM
+    members = ["Giorgio", "Me"]  # CAMBIA QUI I MEMBRI DEL TUO TEAM
     
     submission_file, submission_data = generate_submission_track3(
-        df, iso_forest, feature_cols, team_name, members
+        df_test, iso_forest, feature_cols, team_name, members
     )
     
-    print(f"\n🏆 Submission generata per Team '{team_name}'")
-    print(f"📁 File: {submission_file}")
-    print(f"💯 Score finale stimato: {submission_data['metrics']['f1_score']:.3f}")
-    print("\n✅ Track 3 completata con successo!")
+    print("\n=== RIEPILOGO RISULTATI TRACK 3 ===")
+    print(f"📋 Training set: {len(df_train):,} tracce")
+    print(f"🧪 Test set: {len(df_test):,} tracce")
+    if 'genre_top' in df_train.columns:
+        print(f"🎨 Generi musicali: {df_train['genre_top'].nunique()}")
+    if 'artist_name' in df_train.columns:
+        print(f"🎤 Artisti unici: {df_train['artist_name'].nunique()}")
+    print(f"🚨 Anomalie rilevate nel test: {df_test['predicted_anomaly'].sum():,}")
+    print(f"📊 Tasso anomalie test: {df_test['predicted_anomaly'].mean():.2%}")
+    print(f"📄 Submission generata: {submission_file}")
+    
+    return df_train, df_test, submission_data
 
 if __name__ == "__main__":
-    main() 
+    df_train, df_test, submission_data = main() 

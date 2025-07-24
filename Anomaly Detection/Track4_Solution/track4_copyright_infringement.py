@@ -18,6 +18,7 @@ import os
 import json
 import time
 import hashlib
+import sys
 warnings.filterwarnings('ignore')
 
 np.random.seed(42)
@@ -449,8 +450,49 @@ def generate_submission(df, iso_forest, feature_cols, team_name="Me&Giorgio", me
     print(f"✅ Submission salvata: {submission_file}")
     return submission_file, submission_data
 
+def load_train_test_datasets():
+    """
+    Carica i dataset di train e test separati per Track 4
+    """
+    print("📥 Caricando dataset train e test...")
+    
+    # Carica dataset di training
+    train_path = '../datasets/track4_copyright_train.csv'
+    if not os.path.exists(train_path):
+        print(f"❌ File training non trovato: {train_path}")
+        print("💡 Assicurati di aver eseguito generate_datasets.py nella directory principale")
+        sys.exit(1)
+    
+    df_train = pd.read_csv(train_path)
+    print(f"✅ Dataset train caricato: {len(df_train)} opere")
+    
+    # Carica dataset di test (senza ground truth)
+    test_path = '../datasets/track4_copyright_test.csv'
+    if not os.path.exists(test_path):
+        print(f"❌ File test non trovato: {test_path}")
+        sys.exit(1)
+    
+    df_test = pd.read_csv(test_path)
+    print(f"✅ Dataset test caricato: {len(df_test)} opere")
+    
+    # Verifica che i dataset abbiano le stesse colonne (eccetto le target)
+    train_cols = set(df_train.columns)
+    test_cols = set(df_test.columns)
+    
+    # Rimuovi colonne target/infringement dal confronto
+    target_cols = {'infringement_type', 'is_infringement', 'infringement_predicted'}
+    train_feature_cols = train_cols - target_cols
+    test_feature_cols = test_cols - target_cols
+    
+    if train_feature_cols != test_feature_cols:
+        print("⚠️ Avviso: colonne diverse tra train e test")
+        print(f"Solo in train: {train_feature_cols - test_feature_cols}")
+        print(f"Solo in test: {test_feature_cols - train_feature_cols}")
+    
+    return df_train, df_test
+
 def main():
-    """Main function con clustering garantito"""
+    """Main function con clustering garantito e train/test separati"""
     print("=" * 80)
     print("🎯 SIAE Track 4: Copyright Infringement Detection")
     print("🔥 SISTEMA CON CLUSTERING GARANTITO")
@@ -459,46 +501,88 @@ def main():
     start_time = time.time()
     
     # Pipeline completa
-    print("\n🔄 Step 1: Generazione dataset con cluster garantiti...")
-    df = generate_synthetic_copyright_dataset(n_works=15000)
+    print("\n🔄 Step 1: Caricamento dataset train e test...")
+    df_train, df_test = load_train_test_datasets()
     
-    print("\n🔄 Step 2: Feature engineering...")
-    df = advanced_feature_engineering(df)
+    print("\n🔄 Step 2: Feature engineering (training)...")
+    df_train = advanced_feature_engineering(df_train)
     
-    print("\n🔄 Step 3: Rilevamento violazioni...")
-    df, iso_forest, feature_cols = detect_copyright_infringement(df)
+    print("\n🔄 Step 3: Rilevamento violazioni (training)...")
+    df_train, iso_forest, feature_cols = detect_copyright_infringement(df_train)
     
-    print("\n🔄 Step 4: Clustering GARANTITO...")
-    df = cluster_copyright_violations_guaranteed(df)
+    print("\n🔄 Step 4: Clustering GARANTITO (training)...")
+    df_train = cluster_copyright_violations_guaranteed(df_train)
     
-    print("\n🔄 Step 5: Valutazione performance...")
-    metrics = evaluate_performance(df)
+    print("\n🔄 Step 5: Feature engineering (test)...")
+    df_test = advanced_feature_engineering(df_test)
     
-    print("\n🔄 Step 6: Visualizzazioni...")
-    clustering_stats = create_visualizations(df)
+    print("\n🔄 Step 6: Predizioni sul test set...")
+    # Assicurati che le feature siano presenti nel test set
+    missing_features = [col for col in feature_cols if col not in df_test.columns]
+    if missing_features:
+        print(f"⚠️ Feature mancanti nel test set: {missing_features}")
+        # Crea feature mancanti con valori default
+        for col in missing_features:
+            df_test[col] = 0
     
-    print("\n🔄 Step 7: Salvataggio risultati...")
-    df.to_csv('copyright_infringement_detection_results.csv', index=False)
+    # Scala le feature del test set usando il scaler già fittato
+    scaler = StandardScaler()
+    X_train = df_train[feature_cols].fillna(0)
+    scaler.fit(X_train)
     
-    print("\n🔄 Step 8: Generazione submission...")
-    submission_file, submission_data = generate_submission(df, iso_forest, feature_cols)
+    X_test = df_test[feature_cols].fillna(0)
+    X_test_scaled = scaler.transform(X_test)
+    
+    # Predici violazioni
+    test_predictions = iso_forest.predict(X_test_scaled)
+    test_scores = iso_forest.score_samples(X_test_scaled)
+    
+    # Converti da -1/1 a 0/1
+    df_test['infringement_predicted'] = (test_predictions == -1).astype(int)
+    df_test['infringement_score'] = test_scores
+    
+    # Normalizza scores
+    min_score = df_test['infringement_score'].min()
+    max_score = df_test['infringement_score'].max()
+    df_test['infringement_score_normalized'] = (df_test['infringement_score'] - min_score) / (max_score - min_score)
+    
+    print(f"🎯 Violazioni rilevate nel test set: {df_test['infringement_predicted'].sum()}/{len(df_test)}")
+    
+    print("\n🔄 Step 7: Valutazione performance (training)...")
+    metrics = evaluate_performance(df_train)
+    
+    print("\n🔄 Step 8: Visualizzazioni (training)...")
+    clustering_stats = create_visualizations(df_train)
+    
+    print("\n🔄 Step 9: Salvataggio risultati...")
+    df_train.to_csv('copyright_infringement_detection_results_train.csv', index=False)
+    df_test.to_csv('copyright_infringement_detection_results_test_predictions.csv', index=False)
+    
+    print("\n🔄 Step 10: Generazione submission...")
+    team_name = "me_giorgio"  # CAMBIA QUI IL NOME DEL TUO TEAM
+    members = ["Giorgio", "Me"]  # CAMBIA QUI I MEMBRI DEL TUO TEAM
+    
+    submission_file, submission_data = generate_submission(df_test, iso_forest, feature_cols, team_name, members)
     
     execution_time = time.time() - start_time
     
     print("\n" + "=" * 80)
     print("🎉 RIEPILOGO FINALE - CLUSTERING GARANTITO")
     print("=" * 80)
-    print(f"📊 Opere analizzate: {len(df):,}")
-    print(f"🚨 Violazioni rilevate: {df['infringement_predicted'].sum():,}")
-    print(f"🎯 Accuracy: {metrics['accuracy']:.3f}")
-    print(f"🏆 F1-Score: {metrics['f1_score']:.3f}")
+    print(f"📋 Training set: {len(df_train):,} opere")
+    print(f"🧪 Test set: {len(df_test):,} opere")
+    print(f"🚨 Violazioni rilevate nel test: {df_test['infringement_predicted'].sum():,}")
+    print(f"📈 Tasso violazioni test: {df_test['infringement_predicted'].mean():.2%}")
+    print(f"🎯 Accuracy (train): {metrics['accuracy']:.3f}")
+    print(f"🏆 F1-Score (train): {metrics['f1_score']:.3f}")
     print(f"🔗 CLUSTER GARANTITI: {clustering_stats['n_clusters']}")
     print(f"🎪 Violazioni clusterizzate: {clustering_stats['clustered_violations']}")
     print(f"⏱️ Tempo esecuzione: {execution_time:.1f} secondi")
+    print(f"📄 Submission generata: {submission_file}")
     print("=" * 80)
     print("✅ SUCCESSO: Cluster sempre visibili!")
     
-    return df, metrics, submission_data
+    return df_train, df_test, submission_data
 
 if __name__ == "__main__":
-    main() 
+    df_train, df_test, submission_data = main() 

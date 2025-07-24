@@ -1,0 +1,261 @@
+name: 🏆 Auto Update Leaderboard
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'submissions/submission_*.json'
+  workflow_dispatch:
+
+jobs:
+  update-leaderboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2  # Need at least 2 commits to compare changes
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: 'pip'
+    
+    - name: 📦 Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas numpy matplotlib seaborn scikit-learn
+        pip install -r requirements_evaluation.txt || echo "requirements_evaluation.txt not found, using fallback deps"
+    
+    - name: 🔍 Check for New Submissions
+      id: check_submissions
+      run: |
+        echo "Checking for new submission files..."
+        
+        # Get list of changed files
+        CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep "submissions/submission_.*\.json" || true)
+        
+        if [ -n "$CHANGED_FILES" ]; then
+          echo "found_submissions=true" >> $GITHUB_OUTPUT
+          echo "Changed submission files:"
+          echo "$CHANGED_FILES"
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "found_submissions=false" >> $GITHUB_OUTPUT
+          echo "No submission file changes detected"
+        fi
+    
+    - name: 🎯 Validate Ground Truth Files
+      if: steps.check_submissions.outputs.found_submissions == 'true'
+      run: |
+        echo "Validating ground truth files..."
+        
+        MISSING_FILES=""
+        for track in track1_live_events track2_documents track3_music track4_copyright; do
+          GT_FILE="datasets/${track}_test_ground_truth.csv"
+          if [ ! -f "$GT_FILE" ]; then
+            echo "❌ Missing: $GT_FILE"
+            MISSING_FILES="$MISSING_FILES $GT_FILE"
+          else
+            echo "✅ Found: $GT_FILE"
+          fi
+        done
+        
+        if [ -n "$MISSING_FILES" ]; then
+          echo "⚠️ Some ground truth files are missing. Evaluation may not work correctly."
+          echo "Missing files: $MISSING_FILES"
+        else
+          echo "✅ All ground truth files found"
+        fi
+    
+    - name: 📊 Update Leaderboard
+      if: steps.check_submissions.outputs.found_submissions == 'true'
+      run: |
+        echo "🔄 Running evaluation system..."
+        
+        # Create logs directory
+        mkdir -p logs
+        
+        # Run evaluation with detailed logging
+        python evaluate_submissions.py 2>&1 | tee logs/evaluation_$(date +%Y%m%d_%H%M%S).log
+        
+        # Check if leaderboard was updated
+        if [ -f "leaderboard.md" ]; then
+          echo "✅ Leaderboard generated successfully"
+          
+          # Show a preview of the leaderboard
+          echo "📋 Leaderboard Preview:"
+          head -20 leaderboard.md || echo "Could not preview leaderboard"
+        else
+          echo "❌ Leaderboard file not generated"
+          exit 1
+        fi
+    
+    - name: 📈 Generate Statistics
+      if: steps.check_submissions.outputs.found_submissions == 'true'
+      run: |
+        echo "📊 Generating submission statistics..."
+        
+        python -c "
+import json
+import pandas as pd
+from pathlib import Path
+from datetime import datetime
+
+# Count submissions by track
+submissions = list(Path('submissions').glob('submission_*.json'))
+print(f'Total submissions: {len(submissions)}')
+
+track_counts = {}
+valid_submissions = 0
+invalid_submissions = 0
+
+for sub_file in submissions:
+    try:
+        with open(sub_file) as f:
+            data = json.load(f)
+        track = data.get('team_info', {}).get('track', 'Unknown')
+        track_counts[track] = track_counts.get(track, 0) + 1
+        valid_submissions += 1
+    except:
+        invalid_submissions += 1
+
+print(f'Valid submissions: {valid_submissions}')
+print(f'Invalid submissions: {invalid_submissions}')
+print('Submissions by track:')
+for track, count in sorted(track_counts.items()):
+    print(f'  {track}: {count}')
+
+# Save stats
+stats = {
+    'timestamp': datetime.now().isoformat(),
+    'total_submissions': len(submissions),
+    'valid_submissions': valid_submissions,
+    'invalid_submissions': invalid_submissions,
+    'track_counts': track_counts
+}
+
+with open('submission_stats.json', 'w') as f:
+    json.dump(stats, f, indent=2)
+"
+    
+    - name: 💾 Commit Updated Leaderboard
+      if: steps.check_submissions.outputs.found_submissions == 'true'
+      run: |
+        # Configure git
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Check if there are changes to commit
+        if git diff --quiet HEAD -- leaderboard.md submission_stats.json; then
+          echo "ℹ️ No changes to leaderboard detected"
+        else
+          echo "📝 Committing leaderboard updates..."
+          
+          # Add files
+          git add leaderboard.md
+          git add submission_stats.json
+          git add logs/
+          
+          # Create commit message with submission details
+          COMMIT_MSG="🏆 Auto-update leaderboard\n\nNew submissions:\n"
+          echo "${{ steps.check_submissions.outputs.changed_files }}" | while read file; do
+            if [ -n "$file" ]; then
+              COMMIT_MSG="$COMMIT_MSG- $file\n"
+            fi
+          done
+          COMMIT_MSG="$COMMIT_MSG\nUpdated: $(date)"
+          
+          # Commit changes
+          git commit -m "🏆 Auto-update leaderboard
+
+New submissions detected:
+${{ steps.check_submissions.outputs.changed_files }}
+
+Updated: $(date '+%Y-%m-%d %H:%M:%S UTC')
+Generated by GitHub Actions"
+          
+          echo "✅ Leaderboard changes committed"
+        fi
+    
+    - name: 🚀 Push Changes
+      if: steps.check_submissions.outputs.found_submissions == 'true'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+    
+    - name: 📊 Create Check Summary
+      if: always()
+      run: |
+        echo "## 🏆 Leaderboard Update Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ steps.check_submissions.outputs.found_submissions }}" == "true" ]; then
+          echo "✅ **Submissions found and processed**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Changed Files:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.check_submissions.outputs.changed_files }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "submission_stats.json" ]; then
+            echo "### Submission Statistics:" >> $GITHUB_STEP_SUMMARY
+            python -c "
+import json
+with open('submission_stats.json') as f:
+    stats = json.load(f)
+    
+print(f'- **Total Submissions**: {stats[\"total_submissions\"]}')
+print(f'- **Valid Submissions**: {stats[\"valid_submissions\"]}')
+print(f'- **Invalid Submissions**: {stats[\"invalid_submissions\"]}')
+print('')
+print('**By Track:**')
+for track, count in sorted(stats['track_counts'].items()):
+    print(f'- {track}: {count}')
+" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f "leaderboard.md" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Top 5 Teams:" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            head -30 leaderboard.md | tail -20 >> $GITHUB_STEP_SUMMARY || echo "Could not extract top teams" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "ℹ️ **No new submissions detected**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This run was triggered but no submission files were changed." >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "---" >> $GITHUB_STEP_SUMMARY
+        echo "*Updated: $(date '+%Y-%m-%d %H:%M:%S UTC')*" >> $GITHUB_STEP_SUMMARY
+    
+    - name: 🔔 Notify on Failure
+      if: failure()
+      run: |
+        echo "❌ Leaderboard update failed!"
+        echo "Check the logs above for details."
+        echo "Common issues:"
+        echo "- Missing ground truth files"
+        echo "- Invalid submission JSON format"  
+        echo "- Python dependency issues"
+        
+        # Create failure summary
+        echo "## ❌ Leaderboard Update Failed" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "The automatic leaderboard update encountered an error." >> $GITHUB_STEP_SUMMARY
+        echo "Please check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Common solutions:**" >> $GITHUB_STEP_SUMMARY
+        echo "- Ensure all ground truth files exist in \`datasets/\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Validate submission JSON format" >> $GITHUB_STEP_SUMMARY
+        echo "- Check Python dependencies" >> $GITHUB_STEP_SUMMARY 

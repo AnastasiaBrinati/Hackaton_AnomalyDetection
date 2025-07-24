@@ -27,6 +27,7 @@ import zipfile
 import json
 import time
 from sklearn.metrics import roc_auc_score
+import sys
 warnings.filterwarnings('ignore')
 
 # Set random seed for reproducibility
@@ -749,96 +750,129 @@ def generate_submission(df, iso_forest, feature_cols, team_name="YourTeam", memb
     
     return submission_filename, submission
 
+def load_train_test_datasets():
+    """
+    Carica i dataset di train e test separati
+    """
+    print("📥 Caricando dataset train e test...")
+    
+    # Carica dataset di training
+    train_path = '../datasets/track1_live_events_train.csv'
+    if not os.path.exists(train_path):
+        print(f"❌ File training non trovato: {train_path}")
+        print("💡 Assicurati di aver eseguito generate_datasets.py nella directory principale")
+        sys.exit(1)
+    
+    df_train = pd.read_csv(train_path)
+    print(f"✅ Dataset train caricato: {len(df_train)} campioni")
+    
+    # Carica dataset di test (senza ground truth)
+    test_path = '../datasets/track1_live_events_test.csv'
+    if not os.path.exists(test_path):
+        print(f"❌ File test non trovato: {test_path}")
+        sys.exit(1)
+    
+    df_test = pd.read_csv(test_path)
+    print(f"✅ Dataset test caricato: {len(df_test)} campioni")
+    
+    # Verifica che i dataset abbiano le stesse colonne (eccetto le target)
+    train_cols = set(df_train.columns)
+    test_cols = set(df_test.columns)
+    
+    # Rimuovi colonne target/anomaly dal confronto
+    target_cols = {'anomaly_type', 'is_anomaly', 'is_anomaly_detected'}
+    train_feature_cols = train_cols - target_cols
+    test_feature_cols = test_cols - target_cols
+    
+    if train_feature_cols != test_feature_cols:
+        print("⚠️ Avviso: colonne diverse tra train e test")
+        print(f"Solo in train: {train_feature_cols - test_feature_cols}")
+        print(f"Solo in test: {test_feature_cols - train_feature_cols}")
+    
+    return df_train, df_test
+
 def main():
     """
-    Funzione principale che esegue l'intero pipeline
+    Funzione principale che esegue l'intero pipeline con train/test separati
     """
     print("=== SIAE ANOMALY DETECTION HACKATHON ===")
     print("Track 1: Anomaly Detection in Live Events")
     print("==========================================\n")
     
-    # 1. Scarica e processa metadati FMA
-    fma_df = download_fma_metadata()
-    music_data = process_fma_for_events(fma_df)
+    # 1. Carica dataset train e test
+    df_train, df_test = load_train_test_datasets()
     
-    # 2. Genera dataset con informazioni musicali FMA
-    df = generate_live_events_dataset(n_events=10000, music_data=music_data)
+    # 2. Feature engineering sul training set
+    df_train = feature_engineering(df_train)
     
-    # 3. Feature engineering (include features FMA)
-    df = feature_engineering(df)
+    # 3. Applica Isolation Forest sul training
+    df_train, iso_forest, scaler, feature_cols = apply_isolation_forest(df_train, contamination=0.1)
     
-    # 4. Applica Isolation Forest
-    df, iso_forest, scaler, feature_cols = apply_isolation_forest(df, contamination=0.1)
+    # 4. Applica feature engineering anche al test set
+    df_test = feature_engineering(df_test)
     
-    # 5. Applica DBSCAN clustering
-    venue_features, dbscan = apply_dbscan_clustering(df)
+    # 5. Fai predizioni sul test set
+    print("🔮 Facendo predizioni sul test set...")
     
-    # 6. Valuta performance
-    precision, recall, f1 = evaluate_performance(df)
+    # Assicurati che le feature siano presenti nel test set
+    missing_features = [col for col in feature_cols if col not in df_test.columns]
+    if missing_features:
+        print(f"⚠️ Feature mancanti nel test set: {missing_features}")
+        # Crea feature mancanti con valori default
+        for col in missing_features:
+            df_test[col] = 0
     
-    # 7. Crea visualizzazioni
-    create_visualizations(df, venue_features)
+    # Scala le feature del test set
+    X_test = df_test[feature_cols].fillna(0)
+    X_test_scaled = scaler.transform(X_test)
     
-    # 8. Salva risultati
-    print("\nSalvataggio risultati...")
-    df.to_csv('live_events_with_anomalies.csv', index=False)
+    # Predici anomalie
+    test_predictions = iso_forest.predict(X_test_scaled)
+    test_scores = iso_forest.score_samples(X_test_scaled)
+    
+    # Converti da -1/1 a 0/1
+    df_test['is_anomaly_detected'] = (test_predictions == -1).astype(int)
+    df_test['anomaly_score'] = test_scores
+    
+    print(f"🎯 Anomalie rilevate nel test set: {df_test['is_anomaly_detected'].sum()}/{len(df_test)}")
+    
+    # 6. Applica DBSCAN clustering sui dati di training
+    venue_features, dbscan = apply_dbscan_clustering(df_train)
+    
+    # 7. Valuta performance sul training set (per debug)
+    if 'anomaly_type' in df_train.columns:
+        precision, recall, f1 = evaluate_performance(df_train)
+        print(f"\n📊 Performance su training set:")
+        print(f"   Precision: {precision:.3f}")
+        print(f"   Recall: {recall:.3f}")
+        print(f"   F1-Score: {f1:.3f}")
+    
+    # 8. Crea visualizzazioni
+    create_visualizations(df_train, venue_features)
+    
+    # 9. Salva risultati
+    print("\n💾 Salvando risultati...")
+    df_train.to_csv('live_events_with_anomalies_train.csv', index=False)
+    df_test.to_csv('live_events_with_anomalies_test_predictions.csv', index=False)
     venue_features.to_csv('venue_clustering_results.csv')
     
-    # Salva anche informazioni sui generi musicali
-    genre_analysis = df.groupby('event_genre').agg({
-        'is_anomaly_detected': ['sum', 'count'],
-        'total_revenue': 'mean',
-        'attendance': 'mean'
-    })
-    genre_analysis.to_csv('genre_analysis.csv')
-    
-    print("\n=== RIEPILOGO RISULTATI ===")
-    print(f"Dataset generato: {len(df)} eventi")
-    print(f"Anomalie vere: {df['anomaly_type'].notna().sum()}")
-    print(f"Anomalie rilevate: {df['is_anomaly_detected'].sum()}")
-    print(f"Precision: {precision:.3f}")
-    print(f"Recall: {recall:.3f}")
-    print(f"F1-Score: {f1:.3f}")
-    print(f"Venue clusters: {len(venue_features['cluster'].unique()) - (1 if -1 in venue_features['cluster'].unique() else 0)}")
-    
-    # Statistiche musicali
-    print(f"\n=== STATISTICHE MUSICALI (FMA) ===")
-    print(f"Generi musicali totali: {df['event_genre'].nunique()}")
-    print(f"Top 5 generi per numero eventi:")
-    top_genres = df['event_genre'].value_counts().head()
-    for genre, count in top_genres.items():
-        anomaly_rate = df[df['event_genre'] == genre]['is_anomaly_detected'].mean()
-        print(f"  {genre}: {count} eventi (anomaly rate: {anomaly_rate:.1%})")
-    
-    print("\nFile salvati:")
-    print("- live_events_with_anomalies.csv")
-    print("- venue_clustering_results.csv")
-    print("- genre_analysis.csv")
-    print("- anomaly_detection_results.png")
-    print("- genre_distribution.png")
-    
-    print("\n=== ANALISI COMPLETATA ===")
-    
-    # 9. Genera file di submission (esempio)
-    print("\n" + "="*50)
-    print("GENERAZIONE FILE DI SUBMISSION")
-    print("="*50)
-    
-    team_name = "Me&Giorgio"
-    members = ["Mirko", "Giorgio", "Manuel"]
+    # 10. Genera submission
+    team_name = "me_giorgio"  # CAMBIA QUI IL NOME DEL TUO TEAM
+    members = ["Giorgio", "Me"]  # CAMBIA QUI I MEMBRI DEL TUO TEAM
     
     submission_file, submission_data = generate_submission(
-        df=df, 
-        iso_forest=iso_forest, 
-        feature_cols=feature_cols,
-        team_name=team_name,
-        members=members
+        df_test, iso_forest, feature_cols, team_name, members
     )
     
-    print(f"\n✅ File di submission creato: {submission_file}")
-    print("💡 I partecipanti possono modificare team_name e members nella funzione generate_submission()")
+    print("\n=== RIEPILOGO RISULTATI ===")
+    print(f"📋 Training set: {len(df_train)} eventi")
+    print(f"🧪 Test set: {len(df_test)} eventi")
+    print(f"🚨 Anomalie rilevate nel test: {df_test['is_anomaly_detected'].sum()}")
+    print(f"📈 Tasso anomalie test: {df_test['is_anomaly_detected'].mean():.2%}")
+    print(f"🏆 Venue clusters: {len(venue_features['cluster'].unique()) - (1 if -1 in venue_features['cluster'].unique() else 0)}")
+    print(f"📄 Submission generata: {submission_file}")
     
-    return df, venue_features, iso_forest, dbscan
+    return df_train, df_test, submission_data
 
 if __name__ == "__main__":
     # Installazione automatica dipendenze se necessario
@@ -856,4 +890,4 @@ if __name__ == "__main__":
         exit(1)
     
     # Esegui analisi
-    df, venue_features, iso_forest, dbscan = main() 
+    df_train, df_test, submission_data = main() 

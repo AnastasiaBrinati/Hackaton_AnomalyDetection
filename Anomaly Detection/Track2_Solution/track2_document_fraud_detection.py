@@ -99,6 +99,47 @@ def create_synthetic_documents_dataset(n_documents=5000):
     
     return df
 
+def load_train_test_datasets():
+    """
+    Carica i dataset di train e test separati per Track 2
+    """
+    print("📥 Caricando dataset train e test...")
+    
+    # Carica dataset di training
+    train_path = '../datasets/track2_documents_train.csv'
+    if not os.path.exists(train_path):
+        print(f"❌ File training non trovato: {train_path}")
+        print("💡 Assicurati di aver eseguito generate_datasets.py nella directory principale")
+        sys.exit(1)
+    
+    df_train = pd.read_csv(train_path)
+    print(f"✅ Dataset train caricato: {len(df_train)} documenti")
+    
+    # Carica dataset di test (senza ground truth)
+    test_path = '../datasets/track2_documents_test.csv'
+    if not os.path.exists(test_path):
+        print(f"❌ File test non trovato: {test_path}")
+        sys.exit(1)
+    
+    df_test = pd.read_csv(test_path)
+    print(f"✅ Dataset test caricato: {len(df_test)} documenti")
+    
+    # Verifica che i dataset abbiano le stesse colonne (eccetto le target)
+    train_cols = set(df_train.columns)
+    test_cols = set(df_test.columns)
+    
+    # Rimuovi colonne target/fraud dal confronto
+    target_cols = {'fraud_type', 'is_fraudulent', 'fraud_predicted'}
+    train_feature_cols = train_cols - target_cols
+    test_feature_cols = test_cols - target_cols
+    
+    if train_feature_cols != test_feature_cols:
+        print("⚠️ Avviso: colonne diverse tra train e test")
+        print(f"Solo in train: {train_feature_cols - test_feature_cols}")
+        print(f"Solo in test: {test_feature_cols - train_feature_cols}")
+    
+    return df_train, df_test
+
 def feature_engineering_documents(df):
     """Feature engineering specifico per document fraud detection"""
     print("🔧 Feature engineering per document fraud detection...")
@@ -416,40 +457,71 @@ def main():
     print("Track 2: Document Fraud Detection")
     print("==========================================\n")
     
-    # 1. Genera dataset
-    df = create_synthetic_documents_dataset(n_documents=5000)
+    # 1. Carica dataset train/test
+    df_train, df_test = load_train_test_datasets()
     
-    # 2. Feature engineering
-    df = feature_engineering_documents(df)
+    # 2. Feature engineering (applica solo a df_train per ora)
+    df_train = feature_engineering_documents(df_train)
     
-    # 3. Applica modelli
-    df, iso_forest, dbscan, scaler, feature_cols = apply_fraud_detection_models(df)
+    # 3. Applica modelli (solo a df_train)
+    df_train, iso_forest, dbscan, scaler, feature_cols = apply_fraud_detection_models(df_train)
     
-    # 4. Valuta performance
-    precision, recall, f1, auc_roc = evaluate_fraud_detection(df)
+    # 4. Valuta performance (solo a df_train)
+    precision, recall, f1, auc_roc = evaluate_fraud_detection(df_train)
     
-    # 5. Visualizzazioni
-    create_fraud_visualizations(df)
+         # 5. Applica feature engineering al test set
+     df_test = feature_engineering_documents(df_test)
+     
+     # 6. Fai predizioni sul test set
+     print("🔮 Facendo predizioni sul test set...")
+     
+     # Assicurati che le feature siano presenti nel test set
+     missing_features = [col for col in feature_cols if col not in df_test.columns]
+     if missing_features:
+         print(f"⚠️ Feature mancanti nel test set: {missing_features}")
+         # Crea feature mancanti con valori default
+         for col in missing_features:
+             df_test[col] = 0
+     
+     # Scala le feature del test set
+     X_test = df_test[feature_cols].fillna(0)
+     X_test_scaled = scaler.transform(X_test)
+     
+     # Predici frodi
+     test_predictions = iso_forest.predict(X_test_scaled)
+     test_scores = iso_forest.score_samples(X_test_scaled)
+     
+     # Converti da -1/1 a 0/1
+     df_test['is_fraud_detected'] = (test_predictions == -1).astype(int)
+     df_test['fraud_score'] = test_scores
+     
+     print(f"🎯 Frodi rilevate nel test set: {df_test['is_fraud_detected'].sum()}/{len(df_test)}")
+     
+     # 7. Visualizzazioni (solo a df_train)
+     create_fraud_visualizations(df_train)
+     
+     # 8. Salva risultati
+     df_train.to_csv('documents_fraud_detection_train.csv', index=False)
+     df_test.to_csv('documents_fraud_detection_test_predictions.csv', index=False)
+     
+     # 9. Genera submission (usa df_test per le predizioni)
+     team_name = "me_giorgio"  # CAMBIA QUI IL NOME DEL TUO TEAM
+     members = ["Giorgio", "Me"]  # CAMBIA QUI I MEMBRI DEL TUO TEAM
     
-    # 6. Salva risultati
-    df.to_csv('documents_fraud_detection.csv', index=False)
-    
-    # 7. Genera submission
-    team_name = "Me&Giorgio"
-    members = ["Mirko", "Giorgio", "Manuel"]
-    
-    submission_file, submission_data = generate_submission_track2(
-        df=df, iso_forest=iso_forest, feature_cols=feature_cols,
-        team_name=team_name, members=members
-    )
-    
-    print(f"\n=== RIEPILOGO TRACK 2 ===")
-    print(f"Documenti analizzati: {len(df)}")
-    print(f"Frodi rilevate: {df['is_fraud_detected'].sum()}")
-    print(f"F1-Score: {f1:.3f}")
-    print(f"✅ Submission Track 2 creata!")
-    
-    return df, iso_forest, dbscan
+         submission_file, submission_data = generate_submission_track2(
+         df=df_test, iso_forest=iso_forest, feature_cols=feature_cols,
+         team_name=team_name, members=members
+     )
+     
+     print(f"\n=== RIEPILOGO TRACK 2 ===")
+     print(f"📋 Training set: {len(df_train)} documenti")
+     print(f"🧪 Test set: {len(df_test)} documenti")
+     print(f"🚨 Frodi rilevate nel test: {df_test['is_fraud_detected'].sum()}")
+     print(f"📈 Tasso frodi test: {df_test['is_fraud_detected'].mean():.2%}")
+     print(f"🏆 F1-Score (train): {f1:.3f}")
+     print(f"📄 Submission generata: {submission_file}")
+     
+     return df_train, df_test, submission_data
 
 if __name__ == "__main__":
-    df, iso_forest, dbscan = main()
+     df_train, df_test, submission_data = main()

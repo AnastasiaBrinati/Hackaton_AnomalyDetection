@@ -18,17 +18,18 @@ warnings.filterwarnings('ignore')
 class SubmissionEvaluator:
     def __init__(self, submissions_dir="submissions"):
         self.submissions_dir = Path(submissions_dir)
+        # Aggiornato per usare i file ground_truth separati
         self.track_truth_files = {
-            "Track1": "Track1_Solution/live_events_with_anomalies.csv",
-            "Track2": "Track2_Solution/documents_fraud_detection.csv",
-            "Track3": "Track3_Solution/music_anomaly_detection_results.csv",
-            "Track4": "Track4_Solution/copyright_infringement_detection_results.csv"
+            "Track1": "datasets/track1_live_events_test_ground_truth.csv",
+            "Track2": "datasets/track2_documents_test_ground_truth.csv",
+            "Track3": "datasets/track3_music_test_ground_truth.csv",
+            "Track4": "datasets/track4_copyright_test_ground_truth.csv"
         }
         self.ground_truths = {}
         self.load_all_ground_truths()
         
     def load_all_ground_truths(self):
-        """Load ground truth data for all tracks"""
+        """Load ground truth data from the separated test ground truth files"""
         for track, truth_file in self.track_truth_files.items():
             try:
                 truth_path = Path(truth_file)
@@ -36,51 +37,75 @@ class SubmissionEvaluator:
                     df = pd.read_csv(truth_path)
                     
                     if track == "Track1":
-                        # For Track1: anomaly_type column
-                        ground_truth = df['anomaly_type'].notna().astype(int).values
-                        print(f"{track} ground truth loaded: {len(ground_truth)} events")
-                        print(f"{track} true anomalies: {ground_truth.sum()}")
+                        # For Track1: check if we have 'is_anomaly' or 'anomaly_type' column
+                        if 'is_anomaly' in df.columns:
+                            ground_truth = df['is_anomaly'].astype(int).values
+                        elif 'anomaly_type' in df.columns:
+                            ground_truth = df['anomaly_type'].notna().astype(int).values
+                        else:
+                            print(f"⚠️ Warning: No ground truth column found in {truth_file}")
+                            continue
+                        print(f"✅ {track} ground truth loaded: {len(ground_truth)} events")
+                        print(f"🎯 {track} true anomalies: {ground_truth.sum()}")
+                        
                     elif track == "Track2":
-                        # For Track2: is_fraudulent column
-                        ground_truth = df['is_fraudulent'].astype(int).values
-                        print(f"{track} ground truth loaded: {len(ground_truth)} documents")
-                        print(f"{track} true frauds: {ground_truth.sum()}")
+                        # For Track2: check 'is_fraudulent' column
+                        if 'is_fraudulent' in df.columns:
+                            ground_truth = df['is_fraudulent'].astype(int).values
+                        else:
+                            print(f"⚠️ Warning: No 'is_fraudulent' column found in {truth_file}")
+                            continue
+                        print(f"✅ {track} ground truth loaded: {len(ground_truth)} documents")
+                        print(f"🎯 {track} true frauds: {ground_truth.sum()}")
+                        
                     elif track == "Track3":
-                        # For Track3: is_anomaly column
-                        ground_truth = df['is_anomaly'].astype(int).values
-                        print(f"{track} ground truth loaded: {len(ground_truth)} tracks")
-                        print(f"{track} true anomalies: {ground_truth.sum()}")
+                        # For Track3: check 'is_anomaly' column
+                        if 'is_anomaly' in df.columns:
+                            ground_truth = df['is_anomaly'].astype(int).values
+                        else:
+                            print(f"⚠️ Warning: No 'is_anomaly' column found in {truth_file}")
+                            continue
+                        print(f"✅ {track} ground truth loaded: {len(ground_truth)} tracks")
+                        print(f"🎯 {track} true anomalies: {ground_truth.sum()}")
+                        
                     elif track == "Track4":
-                        # For Track4: is_infringement column
-                        ground_truth = df['is_infringement'].astype(int).values
-                        print(f"{track} ground truth loaded: {len(ground_truth)} works")
-                        print(f"{track} true infringements: {ground_truth.sum()}")
+                        # For Track4: check 'is_infringement' column
+                        if 'is_infringement' in df.columns:
+                            ground_truth = df['is_infringement'].astype(int).values
+                        else:
+                            print(f"⚠️ Warning: No 'is_infringement' column found in {truth_file}")
+                            continue
+                        print(f"✅ {track} ground truth loaded: {len(ground_truth)} works")
+                        print(f"🎯 {track} true infringements: {ground_truth.sum()}")
                     
                     self.ground_truths[track] = ground_truth
+                    
                 else:
-                    print(f"Warning: {track} ground truth file not found at {truth_path}")
-                    # Create synthetic ground truth
+                    print(f"❌ Warning: {track} ground truth file not found at {truth_path}")
+                    print("💡 Assicurati di aver eseguito generate_datasets.py per creare i file ground truth")
+                    # Create synthetic ground truth come fallback
                     if track == "Track1":
                         self.ground_truths[track] = np.random.choice([0, 1], size=10000, p=[0.9, 0.1])
                     elif track == "Track2":
-                        self.ground_truths[track] = np.random.choice([0, 1], size=5000, p=[0.85, 0.15])
+                        self.ground_truths[track] = np.random.choice([0, 1], size=1000, p=[0.85, 0.15])
                     elif track == "Track3":
-                        self.ground_truths[track] = np.random.choice([0, 1], size=25000, p=[0.92, 0.08])
+                        self.ground_truths[track] = np.random.choice([0, 1], size=5000, p=[0.92, 0.08])
                     elif track == "Track4":
-                        self.ground_truths[track] = np.random.choice([0, 1], size=15000, p=[0.88, 0.12])
-                    print(f"Using synthetic ground truth for {track}")
+                        self.ground_truths[track] = np.random.choice([0, 1], size=3000, p=[0.88, 0.12])
+                    print(f"🔄 Using synthetic ground truth for {track}")
                     
             except Exception as e:
-                print(f"Error loading {track} ground truth: {e}")
+                print(f"❌ Error loading {track} ground truth: {e}")
                 # Fallback synthetic data
                 if track == "Track1":
                     self.ground_truths[track] = np.random.choice([0, 1], size=10000, p=[0.9, 0.1])
                 elif track == "Track2":
-                    self.ground_truths[track] = np.random.choice([0, 1], size=5000, p=[0.85, 0.15])
+                    self.ground_truths[track] = np.random.choice([0, 1], size=1000, p=[0.85, 0.15])
                 elif track == "Track3":
-                    self.ground_truths[track] = np.random.choice([0, 1], size=25000, p=[0.92, 0.08])
+                    self.ground_truths[track] = np.random.choice([0, 1], size=5000, p=[0.92, 0.08])
                 elif track == "Track4":
-                    self.ground_truths[track] = np.random.choice([0, 1], size=15000, p=[0.88, 0.12])
+                    self.ground_truths[track] = np.random.choice([0, 1], size=3000, p=[0.88, 0.12])
+                print(f"🔄 Using synthetic fallback ground truth for {track}")
     
     def validate_submission(self, submission_data):
         """Validate submission format and content"""
@@ -192,6 +217,74 @@ class SubmissionEvaluator:
         
         return min(score, 100) / 100  # Normalize to 0-1
     
+    def calculate_real_metrics(self, submission_data):
+        """
+        Calcola le metriche reali confrontando le predizioni con la ground truth
+        """
+        track = submission_data.get('team_info', {}).get('track', 'Unknown')
+        
+        if track not in self.ground_truths:
+            print(f"⚠️ Ground truth non disponibile per {track}")
+            return None
+        
+        # Estrai predizioni dalla submission
+        results = submission_data.get('results', {})
+        
+        # Cerca le predizioni nel formato appropriato
+        predictions = None
+        if 'predictions' in results:
+            predictions = results['predictions']
+        elif 'predictions_sample' in results:
+            predictions = results['predictions_sample']
+        elif 'test_predictions' in results:
+            predictions = results['test_predictions']
+        
+        if predictions is None or len(predictions) == 0:
+            print(f"⚠️ Nessuna predizione trovata nella submission per {track}")
+            return None
+        
+        # Ottieni ground truth
+        y_true = self.ground_truths[track]
+        y_pred = np.array(predictions[:len(y_true)])  # Taglia alle dimensioni della ground truth
+        
+        if len(y_pred) != len(y_true):
+            print(f"⚠️ Mismatch dimensioni: predizioni={len(y_pred)}, ground_truth={len(y_true)}")
+            # Estendi o taglia per adattare
+            if len(y_pred) < len(y_true):
+                # Estendi con zeri
+                y_pred = np.concatenate([y_pred, np.zeros(len(y_true) - len(y_pred))])
+            else:
+                # Taglia
+                y_pred = y_pred[:len(y_true)]
+        
+        # Calcola metriche reali
+        try:
+            precision, recall, f1, _ = precision_recall_fscore_support(y_true, y_pred, average='binary', zero_division=0)
+            
+            # Calcola AUC-ROC se possibile
+            auc_roc = 0.5
+            if 'anomaly_scores' in results or 'scores' in results:
+                scores = results.get('anomaly_scores', results.get('scores', []))
+                if len(scores) >= len(y_true):
+                    try:
+                        auc_roc = roc_auc_score(y_true, scores[:len(y_true)])
+                    except:
+                        auc_roc = 0.5
+            
+            real_metrics = {
+                'precision': float(precision),
+                'recall': float(recall),
+                'f1_score': float(f1),
+                'auc_roc': float(auc_roc)
+            }
+            
+            print(f"📊 Metriche reali per {track}: P={precision:.3f}, R={recall:.3f}, F1={f1:.3f}")
+            return real_metrics
+            
+        except Exception as e:
+            print(f"❌ Errore nel calcolo metriche per {track}: {e}")
+            return None
+    
     def evaluate_submission(self, submission_file):
         """Evaluate a single submission file"""
         try:
@@ -208,10 +301,19 @@ class SubmissionEvaluator:
                     'final_score': 0.0
                 }
             
-            # Extract metrics
-            metrics = submission_data['metrics']
+            # Calcola metriche reali confrontando con ground truth
+            real_metrics = self.calculate_real_metrics(submission_data)
             
-            # Calculate component scores
+            if real_metrics:
+                # Usa metriche reali
+                metrics = real_metrics
+                print(f"✅ Usando metriche reali per valutazione")
+            else:
+                # Fallback alle metriche self-reported
+                metrics = submission_data['metrics']
+                print(f"⚠️ Usando metriche self-reported (fallback)")
+            
+            # Calculate component scores (usando metriche reali o fallback)
             technical_score = (
                 metrics['f1_score'] * 0.25 +
                 metrics.get('auc_roc', 0.5) * 0.15 +
