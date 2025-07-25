@@ -595,25 +595,8 @@ iso_forest = IsolationForest(contamination=0.05)  # Prova valori 0.05-0.15
 
 ## 📚 **RISORSE AGGIUNTIVE**
 
-### **Tutorial Online**
-- [Anomaly Detection con Scikit-Learn](https://scikit-learn.org/stable/modules/outlier_detection.html)
-- [Feature Engineering per ML](https://www.kaggle.com/learn/feature-engineering)
-- [Isolation Forest Spiegato](https://towardsdatascience.com/isolation-forest-algorithm-eb47c61ef8e0)
-
-### **Paper Consigliati**
-- "Isolation Forest" (Liu et al., 2008)
-- "LOF: Identifying Density-Based Local Outliers" (Breunig et al., 2000)
-
 ### **Esempi di Codice**
 Tutti gli script nelle cartelle `Track*_Solution/` sono esempi funzionanti che puoi modificare e migliorare!
-
----
-
-## 📞 **SUPPORTO**
-
-- **Email**: hackathon-support@siae.it
-- **Durante l'evento**: Mentori disponibili per domande tecniche
-- **GitHub Issues**: Per problemi con il codice o i dataset
 
 ---
 
