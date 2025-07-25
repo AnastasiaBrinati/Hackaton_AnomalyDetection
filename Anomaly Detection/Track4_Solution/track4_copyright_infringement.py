@@ -133,34 +133,144 @@ def generate_synthetic_copyright_dataset(n_works=15000):
     return df
 
 def advanced_feature_engineering(df):
-    """Feature engineering ottimizzato"""
-    print("🔧 Feature engineering...")
+    """Feature engineering usando solo colonne reali disponibili"""
+    print("🔧 Feature engineering per copyright infringement...")
     
-    df['days_since_release'] = (datetime.now() - df['release_date']).dt.days
-    df['engagement_rate'] = (df['like_count'] + df['share_count']) / np.maximum(df['play_count'], 1)
-    df['viral_coefficient'] = df['share_count'] / np.maximum(df['play_count'], 1)
-    df['monetization_efficiency'] = df['revenue_generated'] / np.maximum(df['play_count'], 1)
-    df['audio_complexity'] = df['spectral_centroid'] / 1000
-    df['tonal_stability'] = 1 - abs(df['tempo'] - 120) / 120
-    df['multi_platform_score'] = df.groupby('file_hash')['platform'].transform('nunique')
+    # Features basate su colonne reali: work_id, title, author, creation_year, license_type, total_royalties, fingerprint_similarity, platform
     
-    # Label encoding
-    for col in ['work_type', 'genre', 'platform']:
-        df[f'{col}_encoded'] = LabelEncoder().fit_transform(df[col])
+    # Features temporali basate su creation_year
+    current_year = datetime.now().year
+    df['work_age'] = current_year - df['creation_year']
+    df['is_recent_work'] = (df['work_age'] < 5).astype(int)
+    df['is_old_work'] = (df['work_age'] > 20).astype(int)
+    df['is_classic_work'] = (df['work_age'] > 50).astype(int)
     
+    # Features basate sui royalties
+    df['royalties_normalized'] = (df['total_royalties'] - df['total_royalties'].min()) / (df['total_royalties'].max() - df['total_royalties'].min())
+    df['high_royalties'] = (df['total_royalties'] > df['total_royalties'].quantile(0.8)).astype(int)
+    df['low_royalties'] = (df['total_royalties'] < df['total_royalties'].quantile(0.2)).astype(int)
+    df['zero_royalties'] = (df['total_royalties'] == 0).astype(int)
+    
+    # Features basate sulla similarità del fingerprint
+    df['fingerprint_similarity_normalized'] = (df['fingerprint_similarity'] - df['fingerprint_similarity'].min()) / (df['fingerprint_similarity'].max() - df['fingerprint_similarity'].min())
+    df['high_similarity'] = (df['fingerprint_similarity'] > 0.8).astype(int)
+    df['medium_similarity'] = ((df['fingerprint_similarity'] >= 0.5) & (df['fingerprint_similarity'] <= 0.8)).astype(int)
+    df['low_similarity'] = (df['fingerprint_similarity'] < 0.5).astype(int)
+    df['suspicious_similarity'] = (df['fingerprint_similarity'] > 0.9).astype(int)
+    
+    # Features combinatorie
+    df['royalties_per_year'] = df['total_royalties'] / (df['work_age'] + 1)
+    df['similarity_royalties_product'] = df['fingerprint_similarity'] * df['total_royalties']
+    df['age_similarity_ratio'] = df['work_age'] / (df['fingerprint_similarity'] + 0.01)
+    
+    # Encoding categorico
+    license_encoder = LabelEncoder()
+    df['license_type_encoded'] = license_encoder.fit_transform(df['license_type'])
+    
+    platform_encoder = LabelEncoder()
+    df['platform_encoded'] = platform_encoder.fit_transform(df['platform'])
+    
+    author_encoder = LabelEncoder()
+    df['author_encoded'] = author_encoder.fit_transform(df['author'])
+    
+    # Features basate su autore
+    author_stats = df.groupby('author').agg({
+        'total_royalties': ['count', 'mean', 'sum'],
+        'fingerprint_similarity': 'mean',
+        'work_age': 'mean'
+    }).round(2)
+    
+    author_stats.columns = ['author_work_count', 'author_avg_royalties', 'author_total_royalties',
+                           'author_avg_similarity', 'author_avg_work_age']
+    
+    df = df.merge(author_stats, left_on='author', right_index=True, how='left')
+    
+    # Features comparative rispetto all'autore
+    df['royalties_vs_author_avg'] = df['total_royalties'] / (df['author_avg_royalties'] + 1)
+    df['similarity_vs_author_avg'] = df['fingerprint_similarity'] / (df['author_avg_similarity'] + 0.01)
+    
+    # Features basate su platform
+    if 'is_infringement' in df.columns:
+        # Training set - calcola anche infringement rate
+        platform_stats = df.groupby('platform').agg({
+            'total_royalties': 'mean',
+            'fingerprint_similarity': ['mean', 'count'],
+            'is_infringement': 'mean'
+        }).round(3)
+        
+        platform_stats.columns = ['platform_avg_royalties', 'platform_avg_similarity', 
+                                  'platform_work_count', 'platform_infringement_rate']
+    else:
+        # Test set - non calcolare infringement rate
+        platform_stats = df.groupby('platform').agg({
+            'total_royalties': 'mean',
+            'fingerprint_similarity': ['mean', 'count']
+        }).round(3)
+        
+        platform_stats.columns = ['platform_avg_royalties', 'platform_avg_similarity', 
+                                  'platform_work_count']
+        platform_stats['platform_infringement_rate'] = 0.05  # Valore di default
+    
+    df = df.merge(platform_stats, left_on='platform', right_index=True, how='left')
+    
+    # Features sui license type (anche questo condizionale)
+    if 'is_infringement' in df.columns:
+        license_stats = df.groupby('license_type').agg({
+            'total_royalties': 'mean',
+            'is_infringement': 'mean'
+        }).round(3)
+        
+        license_stats.columns = ['license_avg_royalties', 'license_infringement_rate']
+    else:
+        license_stats = df.groupby('license_type').agg({
+            'total_royalties': 'mean'
+        }).round(3)
+        
+        license_stats.columns = ['license_avg_royalties']
+        license_stats['license_infringement_rate'] = 0.05  # Valore di default
+    
+    df = df.merge(license_stats, left_on='license_type', right_index=True, how='left')
+    
+    # Features sui pattern sospetti
+    df['author_prolific'] = (df['author_work_count'] > 10).astype(int)
+    df['platform_risky'] = (df['platform_infringement_rate'] > 0.1).astype(int)
+    df['suspicious_combination'] = ((df['high_similarity'] == 1) & 
+                                   (df['high_royalties'] == 1) & 
+                                   (df['is_recent_work'] == 1)).astype(int)
+    
+    # Features ID-based (per pattern)
+    df['work_id_mod_100'] = df['work_id'] % 100
+    df['work_id_mod_1000'] = df['work_id'] % 1000
+    
+    df['license_high_risk'] = (df['license_infringement_rate'] > 0.1).astype(int)
+    
+    print(f"✅ Feature engineering completato: {df.shape[1]} colonne totali")
     return df
 
 def detect_copyright_infringement(df):
-    """Isolation Forest per rilevamento violazioni"""
+    """Isolation Forest per rilevamento violazioni usando feature automatiche"""
     print("🤖 Rilevamento violazioni con Isolation Forest...")
     
-    feature_cols = [
-        'duration_seconds', 'tempo', 'spectral_centroid', 'mfcc_1', 'mfcc_2',
-        'play_count', 'like_count', 'share_count', 'revenue_generated',
-        'compression_ratio', 'engagement_rate', 'viral_coefficient',
-        'monetization_efficiency', 'audio_complexity', 'tonal_stability',
-        'multi_platform_score', 'work_type_encoded', 'genre_encoded', 'platform_encoded'
-    ]
+    # Selezione automatica delle features create dal feature engineering
+    # Escludi colonne target, id, originali base e categoriche non encoded
+    exclude_cols = ['work_id', 'title', 'author', 'license_type', 'platform', 
+                   'is_infringement', 'violation_type', 'infringement_predicted', 
+                   'infringement_score', 'infringement_score_normalized']
+    feature_cols = [col for col in df.columns if col not in exclude_cols]
+    
+    print(f"🔍 Usando {len(feature_cols)} features per detection")
+    print(f"📋 Prime 5 features: {feature_cols[:5]}...")
+    
+    # Verifica che tutte le feature siano numeriche
+    numeric_cols = []
+    for col in feature_cols:
+        if df[col].dtype in ['int64', 'float64', 'bool']:
+            numeric_cols.append(col)
+        else:
+            print(f"⚠️ Colonna non numerica esclusa: {col} (tipo: {df[col].dtype})")
+    
+    feature_cols = numeric_cols
+    print(f"✅ Features numeriche finali: {len(feature_cols)}")
     
     X = df[feature_cols].fillna(0)
     scaler = StandardScaler()
@@ -175,7 +285,7 @@ def detect_copyright_infringement(df):
     df['infringement_score_normalized'] = (df['infringement_score'] - df['infringement_score'].min()) / (df['infringement_score'].max() - df['infringement_score'].min())
     
     print(f"✅ Violazioni rilevate: {df['infringement_predicted'].sum()} ({df['infringement_predicted'].mean():.2%})")
-    return df, iso_forest, feature_cols
+    return df, iso_forest, scaler, feature_cols
 
 def cluster_copyright_violations_guaranteed(df):
     """Sistema di clustering GARANTITO - produce sempre cluster visibili"""
@@ -508,7 +618,7 @@ def main():
     df_train = advanced_feature_engineering(df_train)
     
     print("\n🔄 Step 3: Rilevamento violazioni (training)...")
-    df_train, iso_forest, feature_cols = detect_copyright_infringement(df_train)
+    df_train, iso_forest, scaler, feature_cols = detect_copyright_infringement(df_train)
     
     print("\n🔄 Step 4: Clustering GARANTITO (training)...")
     df_train = cluster_copyright_violations_guaranteed(df_train)
@@ -526,10 +636,6 @@ def main():
             df_test[col] = 0
     
     # Scala le feature del test set usando il scaler già fittato
-    scaler = StandardScaler()
-    X_train = df_train[feature_cols].fillna(0)
-    scaler.fit(X_train)
-    
     X_test = df_test[feature_cols].fillna(0)
     X_test_scaled = scaler.transform(X_test)
     

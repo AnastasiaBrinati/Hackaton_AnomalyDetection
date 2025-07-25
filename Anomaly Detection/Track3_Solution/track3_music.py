@@ -274,73 +274,89 @@ def load_train_test_datasets():
     return df_train, df_test
 
 def advanced_feature_engineering(df):
-    """
-    Feature engineering avanzato per Music Anomaly Detection
-    """
+    """Feature engineering avanzato usando solo colonne reali disponibili"""
     print("🔧 Feature engineering avanzato per musica...")
     
-    # Features di rapporto e interazione
+    # Features basate su colonne reali: track_id, artist_name, genre_top, track_duration, track_listens, track_favorites, energy, tempo, bit_rate, file_size
+    
+    # Features di rapporto e popularità
     df['listens_to_favorites_ratio'] = df['track_listens'] / (df['track_favorites'] + 1)
-    df['favorites_to_comments_ratio'] = df['track_favorites'] / (df['track_comments'] + 1)
-    df['downloads_to_listens_ratio'] = df['track_downloads'] / (df['track_listens'] + 1)
+    df['favorites_to_listens_ratio'] = df['track_favorites'] / (df['track_listens'] + 1)
+    df['listens_per_duration'] = df['track_listens'] / (df['track_duration'] + 1)
+    df['favorites_per_duration'] = df['track_favorites'] / (df['track_duration'] + 1)
     
-    # Features temporali
-    df['track_age_days'] = (datetime.now() - df['track_date_created']).dt.days
-    df['artist_career_length'] = df['track_date_created'].dt.year - df['artist_active_year_begin']
-    df['is_recent_track'] = (df['track_age_days'] < 365).astype(int)
+    # Features audio e qualità
+    df['energy_tempo_product'] = df['energy'] * df['tempo']
+    df['quality_indicator'] = df['bit_rate'] * df['file_size']
+    df['file_size_per_duration'] = df['file_size'] / (df['track_duration'] + 1)
+    df['bit_rate_normalized'] = (df['bit_rate'] - df['bit_rate'].min()) / (df['bit_rate'].max() - df['bit_rate'].min())
     
-    # Features audio composite
-    df['audio_complexity'] = (df['energy'] + df['danceability'] + df['valence']) / 3
-    df['mood_energy_combo'] = df['valence'] * df['energy']
-    df['acoustic_speech_balance'] = df['acousticness'] - df['speechiness']
+    # Features basate su durata
+    df['is_short_track'] = (df['track_duration'] < 180).astype(int)  # <3 minuti
+    df['is_long_track'] = (df['track_duration'] > 300).astype(int)   # >5 minuti
+    df['is_standard_duration'] = ((df['track_duration'] >= 180) & (df['track_duration'] <= 300)).astype(int)
     
-    # Features di popolarità normalizzate
-    df['listens_per_day'] = df['track_listens'] / (df['track_age_days'] + 1)
-    df['popularity_momentum'] = df['track_favorites'] / (df['track_age_days'] + 1)
+    # Features di popolarità
+    df['is_popular'] = (df['track_listens'] > df['track_listens'].quantile(0.8)).astype(int)
+    df['is_highly_favored'] = (df['track_favorites'] > df['track_favorites'].quantile(0.8)).astype(int)
+    df['low_engagement'] = ((df['track_listens'] < df['track_listens'].quantile(0.2)) & 
+                           (df['track_favorites'] < df['track_favorites'].quantile(0.2))).astype(int)
     
-    # Features di qualità audio
-    df['quality_size_ratio'] = df['file_size'] / (df['bit_rate'] * df['track_duration'] / 1000)
-    df['is_high_quality'] = ((df['bit_rate'] >= 256) & (df['sample_rate'] >= 44100)).astype(int)
+    # Features basate sul genere
+    genre_encoder = LabelEncoder()
+    df['genre_encoded'] = genre_encoder.fit_transform(df['genre_top'])
     
-    # Features geografiche
-    df['artist_coordinates'] = df['artist_latitude'].astype(str) + ',' + df['artist_longitude'].astype(str)
-    df['is_us_artist'] = (df['artist_location'] == 'US').astype(int)
-    df['is_european_artist'] = df['artist_location'].isin(['UK', 'DE', 'FR', 'IT', 'ES']).astype(int)
-    
-    # Encoding categorico
-    le_genre = LabelEncoder()
-    df['genre_encoded'] = le_genre.fit_transform(df['genre_top'])
-    
-    le_subgenre = LabelEncoder()
-    df['subgenre_encoded'] = le_subgenre.fit_transform(df['genre_sub'])
-    
-    le_location = LabelEncoder()
-    df['location_encoded'] = le_location.fit_transform(df['artist_location'])
-    
-    # Features di artista aggregate
-    artist_stats = df.groupby('artist_name').agg({
-        'track_listens': ['mean', 'std', 'count'],
+    # Features composite per genre
+    genre_stats = df.groupby('genre_top').agg({
+        'track_listens': ['mean', 'std'],
         'track_favorites': 'mean',
-        'track_duration': 'mean',
-        'genre_top': lambda x: x.nunique()
+        'energy': 'mean',
+        'tempo': 'mean',
+        'track_duration': 'mean'
     }).round(2)
     
-    artist_stats.columns = ['artist_avg_listens', 'artist_std_listens', 'artist_track_count',
-                          'artist_avg_favorites', 'artist_avg_duration', 'artist_genre_diversity']
+    genre_stats.columns = ['genre_avg_listens', 'genre_std_listens', 'genre_avg_favorites', 
+                          'genre_avg_energy', 'genre_avg_tempo', 'genre_avg_duration']
     
+    df = df.merge(genre_stats, left_on='genre_top', right_index=True, how='left')
+    
+    # Features comparative rispetto al genere
+    df['listens_vs_genre_avg'] = df['track_listens'] / (df['genre_avg_listens'] + 1)
+    df['energy_vs_genre_avg'] = df['energy'] / (df['genre_avg_energy'] + 1)
+    df['tempo_vs_genre_avg'] = df['tempo'] / (df['genre_avg_tempo'] + 1)
+    
+    # Features basate sull'artista
+    artist_encoder = LabelEncoder()
+    df['artist_encoded'] = artist_encoder.fit_transform(df['artist_name'])
+    
+    # Artist statistics
+    artist_stats = df.groupby('artist_name').agg({
+        'track_listens': ['count', 'mean'],
+        'track_favorites': 'mean',
+        'energy': 'mean'
+    }).round(2)
+    
+    artist_stats.columns = ['artist_track_count', 'artist_avg_listens', 'artist_avg_favorites', 'artist_avg_energy']
     df = df.merge(artist_stats, left_on='artist_name', right_index=True, how='left')
     
-    # Features di comparazione con artista
-    df['listens_vs_artist_avg'] = df['track_listens'] / (df['artist_avg_listens'] + 1)
-    df['favorites_vs_artist_avg'] = df['track_favorites'] / (df['artist_avg_favorites'] + 1)
-    df['duration_vs_artist_avg'] = df['track_duration'] / (df['artist_avg_duration'] + 1)
+    # Features sui pattern sospetti
+    df['zero_file_size'] = (df['file_size'] == 0).astype(int)
+    df['extreme_duration'] = ((df['track_duration'] < 30) | (df['track_duration'] > 600)).astype(int)
+    df['low_bit_rate'] = (df['bit_rate'] < 128).astype(int)
+    df['high_energy_low_tempo'] = ((df['energy'] > 0.8) & (df['tempo'] < 100)).astype(int)
+    df['suspicious_popularity'] = ((df['track_listens'] > df['track_listens'].quantile(0.95)) & 
+                                  (df['track_favorites'] < df['track_favorites'].quantile(0.1))).astype(int)
     
-    # Features di outlier detection pre-processing
-    df['is_viral_track'] = (df['listens_vs_artist_avg'] > 10).astype(int)
-    df['is_underperforming'] = (df['listens_vs_artist_avg'] < 0.1).astype(int)
+    # Features di combinazione
+    df['total_engagement'] = df['track_listens'] + df['track_favorites']
+    df['quality_engagement_product'] = df['bit_rate'] * df['track_listens']
+    df['energy_engagement_product'] = df['energy'] * df['track_favorites']
     
-    print(f"✅ Feature engineering completato: {len(df.columns)} features totali")
+    # Features ID-based (per pattern)
+    df['track_id_mod_100'] = df['track_id'] % 100
+    df['track_id_mod_1000'] = df['track_id'] % 1000
     
+    print(f"✅ Feature engineering completato: {df.shape[1]} colonne totali")
     return df
 
 def detect_music_anomalies(df):
@@ -349,25 +365,14 @@ def detect_music_anomalies(df):
     """
     print("🤖 Rilevamento anomalie musicali con Isolation Forest...")
     
-    # Selezione features per anomaly detection
-    feature_cols = [
-        'track_duration', 'track_listens', 'track_favorites', 'track_comments',
-        'track_downloads', 'tempo', 'loudness', 'energy', 'danceability',
-        'valence', 'acousticness', 'instrumentalness', 'speechiness', 'liveness',
-        'bit_rate', 'sample_rate', 'file_size', 'track_age_days',
-        'artist_career_length', 'listens_to_favorites_ratio',
-        'favorites_to_comments_ratio', 'downloads_to_listens_ratio',
-        'audio_complexity', 'mood_energy_combo', 'acoustic_speech_balance',
-        'listens_per_day', 'popularity_momentum', 'quality_size_ratio',
-        'is_high_quality', 'genre_encoded', 'subgenre_encoded', 'location_encoded',
-        'artist_avg_listens', 'artist_track_count', 'artist_genre_diversity',
-        'listens_vs_artist_avg', 'favorites_vs_artist_avg', 'duration_vs_artist_avg',
-        'is_viral_track', 'is_underperforming'
-    ]
+    # Selezione automatica delle features create dal feature engineering
+    # Escludi colonne target, id e originali base
+    exclude_cols = ['track_id', 'artist_name', 'genre_top', 'is_anomaly', 'anomaly_type', 
+                   'predicted_anomaly', 'anomaly_score']
+    available_features = [col for col in df.columns if col not in exclude_cols]
     
-    # Rimuovi features mancanti
-    available_features = [col for col in feature_cols if col in df.columns]
     print(f"🔍 Usando {len(available_features)} features per anomaly detection")
+    print(f"📋 Prime 5 features: {available_features[:5]}...")
     
     X = df[available_features].fillna(0)
     
@@ -482,85 +487,160 @@ def evaluate_music_anomaly_detection(df):
         return 0.0, 0.0, 0.0, 0.5
 
 def create_music_visualizations(df):
-    """
-    Crea visualizzazioni per l'analisi delle anomalie musicali
-    """
-    print("📊 Creando visualizzazioni...")
+    """Crea visualizzazioni complete per music anomaly detection usando colonne reali"""
+    print("📊 Creando visualizzazioni musicali complete...")
     
-    plt.style.use('seaborn-v0_8')
-    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+    fig, axes = plt.subplots(3, 3, figsize=(24, 18))
+    fig.suptitle('🎵 SIAE Hackathon - Track 3: Music Anomaly Detection Results', fontsize=20, fontweight='bold')
     
-    # 1. Distribuzione anomaly scores
-    axes[0, 0].hist(df['anomaly_score'], bins=50, alpha=0.7, color='skyblue')
-    axes[0, 0].axvline(df['anomaly_score'].mean(), color='red', linestyle='--', 
-                      label=f'Media: {df["anomaly_score"].mean():.3f}')
-    axes[0, 0].set_title('Distribuzione Anomaly Scores')
-    axes[0, 0].set_xlabel('Anomaly Score')
-    axes[0, 0].set_ylabel('Frequenza')
-    axes[0, 0].legend()
-    
-    # 2. Scatter plot Energy vs Danceability
+    # Separazione anomalie vs normali
     normal_mask = df['predicted_anomaly'] == 0
     anomaly_mask = df['predicted_anomaly'] == 1
+    normal_tracks = df[normal_mask]
+    anomaly_tracks = df[anomaly_mask]
     
-    axes[0, 1].scatter(df.loc[normal_mask, 'energy'], df.loc[normal_mask, 'danceability'],
-                      alpha=0.5, c='blue', s=10, label='Normale')
-    axes[0, 1].scatter(df.loc[anomaly_mask, 'energy'], df.loc[anomaly_mask, 'danceability'],
-                      alpha=0.8, c='red', s=20, label='Anomalia')
-    axes[0, 1].set_title('Energy vs Danceability')
+    # 1. Distribuzione Anomaly Scores
+    axes[0, 0].hist(normal_tracks['anomaly_score'], bins=40, alpha=0.7, color='skyblue', 
+                   label=f'Normali ({len(normal_tracks):,})', density=True)
+    axes[0, 0].hist(anomaly_tracks['anomaly_score'], bins=40, alpha=0.7, color='red', 
+                   label=f'Anomalie ({len(anomaly_tracks):,})', density=True)
+    threshold = df[df['predicted_anomaly'] == 1]['anomaly_score'].max()
+    axes[0, 0].axvline(threshold, color='darkred', linestyle='--', linewidth=2, label=f'Soglia={threshold:.3f}')
+    axes[0, 0].set_title('📊 Distribuzione Anomaly Scores', fontsize=14, fontweight='bold')
+    axes[0, 0].set_xlabel('Anomaly Score')
+    axes[0, 0].set_ylabel('Densità')
+    axes[0, 0].legend()
+    axes[0, 0].grid(True, alpha=0.3)
+    
+    # 2. Energy vs Tempo (sostituisce energy vs danceability)
+    axes[0, 1].scatter(normal_tracks['energy'], normal_tracks['tempo'],
+                      alpha=0.6, s=15, color='blue', label='Normali')
+    axes[0, 1].scatter(anomaly_tracks['energy'], anomaly_tracks['tempo'],
+                      alpha=0.8, s=40, c='red', edgecolor='darkred', label='Anomalie')
+    axes[0, 1].set_title('⚡ Energy vs Tempo', fontsize=14, fontweight='bold')
     axes[0, 1].set_xlabel('Energy')
-    axes[0, 1].set_ylabel('Danceability')
+    axes[0, 1].set_ylabel('Tempo (BPM)')
     axes[0, 1].legend()
+    axes[0, 1].grid(True, alpha=0.3)
     
-    # 3. Boxplot anomalie per genere
-    genre_anomaly = df.groupby('genre_top')['predicted_anomaly'].mean().sort_values(ascending=False)
-    top_genres = genre_anomaly.head(8).index
+    # 3. Anomalie per Genere
+    genre_anomaly_rate = df.groupby('genre_top').agg({
+        'predicted_anomaly': ['sum', 'count', 'mean']
+    }).round(3)
+    genre_anomaly_rate.columns = ['anomalies', 'total', 'rate']
+    genre_anomaly_rate = genre_anomaly_rate[genre_anomaly_rate['total'] >= 50]  # Solo generi con almeno 50 tracce
+    top_genres = genre_anomaly_rate.nlargest(8, 'rate')
     
-    genre_data = [df[df['genre_top'] == genre]['anomaly_score'].values for genre in top_genres]
-    axes[0, 2].boxplot(genre_data, labels=top_genres)
-    axes[0, 2].set_title('Anomaly Scores per Genere')
-    axes[0, 2].set_xlabel('Genere')
-    axes[0, 2].set_ylabel('Anomaly Score')
-    axes[0, 2].tick_params(axis='x', rotation=45)
+    bars = axes[0, 2].bar(range(len(top_genres)), top_genres['rate'], color='orange', alpha=0.7)
+    axes[0, 2].set_title('🎭 Tasso Anomalie per Genere', fontsize=14, fontweight='bold')
+    axes[0, 2].set_xlabel('Genere Musicale')
+    axes[0, 2].set_ylabel('Tasso Anomalie')
+    axes[0, 2].set_xticks(range(len(top_genres)))
+    axes[0, 2].set_xticklabels(top_genres.index, rotation=45, ha='right')
+    axes[0, 2].grid(True, alpha=0.3)
     
-    # 4. Scatter plot Listens vs Favorites
-    axes[1, 0].scatter(df.loc[normal_mask, 'track_listens'], df.loc[normal_mask, 'track_favorites'],
-                      alpha=0.5, c='blue', s=10, label='Normale')
-    axes[1, 0].scatter(df.loc[anomaly_mask, 'track_listens'], df.loc[anomaly_mask, 'track_favorites'],
-                      alpha=0.8, c='red', s=20, label='Anomalia')
-    axes[1, 0].set_title('Listens vs Favorites')
+    # 4. Listens vs Favorites
+    axes[1, 0].scatter(normal_tracks['track_listens'], normal_tracks['track_favorites'],
+                      alpha=0.6, s=15, color='green', label='Normali')
+    axes[1, 0].scatter(anomaly_tracks['track_listens'], anomaly_tracks['track_favorites'],
+                      alpha=0.8, s=40, color='red', edgecolor='darkred', label='Anomalie')
+    axes[1, 0].set_title('👥 Listens vs Favorites', fontsize=14, fontweight='bold')
     axes[1, 0].set_xlabel('Track Listens')
     axes[1, 0].set_ylabel('Track Favorites')
     axes[1, 0].set_xscale('log')
     axes[1, 0].set_yscale('log')
     axes[1, 0].legend()
+    axes[1, 0].grid(True, alpha=0.3)
     
-    # 5. Heatmap correlation features principali
-    main_features = ['energy', 'danceability', 'valence', 'acousticness', 
-                    'tempo', 'loudness', 'track_listens', 'track_favorites']
-    available_main_features = [col for col in main_features if col in df.columns]
+    # 5. Durata vs Bit Rate
+    axes[1, 1].scatter(normal_tracks['track_duration'], normal_tracks['bit_rate'],
+                      alpha=0.6, s=15, color='purple', label='Normali')
+    axes[1, 1].scatter(anomaly_tracks['track_duration'], anomaly_tracks['bit_rate'],
+                      alpha=0.8, s=40, color='red', edgecolor='darkred', label='Anomalie')
+    axes[1, 1].set_title('⏱️ Durata vs Bit Rate', fontsize=14, fontweight='bold')
+    axes[1, 1].set_xlabel('Durata (secondi)')
+    axes[1, 1].set_ylabel('Bit Rate (kbps)')
+    axes[1, 1].legend()
+    axes[1, 1].grid(True, alpha=0.3)
     
-    if len(available_main_features) > 3:
-        corr_matrix = df[available_main_features].corr()
-        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0,
-                   ax=axes[1, 1], fmt='.2f')
-        axes[1, 1].set_title('Correlation Matrix Features Audio')
-    
-    # 6. Distribuzione tipi di anomalia
-    if 'anomaly_type' in df.columns:
-        anomaly_types = df[df['is_anomaly'] == True]['anomaly_type'].value_counts()
-        axes[1, 2].bar(range(len(anomaly_types)), anomaly_types.values, color='coral')
-        axes[1, 2].set_title('Distribuzione Tipi di Anomalia')
-        axes[1, 2].set_xlabel('Tipo Anomalia')
+    # 6. File Size vs Quality Indicator
+    if 'quality_indicator' in df.columns:
+        axes[1, 2].scatter(normal_tracks['file_size'], normal_tracks['quality_indicator'],
+                          alpha=0.6, s=15, color='cyan', label='Normali')
+        axes[1, 2].scatter(anomaly_tracks['file_size'], anomaly_tracks['quality_indicator'],
+                          alpha=0.8, s=40, color='red', edgecolor='darkred', label='Anomalie')
+        axes[1, 2].set_title('💾 File Size vs Quality Indicator', fontsize=14, fontweight='bold')
+        axes[1, 2].set_xlabel('File Size (KB)')
+        axes[1, 2].set_ylabel('Quality Indicator')
+        axes[1, 2].legend()
+        axes[1, 2].grid(True, alpha=0.3)
+    else:
+        # Fallback: File Size distribution
+        axes[1, 2].hist(df['file_size'], bins=30, alpha=0.7, color='lightblue')
+        axes[1, 2].set_title('💾 Distribuzione File Size', fontsize=14, fontweight='bold')
+        axes[1, 2].set_xlabel('File Size (KB)')
         axes[1, 2].set_ylabel('Frequenza')
-        axes[1, 2].set_xticks(range(len(anomaly_types)))
-        axes[1, 2].set_xticklabels(anomaly_types.index, rotation=45)
+        axes[1, 2].grid(True, alpha=0.3)
+    
+    # 7. Artist Track Count (se disponibile)
+    if 'artist_track_count' in df.columns:
+        axes[2, 0].scatter(normal_tracks['artist_track_count'], normal_tracks['track_listens'],
+                          alpha=0.6, s=15, color='brown', label='Normali')
+        axes[2, 0].scatter(anomaly_tracks['artist_track_count'], anomaly_tracks['track_listens'],
+                          alpha=0.8, s=40, color='red', edgecolor='darkred', label='Anomalie')
+        axes[2, 0].set_title('👨‍🎤 Artist Track Count vs Listens', fontsize=14, fontweight='bold')
+        axes[2, 0].set_xlabel('Artist Track Count')
+        axes[2, 0].set_ylabel('Track Listens')
+        axes[2, 0].set_yscale('log')
+        axes[2, 0].legend()
+        axes[2, 0].grid(True, alpha=0.3)
+    else:
+        axes[2, 0].axis('off')
+        axes[2, 0].text(0.5, 0.5, 'Artist data\nnon disponibile', ha='center', va='center', fontsize=14)
+    
+    # 8. Engagement Patterns
+    if 'total_engagement' in df.columns:
+        axes[2, 1].scatter(normal_tracks['total_engagement'], normal_tracks['energy'],
+                          alpha=0.6, s=15, color='pink', label='Normali')
+        axes[2, 1].scatter(anomaly_tracks['total_engagement'], anomaly_tracks['energy'],
+                          alpha=0.8, s=40, color='red', edgecolor='darkred', label='Anomalie')
+        axes[2, 1].set_title('🔥 Total Engagement vs Energy', fontsize=14, fontweight='bold')
+        axes[2, 1].set_xlabel('Total Engagement')
+        axes[2, 1].set_ylabel('Energy')
+        axes[2, 1].set_xscale('log')
+        axes[2, 1].legend()
+        axes[2, 1].grid(True, alpha=0.3)
+    else:
+        axes[2, 1].axis('off')
+        axes[2, 1].text(0.5, 0.5, 'Engagement data\nnon disponibile', ha='center', va='center', fontsize=14)
+    
+    # 9. Statistics Summary
+    stats_text = f"""📊 MUSIC ANOMALY DETECTION STATS
+    
+    Total Tracks: {len(df):,}
+    Anomalies Detected: {len(anomaly_tracks):,} ({len(anomaly_tracks)/len(df)*100:.1f}%)
+    Normal Tracks: {len(normal_tracks):,} ({len(normal_tracks)/len(df)*100:.1f}%)
+    
+    Genres Analyzed: {df['genre_top'].nunique()}
+    Artists: {df['artist_name'].nunique()}
+    
+    Avg Duration: {df['track_duration'].mean():.1f}s
+    Avg Energy: {df['energy'].mean():.3f}
+    Avg Tempo: {df['tempo'].mean():.1f} BPM
+    
+    Anomaly Score Range: {df['anomaly_score'].min():.3f} - {df['anomaly_score'].max():.3f}
+    """
+    
+    axes[2, 2].axis('off')
+    axes[2, 2].text(0.1, 0.5, stats_text, transform=axes[2, 2].transAxes, 
+                    fontsize=11, ha='left', va='center',
+                    bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8))
     
     plt.tight_layout()
     plt.savefig('music_anomaly_detection_results.png', dpi=300, bbox_inches='tight')
     plt.show()
     
-    print("✅ Visualizzazioni salvate in 'music_anomaly_detection_results.png'")
+    print("✅ Visualizzazioni musicali salvate in: music_anomaly_detection_results.png")
 
 def generate_submission_track3(df, iso_forest, feature_cols, team_name="Me&Giorgio", members=["Mirko", "Giorgio", "Manuel"]):
     """

@@ -390,6 +390,10 @@ def apply_dbscan_clustering(df):
     print("Applicando DBSCAN per clustering venue...")
     
     # Aggrega dati per venue
+    # Prima aggiungi la colonna se non esiste (per il training set)
+    if 'is_anomaly_detected' not in df.columns:
+        df['is_anomaly_detected'] = 0
+    
     venue_features = df.groupby('venue').agg({
         'attendance': ['mean', 'std'],
         'total_revenue': 'mean',
@@ -406,14 +410,28 @@ def apply_dbscan_clustering(df):
     scaler_venue = StandardScaler()
     venue_scaled = scaler_venue.fit_transform(venue_features.fillna(0))
     
-    # Applica DBSCAN
-    dbscan = DBSCAN(eps=0.5, min_samples=5)
+    # Applica DBSCAN con parametri più permissivi
+    dbscan = DBSCAN(eps=0.8, min_samples=2)
     venue_clusters = dbscan.fit_predict(venue_scaled)
+    
+    n_clusters = len(set(venue_clusters)) - (1 if -1 in venue_clusters else 0)
+    n_outliers = sum(venue_clusters == -1)
+    
+    # Se non trova cluster, usa K-means come fallback
+    if n_clusters == 0 and len(venue_features) > 3:
+        print("🔄 DBSCAN non ha trovato cluster, usando K-means...")
+        from sklearn.cluster import KMeans
+        n_kmeans_clusters = min(5, max(2, len(venue_features)//10))
+        kmeans = KMeans(n_clusters=n_kmeans_clusters, random_state=42, n_init=10)
+        venue_clusters = kmeans.fit_predict(venue_scaled)
+        n_clusters = len(set(venue_clusters))
+        n_outliers = 0
+        print(f"✅ K-means cluster identificati: {n_clusters}")
     
     venue_features['cluster'] = venue_clusters
     
-    print(f"Cluster identificati: {len(set(venue_clusters)) - (1 if -1 in venue_clusters else 0)}")
-    print(f"Venue outlier (noise): {sum(venue_clusters == -1)}")
+    print(f"Cluster identificati: {n_clusters}")
+    print(f"Venue outlier (noise): {n_outliers}")
     
     return venue_features, dbscan
 
@@ -456,136 +474,172 @@ def evaluate_performance(df):
 
 def create_visualizations(df, venue_features):
     """
-    Crea visualizzazioni dei risultati
+    Crea visualizzazioni complete e informatire dei risultati
     """
-    print("Creando visualizzazioni...")
+    print("Creando visualizzazioni complete...")
     
-    # Setup matplotlib
+    # Setup matplotlib con stile moderno
     plt.style.use('seaborn-v0_8')
-    fig, axes = plt.subplots(3, 3, figsize=(20, 15))
-    fig.suptitle('SIAE Anomaly Detection - Track 1: Live Events Analysis (con FMA)', fontsize=16)
+    fig, axes = plt.subplots(3, 3, figsize=(24, 18))
+    fig.suptitle('🏆 SIAE Hackathon - Track 1: Anomaly Detection Results', fontsize=20, fontweight='bold')
     
-    # 1. Distribuzione anomaly scores
-    axes[0, 0].hist(df['anomaly_score'], bins=50, alpha=0.7, color='skyblue')
-    axes[0, 0].axvline(df[df['is_anomaly_detected']]['anomaly_score'].max(), 
-                      color='red', linestyle='--', label='Soglia anomalia')
-    axes[0, 0].set_title('Distribuzione Anomaly Scores')
-    axes[0, 0].set_xlabel('Anomaly Score')
-    axes[0, 0].set_ylabel('Frequenza')
-    axes[0, 0].legend()
-    
-    # 2. Attendance vs Revenue (con anomalie evidenziate)
+    # Dati separati per visualizzazione
     normal_events = df[~df['is_anomaly_detected']]
     anomaly_events = df[df['is_anomaly_detected']]
     
+    # 1. Distribuzione Anomaly Scores (più informativo)
+    axes[0, 0].hist(normal_events['anomaly_score'], bins=40, alpha=0.7, color='skyblue', label='Eventi normali', density=True)
+    axes[0, 0].hist(anomaly_events['anomaly_score'], bins=40, alpha=0.7, color='red', label='Anomalie rilevate', density=True)
+    threshold = df[df['is_anomaly_detected']]['anomaly_score'].max()
+    axes[0, 0].axvline(threshold, color='darkred', linestyle='--', linewidth=2, label=f'Soglia={threshold:.3f}')
+    axes[0, 0].set_title('📊 Distribuzione Anomaly Scores', fontsize=14, fontweight='bold')
+    axes[0, 0].set_xlabel('Anomaly Score')
+    axes[0, 0].set_ylabel('Densità')
+    axes[0, 0].legend()
+    axes[0, 0].grid(True, alpha=0.3)
+    
+    # 2. Attendance vs Revenue (scatter plot migliorato)
     axes[0, 1].scatter(normal_events['attendance'], normal_events['total_revenue'], 
-                      alpha=0.6, s=20, label='Eventi normali')
+                      alpha=0.6, s=15, color='blue', label=f'Eventi normali ({len(normal_events):,})')
     axes[0, 1].scatter(anomaly_events['attendance'], anomaly_events['total_revenue'], 
-                      alpha=0.8, s=30, color='red', label='Anomalie rilevate')
-    axes[0, 1].set_title('Attendance vs Revenue')
+                      alpha=0.8, s=40, color='red', edgecolor='darkred', label=f'Anomalie ({len(anomaly_events):,})')
+    axes[0, 1].set_title('💰 Attendance vs Revenue', fontsize=14, fontweight='bold')
     axes[0, 1].set_xlabel('Attendance')
-    axes[0, 1].set_ylabel('Total Revenue')
+    axes[0, 1].set_ylabel('Total Revenue (€)')
     axes[0, 1].legend()
+    axes[0, 1].grid(True, alpha=0.3)
     
-    # 3. Distribuzione generi musicali
-    if 'event_genre' in df.columns:
-        genre_counts = df['event_genre'].value_counts().head(10)
-        axes[0, 2].bar(range(len(genre_counts)), genre_counts.values, color='lightgreen')
-        axes[0, 2].set_title('Top 10 Generi Musicali')
-        axes[0, 2].set_xlabel('Genere')
-        axes[0, 2].set_ylabel('Numero Eventi')
-        axes[0, 2].set_xticks(range(len(genre_counts)))
-        axes[0, 2].set_xticklabels(genre_counts.index, rotation=45, ha='right')
+    # 3. Distribuzione per Città
+    city_counts = df['city'].value_counts()
+    city_anomalies = df[df['is_anomaly_detected']]['city'].value_counts()
+    city_rates = (city_anomalies / city_counts * 100).fillna(0)
     
-    # 4. Anomalie per genere musicale
-    if 'event_genre' in df.columns:
-        genre_anomaly_rate = df.groupby('event_genre')['is_anomaly_detected'].agg(['sum', 'count', 'mean'])
-        genre_anomaly_rate = genre_anomaly_rate[genre_anomaly_rate['count'] >= 10]  # Solo generi con >10 eventi
-        top_anomaly_genres = genre_anomaly_rate.nlargest(10, 'mean')
+    bars = axes[0, 2].bar(range(len(city_counts)), city_counts.values, color='lightblue', alpha=0.7)
+    axes2 = axes[0, 2].twinx()
+    line = axes2.plot(range(len(city_counts)), city_rates.values, color='red', marker='o', linewidth=2, markersize=6)
+    
+    axes[0, 2].set_title('🏙️ Eventi per Città e Tasso Anomalie', fontsize=14, fontweight='bold')
+    axes[0, 2].set_xlabel('Città')
+    axes[0, 2].set_ylabel('Numero Eventi', color='blue')
+    axes2.set_ylabel('Tasso Anomalie (%)', color='red')
+    axes[0, 2].set_xticks(range(len(city_counts)))
+    axes[0, 2].set_xticklabels(city_counts.index, rotation=45, ha='right')
+    axes[0, 2].grid(True, alpha=0.3)
+    
+    # 4. Revenue per Person vs Occupancy Rate
+    axes[1, 0].scatter(normal_events['occupancy_rate'], normal_events['revenue_per_person'], 
+                      alpha=0.6, s=15, color='green', label='Eventi normali')
+    axes[1, 0].scatter(anomaly_events['occupancy_rate'], anomaly_events['revenue_per_person'], 
+                      alpha=0.8, s=40, color='red', edgecolor='darkred', label='Anomalie')
+    axes[1, 0].set_title('📈 Occupancy Rate vs Revenue per Person', fontsize=14, fontweight='bold')
+    axes[1, 0].set_xlabel('Occupancy Rate')
+    axes[1, 0].set_ylabel('Revenue per Person (€)')
+    axes[1, 0].legend()
+    axes[1, 0].grid(True, alpha=0.3)
+    
+    # 5. Numero Brani vs Attendance
+    axes[1, 1].scatter(normal_events['n_songs'], normal_events['attendance'], 
+                      alpha=0.6, s=15, color='purple', label='Eventi normali')
+    axes[1, 1].scatter(anomaly_events['n_songs'], anomaly_events['attendance'], 
+                      alpha=0.8, s=40, color='red', edgecolor='darkred', label='Anomalie')
+    axes[1, 1].set_title('🎵 Numero Brani vs Attendance', fontsize=14, fontweight='bold')
+    axes[1, 1].set_xlabel('Numero Brani')
+    axes[1, 1].set_ylabel('Attendance')
+    axes[1, 1].legend()
+    axes[1, 1].grid(True, alpha=0.3)
+    
+    # 6. Clustering Venues (migliorato)
+    if 'cluster' in venue_features.columns:
+        cluster_colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9']
+        unique_clusters = venue_features['cluster'].unique()
         
-        axes[1, 0].bar(range(len(top_anomaly_genres)), top_anomaly_genres['mean'], color='orange')
-        axes[1, 0].set_title('Tasso Anomalie per Genere')
-        axes[1, 0].set_xlabel('Genere')
-        axes[1, 0].set_ylabel('Tasso Anomalie')
-        axes[1, 0].set_xticks(range(len(top_anomaly_genres)))
-        axes[1, 0].set_xticklabels(top_anomaly_genres.index, rotation=45, ha='right')
+        for i, cluster in enumerate(unique_clusters):
+            if cluster == -1:
+                # Outliers
+                outlier_data = venue_features[venue_features['cluster'] == cluster]
+                axes[1, 2].scatter(outlier_data['avg_attendance'], outlier_data['avg_revenue'], 
+                                  s=100, color='black', marker='x', linewidth=3, label=f'Outliers ({len(outlier_data)})')
+            else:
+                cluster_data = venue_features[venue_features['cluster'] == cluster]
+                axes[1, 2].scatter(cluster_data['avg_attendance'], cluster_data['avg_revenue'], 
+                                  alpha=0.8, s=80, color=cluster_colors[i % len(cluster_colors)], 
+                                  label=f'Cluster {cluster} ({len(cluster_data)} venues)')
     
-    # 5. Numero artisti vs Revenue
-    if 'n_artists' in df.columns:
-        axes[1, 1].scatter(normal_events['n_artists'], normal_events['total_revenue'], 
-                          alpha=0.6, s=20, label='Eventi normali')
-        axes[1, 1].scatter(anomaly_events['n_artists'], anomaly_events['total_revenue'], 
-                          alpha=0.8, s=30, color='red', label='Anomalie rilevate')
-        axes[1, 1].set_title('Numero Artisti vs Revenue')
-        axes[1, 1].set_xlabel('Numero Artisti')
-        axes[1, 1].set_ylabel('Total Revenue')
-        axes[1, 1].legend()
-    
-    # 6. Clustering venues
-    cluster_colors = ['red', 'blue', 'green', 'purple', 'orange', 'brown', 'pink', 'gray']
-    for i, cluster in enumerate(venue_features['cluster'].unique()):
-        if cluster == -1:
-            continue
-        cluster_data = venue_features[venue_features['cluster'] == cluster]
-        axes[1, 2].scatter(cluster_data['avg_attendance'], cluster_data['avg_revenue'], 
-                          alpha=0.7, s=50, color=cluster_colors[i % len(cluster_colors)], 
-                          label=f'Cluster {cluster}')
-    
-    # Venue outlier
-    outlier_venues = venue_features[venue_features['cluster'] == -1]
-    if not outlier_venues.empty:
-        axes[1, 2].scatter(outlier_venues['avg_attendance'], outlier_venues['avg_revenue'], 
-                          alpha=0.7, s=50, color='black', marker='x', label='Outlier venues')
-    
-    axes[1, 2].set_title('Clustering Venues')
+    axes[1, 2].set_title('🏢 Clustering Venues', fontsize=14, fontweight='bold')
     axes[1, 2].set_xlabel('Average Attendance')
-    axes[1, 2].set_ylabel('Average Revenue')
+    axes[1, 2].set_ylabel('Average Revenue (€)')
     axes[1, 2].legend()
+    axes[1, 2].grid(True, alpha=0.3)
     
-    # 7. Durata eventi vs Anomalie
-    if 'estimated_duration_minutes' in df.columns:
-        axes[2, 0].scatter(normal_events['estimated_duration_minutes'], normal_events['attendance'], 
-                          alpha=0.6, s=20, label='Eventi normali')
-        axes[2, 0].scatter(anomaly_events['estimated_duration_minutes'], anomaly_events['attendance'], 
-                          alpha=0.8, s=30, color='red', label='Anomalie rilevate')
-        axes[2, 0].set_title('Durata Eventi vs Attendance')
-        axes[2, 0].set_xlabel('Durata (minuti)')
-        axes[2, 0].set_ylabel('Attendance')
-        axes[2, 0].legend()
+    # 7. Distribuzione Anomalie per Ora del Giorno
+    hour_data = df.groupby('hour').agg({
+        'is_anomaly_detected': ['sum', 'count']
+    }).round(2)
+    hour_data.columns = ['anomalies', 'total']
+    hour_data['rate'] = (hour_data['anomalies'] / hour_data['total'] * 100).fillna(0)
     
-    # 8. Distribuzione anomalie per ora del giorno
-    hour_anomalies = df[df['is_anomaly_detected']]['hour'].value_counts().sort_index()
-    axes[2, 1].bar(hour_anomalies.index, hour_anomalies.values, color='lightcoral')
-    axes[2, 1].set_title('Distribuzione Anomalie per Ora')
-    axes[2, 1].set_xlabel('Ora del giorno')
-    axes[2, 1].set_ylabel('Numero anomalie')
+    bars = axes[2, 0].bar(hour_data.index, hour_data['total'], color='lightblue', alpha=0.7, label='Totale eventi')
+    bars_anom = axes[2, 0].bar(hour_data.index, hour_data['anomalies'], color='red', alpha=0.8, label='Anomalie')
     
-    # 9. Heatmap matrice di confusione
-    cm = confusion_matrix(df['anomaly_type'].notna(), df['is_anomaly_detected'])
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=axes[2, 2])
-    axes[2, 2].set_title('Confusion Matrix')
-    axes[2, 2].set_xlabel('Predicted')
-    axes[2, 2].set_ylabel('Actual')
+    axes[2, 0].set_title('⏰ Distribuzione Eventi per Ora del Giorno', fontsize=14, fontweight='bold')
+    axes[2, 0].set_xlabel('Ora del giorno')
+    axes[2, 0].set_ylabel('Numero eventi')
+    axes[2, 0].legend()
+    axes[2, 0].grid(True, alpha=0.3)
+    
+    # 8. Capacity vs Songs per Person
+    axes[2, 1].scatter(normal_events['capacity'], normal_events['songs_per_person'], 
+                      alpha=0.6, s=15, color='orange', label='Eventi normali')
+    axes[2, 1].scatter(anomaly_events['capacity'], anomaly_events['songs_per_person'], 
+                      alpha=0.8, s=40, color='red', edgecolor='darkred', label='Anomalie')
+    axes[2, 1].set_title('🏟️ Capacity vs Songs per Person', fontsize=14, fontweight='bold')
+    axes[2, 1].set_xlabel('Venue Capacity')
+    axes[2, 1].set_ylabel('Songs per Person')
+    axes[2, 1].legend()
+    axes[2, 1].grid(True, alpha=0.3)
+    
+    # 9. Confusion Matrix (solo se abbiamo ground truth nel training)
+    if 'anomaly_type' in df.columns:
+        y_true = df['anomaly_type'].notna().astype(int)
+        y_pred = df['is_anomaly_detected'].astype(int)
+        cm = confusion_matrix(y_true, y_pred)
+        
+        im = axes[2, 2].imshow(cm, interpolation='nearest', cmap='Blues')
+        axes[2, 2].figure.colorbar(im, ax=axes[2, 2])
+        
+        # Aggiungi testo nelle celle
+        thresh = cm.max() / 2.
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                axes[2, 2].text(j, i, format(cm[i, j], 'd'),
+                               ha="center", va="center",
+                               color="white" if cm[i, j] > thresh else "black",
+                               fontsize=16, fontweight='bold')
+        
+        axes[2, 2].set_title('🎯 Confusion Matrix', fontsize=14, fontweight='bold')
+        axes[2, 2].set_xlabel('Predicted')
+        axes[2, 2].set_ylabel('Actual')
+    else:
+        # Se non abbiamo ground truth, mostra statistiche generali
+        anomaly_stats = {
+            'Total Events': len(df),
+            'Anomalies Detected': len(anomaly_events),
+            'Anomaly Rate': f"{len(anomaly_events)/len(df)*100:.1f}%",
+            'Avg Anomaly Score': f"{anomaly_events['anomaly_score'].mean():.3f}"
+        }
+        
+        axes[2, 2].axis('off')
+        text_str = '\n'.join([f'{k}: {v}' for k, v in anomaly_stats.items()])
+        axes[2, 2].text(0.5, 0.5, text_str, transform=axes[2, 2].transAxes, 
+                        fontsize=16, ha='center', va='center', 
+                        bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
+        axes[2, 2].set_title('📊 Summary Statistics', fontsize=14, fontweight='bold')
     
     plt.tight_layout()
     plt.savefig('anomaly_detection_results.png', dpi=300, bbox_inches='tight')
     plt.show()
     
-    # Grafico aggiuntivo per analisi FMA
-    if 'event_genre' in df.columns:
-        plt.figure(figsize=(12, 8))
-        
-        # Crea un grafico a torta per i generi musicali
-        genre_counts = df['event_genre'].value_counts().head(8)
-        others = df['event_genre'].value_counts().iloc[8:].sum()
-        if others > 0:
-            genre_counts['Altri'] = others
-        
-        plt.pie(genre_counts.values, labels=genre_counts.index, autopct='%1.1f%%', startangle=90)
-        plt.title('Distribuzione Generi Musicali negli Eventi Live')
-        plt.axis('equal')
-        plt.savefig('genre_distribution.png', dpi=300, bbox_inches='tight')
-        plt.show()
+    print("✅ Visualizzazioni salvate in: anomaly_detection_results.png")
 
 def generate_submission(df, iso_forest, feature_cols, team_name="YourTeam", members=["Member1", "Member2"]):
     """
