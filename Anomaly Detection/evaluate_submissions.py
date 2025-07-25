@@ -41,7 +41,7 @@ class SubmissionEvaluator:
                         if 'is_anomaly' in df.columns:
                             ground_truth = df['is_anomaly'].astype(int).values
                         elif 'anomaly_type' in df.columns:
-                            ground_truth = df['anomaly_type'].notna().astype(int).values
+                        ground_truth = df['anomaly_type'].notna().astype(int).values
                         else:
                             print(f"⚠️ Warning: No ground truth column found in {truth_file}")
                             continue
@@ -51,7 +51,7 @@ class SubmissionEvaluator:
                     elif track == "Track2":
                         # For Track2: check 'is_fraudulent' column
                         if 'is_fraudulent' in df.columns:
-                            ground_truth = df['is_fraudulent'].astype(int).values
+                        ground_truth = df['is_fraudulent'].astype(int).values
                         else:
                             print(f"⚠️ Warning: No 'is_fraudulent' column found in {truth_file}")
                             continue
@@ -61,7 +61,7 @@ class SubmissionEvaluator:
                     elif track == "Track3":
                         # For Track3: check 'is_anomaly' column
                         if 'is_anomaly' in df.columns:
-                            ground_truth = df['is_anomaly'].astype(int).values
+                        ground_truth = df['is_anomaly'].astype(int).values
                         else:
                             print(f"⚠️ Warning: No 'is_anomaly' column found in {truth_file}")
                             continue
@@ -71,7 +71,7 @@ class SubmissionEvaluator:
                     elif track == "Track4":
                         # For Track4: check 'is_infringement' column
                         if 'is_infringement' in df.columns:
-                            ground_truth = df['is_infringement'].astype(int).values
+                        ground_truth = df['is_infringement'].astype(int).values
                         else:
                             print(f"⚠️ Warning: No 'is_infringement' column found in {truth_file}")
                             continue
@@ -310,7 +310,7 @@ class SubmissionEvaluator:
                 print(f"✅ Usando metriche reali per valutazione")
             else:
                 # Fallback alle metriche self-reported
-                metrics = submission_data['metrics']
+            metrics = submission_data['metrics']
                 print(f"⚠️ Usando metriche self-reported (fallback)")
             
             # Calculate component scores (usando metriche reali o fallback)
