@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missione: Cacciatori di Anomalie SIAE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0a0a14;
+            color: #e0e0e0;
+            font-family: 'Roboto Mono', monospace;
+            overflow-x: hidden;
+        }
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            background: rgba(10, 10, 20, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        h1, h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00f2ff;
+            text-shadow: 0 0 8px rgba(0, 242, 255, 0.7), 0 0 12px rgba(0, 242, 255, 0.5);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 242, 255, 0.5);
+            box-shadow: 0 8px 30px rgba(0, 242, 255, 0.1);
+        }
+        code {
+            background: rgba(0, 242, 255, 0.1);
+            color: #ff79c6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        pre {
+            background: #011627;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #d6deeb;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .icon {
+            font-size: 2.5rem;
+            line-height: 1;
+            color: #00f2ff;
+            filter: drop-shadow(0 0 5px #00f2ff);
+        }
+        .btn {
+            background-color: #00f2ff;
+            color: #0a0a14;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid #00f2ff;
+        }
+        .btn:hover {
+            background-color: transparent;
+            color: #00f2ff;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-bg"></canvas>
+    <div class="content-wrapper min-h-screen">
+        <div class="container mx-auto p-4 md:p-8">
+            
+            <header class="text-center my-8 md:my-12">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">Missione: Cacciatori di Anomalie SIAE</h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">Benvenuti alla nostra prossima sfida. Il nostro obiettivo: diventare i migliori detective digitali scovando le "interferenze" nascoste nei dati musicali della SIAE.</p>
+            </header>
+
+            <section id="battlefields" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">I Nostri Campi di Battaglia: Le 4 Track</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Track 1 -->
+                    <div class="card p-6 rounded-lg text-center">
+                        <div class="icon mb-4">🕵️‍♂️</div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Track 1: Live Events</h3>
+                        <p class="text-gray-400">Dichiarazioni duplicate, presenze impossibili, ricavi sospetti. Un vero caos da mettere in ordine.</p>
+                    </div>
+                    <!-- Track 2 -->
+                    <div class="card p-6 rounded-lg text-center">
+                        <div class="icon mb-4">✍️</div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Track 2: Document Fraud</h3>
+                        <p class="text-gray-400">Firme contraffatte, metadati manipolati, documenti alterati. Siamo i periti forensi del digitale.</p>
+                    </div>
+                    <!-- Track 3 -->
+                    <div class="card p-6 rounded-lg text-center">
+                        <div class="icon mb-4">🎧</div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Track 3: Music Anomaly</h3>
+                        <p class="text-gray-400">Streaming da bot, plagi, generi incoerenti. Dobbiamo fidarci solo del nostro codice.</p>
+                    </div>
+                    <!-- Track 4 -->
+                    <div class="card p-6 rounded-lg text-center">
+                        <div class="icon mb-4">⚖️</div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Track 4: Copyright</h3>
+                        <p class="text-gray-400">Campionamenti non autorizzati, opere derivate illegali, elusione di Content ID. Facciamo rispettare la legge.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="action-plan" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">Il Nostro Piano d'Azione</h2>
+                <div class="max-w-4xl mx-auto space-y-6">
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-white mb-2">1. Setup del Laboratorio (5 min)</h3>
+                        <p class="text-gray-300 mb-4">Cloniamo il repo, installiamo le dipendenze e, <span class="text-red-400 font-bold">OBBLIGATORIO</span>, lanciamo lo script per generare i dataset. Tutti sulla stessa barca.</p>
+                        <pre><code>python generate_datasets.py</code></pre>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-white mb-2">2. Definire la Nostra Identità (1 min)</h3>
+                        <p class="text-gray-300 mb-4">Apriamo lo script <code>.py</code> della track scelta e inseriamo il nostro <code>team_name</code> e <code>members</code>. <span class="text-red-400 font-bold">Non dimentichiamolo!</span></p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-white mb-2">3. L'Algoritmo all'Opera (Iterativo)</h3>
+                        <p class="text-gray-300">Lanciamo lo script base per avere una baseline. Poi inizia il divertimento: feature engineering, sperimentazione con algoritmi, validazione incrociata.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-white mb-2">4. Lancio Verso la Leaderboard</h3>
+                        <p class="text-gray-300 mb-4">Verifichiamo il file di submission e lanciamo i comandi per scalare la classifica.</p>
+                        <pre><code>git add submissions/submission_*.json
+git commit -m "Submission Team [NOME] - Track X"
+git push origin main</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="victory-formula" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">La Formula della Vittoria</h2>
+                <div class="card max-w-3xl mx-auto p-8 rounded-lg text-center">
+                    <p class="text-lg md:text-2xl font-bold text-white mb-4">
+                        Punteggio = (F1-Score × 40%) + (AUC-ROC × 25%) + (Precision × 20%) + (Innovazione × 15%)
+                    </p>
+                    <p class="text-gray-300">La nostra priorità è l'<code>F1-Score</code>, ma ogni componente è cruciale. L'innovazione nel feature engineering ci darà il vantaggio decisivo.</p>
+                </div>
+            </section>
+            
+            <section id="rules" class="my-12">
+                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">⚠️ Regole d'Ingaggio Fondamentali</h2>
+                 <div class="max-w-3xl mx-auto space-y-4 text-lg">
+                    <p class="card p-4 rounded-lg"><span class="text-red-500 mr-2">❌</span> <strong>NON</strong> usare i dati di test per l'addestramento. È barare.</p>
+                    <p class="card p-4 rounded-lg"><span class="text-yellow-500 mr-2">❗</span> <strong>ASSICURARSI</strong> che le predizioni coprano tutto il test set.</p>
+                    <p class="card p-4 rounded-lg"><span class="text-green-500 mr-2">✅</span> <strong>TESTARE</strong> sempre il file JSON prima di ogni submission.</p>
+                 </div>
+            </section>
+
+            <footer class="text-center mt-16 pb-8">
+                <p class="text-2xl font-bold text-white mb-4">È tutto, team. La sfida è lanciata.</p>
+                <button class="btn">Andiamo a Prenderci quella Leaderboard!</button>
+            </footer>
+
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas to full screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Characters to draw
+        const chars = "01♫§©%#?*+=-<>{}[]()";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        // Array to store the y-position of each column
+        const drops = [];
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            // Semi-transparent background for fading effect
+            ctx.fillStyle = 'rgba(10, 10, 20, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00f2ff'; // Glitchy cyan color
+            ctx.font = fontSize + 'px Roboto Mono';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                // Reset drop to top randomly
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                
+                drops[i]++;
+            }
+        }
+
+        const interval = setInterval(draw, 40);
+
+        // Adjust canvas on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Recalculate columns and reset drops if needed
+        });
+    </script>
+</body>
+</html>
