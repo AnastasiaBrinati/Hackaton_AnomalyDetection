@@ -11,7 +11,7 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{Implementazione di un Sistema RAG Agentico Robusto}
+\fancyhead[L]{Implementazione di un sistema RAG agentico robusto}
 \fancyfoot[C]{\thepage}
 \usepackage{hyperref}
 \hypersetup{
@@ -27,7 +27,7 @@
 \usepackage{enumitem}
 
 % Informazioni sul documento
-\title{Implementazione di un sistema RAG agentico robusto per documenti di eterogenei}
+\title{Implementazione di un sistema RAG agentico robusto per documenti eterogenei}
 \author{Mirko Calcaterra}
 \date{\today}
 
@@ -43,11 +43,11 @@
 \tableofcontents
 \clearpage
 
-\section{Introduzione: Navigare le Complessità del RAG Agentico per Documenti di Ricette Diversi}
+\section{Introduzione: navigare le complessità del RAG agentico per documenti di ricette diversi}
 
 La proliferazione di documenti digitali, specialmente in formati non strutturati come i PDF, presenta sfide significative per l'estrazione e l'utilizzo automatizzato delle informazioni. Quando si costruiscono sistemi di intelligenza artificiale avanzati come la Generazione Aumentata tramite Recupero (RAG) all'interno di un framework agentico, queste sfide sono aggravate, in particolare in domini specializzati come le arti culinarie. I documenti di ricette sono intrinsecamente diversi, spesso privi di layout coerenti, contenenti contenuti misti (testo, tabelle, immagini) e caratterizzati da un vocabolario altamente ripetitivo (ad esempio, nomi di ingredienti, verbi di preparazione). Questa sezione introduce le complessità uniche di questo dominio e fornisce una panoramica della soluzione multifase proposta.
 
-\subsection{Comprendere le Sfide Uniche: PDF Eterogenei, Indipendenza dal Layout e Vocabolario di Dominio Ripetitivo}
+\subsection{Comprendere le sfide uniche: PDF eterogenei, indipendenza dal layout e vocabolario di dominio ripetitivo}
 
 L'implementazione di un sistema RAG agentico in questo contesto specifico è ostacolata da tre sfide principali, che richiedono soluzioni mirate e sofisticate.
 \begin{itemize}
@@ -55,7 +55,7 @@ L'implementazione di un sistema RAG agentico in questo contesto specifico è ost
     \item \textbf{Vocabolario di Dominio Ripetitivo:} I documenti di ricette utilizzano frequentemente le stesse parole per gli ingredienti (ad esempio, "sale", "zucchero", "farina") o i nomi delle ricette in contesti diversi (query dell'utente). Questa elevata sovrapposizione lessicale può portare ad ambiguità e a una riduzione della precisione nella ricerca semantica e nel Riconoscimento di Entità Nominate (NER). La difficoltà risiede nel distinguere tra entità o concetti distinti quando i termini sono così comuni. Ad esempio, "mela" potrebbe riferirsi al frutto, al nome di una ricetta ("torta di mele") o a un'altra entità che non ha nulla a che fare con il cibo. Questa ambiguità lessicale è una sfida significativa per i sistemi che si basano sulla somiglianza semantica per il recupero delle informazioni. \cite{nlp_challenges}
 \end{itemize}
 
-\subsection{Panoramica dell'Approccio Multifase Proposto}
+\subsection{Panoramica dell'approccio multifase proposto}
 
 Per affrontare queste complessità, viene proposta una pipeline strutturata e multifase:
 \begin{enumerate}
@@ -66,11 +66,11 @@ Per affrontare queste complessità, viene proposta una pipeline strutturata e mu
    \item \textbf{Orchestrazione Agentica - Progettazione del Sistema RAG Intelligente:} Implementare un livello di agente intelligente capace di ragionamento dinamico, pianificazione e utilizzo di strumenti per gestire query culinarie complesse.
 \end{enumerate}
 
-\section{Fase 1: Fondazione - Ingestione Robusta dei Documenti ed Estrazione del Testo Indipendente dal Layout}
+\section{Fase 1: fondazione - ingestione robusta dei documenti ed estrazione del testo indipendente dal layout}
 
 Il primo passo critico è estrarre accuratamente il testo da diversi documenti PDF senza fare affidamento sul loro layout visivo. Ciò richiede un approccio robusto al Riconoscimento Ottico dei Caratteri (OCR) e all'estrazione del testo che possa gestire la qualità e le strutture variabili dei documenti.
 
-\subsection{OCR Avanzato e Preprocessing delle Immagini per Qualità PDF Variabili}
+\subsection{OCR avanzato e preprocessing delle immagini per qualità PDF variabili}
 
 Dato che i documenti di ricette possono provenire da varie fonti (ad esempio, libri di cucina scansionati, appunti scritti a mano, file digitali), la loro qualità può essere altamente variabile, spesso caratterizzata da scarsa risoluzione, allineamento incoerente o persino caratteri diversi. \cite{algodocs_challenges} Un OCR robusto è il passo fondamentale per convertire questi diversi input visivi in testo leggibile dalla macchina. Se l'estrazione iniziale del testo è di scarsa qualità, gli errori si propagheranno attraverso l'intera pipeline RAG, portando a chunk imprecisi, embedding difettosi, recupero inefficace e, in ultima analisi, risposte inaffidabili del modello linguistico di grandi dimensioni (LLM). Pertanto, un investimento significativo in un preprocessing OCR robusto non è solo una buona pratica, ma un passo critico e fondamentale che influisce direttamente sulla qualità di tutti i componenti RAG successivi. Garantisce che l'input testuale grezzo sia il più pulito e accurato possibile, indipendentemente dalla qualità fisica o dal formato del documento originale.
 \begin{itemize}
@@ -128,10 +128,10 @@ Supporto alla Disambiguazione & Alto (comprensione semantica) & Basso (output di
 Note & State-of-the-art, minore perdita di contesto. \cite{problem_solved_layout_extraction} & Estrazione precisa dei bounding box. \cite{analytics_vidhya_pdf_extraction} & Leggero, senza API. \cite{medium_kreuzberg} & Aumenta gli embedding del testo. \cite{problem_solved_layout_extraction} & Modella le relazioni tra gli elementi del testo. \cite{gnn_benchmarking} \\
 \end{longtable}
 
-\section{Fase 2: Comprensione Semantica - Chunking Intelligente e Riconoscimento di Entità Nominate}
+\section{Fase 2: comprensione semantica - chunking intelligente e riconoscimento di entità nominate}
 Una volta che il testo è stato estratto in modo affidabile, la sfida successiva è trasformare questo testo grezzo in unità significative che possano essere efficacemente utilizzate da un sistema RAG. Questo è particolarmente complesso per i documenti di ricette a causa del vocabolario ripetitivo.
 
-\subsection{Strategie di Chunking Adattive per il Vocabolario Ripetitivo delle Ricette}
+\subsection{Strategie di chunking adattive per il vocabolario ripetitivo delle ricette}
 Un chunking efficace è cruciale per i sistemi RAG, poiché influisce direttamente sulla pertinenza e sulla coerenza delle informazioni recuperate. \cite{semantic_chunking_multimodal} Per i documenti di ricette, la sfida è amplificata dalla frequente ripetizione dei nomi degli ingredienti e dei termini culinari comuni (query dell'utente), che può portare a risultati di ricerca imprecisi o alla perdita di contesto se i chunk sono troppo piccoli o mal divisi. \cite{chunking_strategies_pinecone} Se una strategia di chunking non tiene conto del vocabolario ripetitivo, molti chunk conterranno termini comuni come "sale", "zucchero" o "acqua", portando a una scarsa distinzione semantica e a un recupero irrilevante. \cite{semantic_chunking_ani}
 \begin{itemize}
     \item \textbf{Chunking a Dimensione Fissa (Fixed-Size Chunking):} Sebbene semplice da implementare \cite{f22_chunking_strategies}, questo metodo divide il testo in chunk uniformi basati sul conteggio di caratteri o token. \cite{chunking_strategies_ibm} Spesso interrompe frasi o paragrafi a metà \cite{semantic_chunking_ani}, portando alla frammentazione del contesto ed è generalmente subottimale per i sistemi RAG di produzione, specialmente con contenuti diversi. \cite{databricks_unstructured_data} L'overlap (10-20\%) può mitigare una parte della perdita di contesto. \cite{semantic_chunking_multimodal}
@@ -176,10 +176,10 @@ Consapevole dei Metadati \cite{semantic_chunking_multimodal} & Arricchisce i chu
 Agentica \cite{chunking_strategies_ibm} & Un LLM determina dinamicamente la suddivisione in base al significato semantico e alla struttura del contenuto. & Altamente adattiva a formati non strutturati e diversi, simula il ragionamento umano. \cite{chunking_strategies_ibm} & Sperimentale, può essere complessa da configurare, potenziale perdita di contesto globale. \cite{f22_chunking_strategies} & Ricette con layout molto irregolari o stili narrativi unici, che richiedono un'interpretazione dinamica. \\
 \end{longtable}
 
-\section{Fase 3: Arricchimento della Conoscenza - Sfruttare i Knowledge Graph per la Disambiguazione e le Relazioni}
+\section{Fase 3: arricchimento della conoscenza - sfruttare i knowledge graph per la disambiguazione e le relazioni}
 La presenza di "parole che si ripetono frequentemente negli ingredienti e nei nomi delle ricette" (query dell'utente) introduce una significativa ambiguità. Se un utente cerca "sale", una semplice ricerca basata sulla somiglianza testuale o semantica potrebbe recuperare molte ricette che menzionano il sale, ma non necessariamente nel contesto desiderato (ad esempio, "sale" come ingrediente principale vs. "sale" come parte di un'analisi nutrizionale). Questo rende la disambiguazione e la normalizzazione dei termini cruciali.
 
-\subsection{Costruzione di un Knowledge Graph Specifico del Dominio per le Ricette}
+\subsection{Costruzione di un knowledge graph specifico del dominio per le ricette}
 Un knowledge graph (KG) è una struttura dati che collega entità tra loro attraverso relazioni. \cite{understanding_kg} Le entità (nodi) sono oggetti con proprietà (metadati), e le relazioni (archi) descrivono le connessioni tra le entità. \cite{understanding_kg} Per il dominio delle ricette, un KG non è un semplice miglioramento, ma una necessità. Esso fornisce una rappresentazione strutturata e non ambigua di ingredienti, delle loro proprietà (ad esempio, "contenuto nutrizionale", "allergeni") e delle relazioni (ad esempio, "può sostituire", "è parte di"), cosa impossibile da ottenere con i soli embedding di testo grezzo, specialmente con vocabolario ripetitivo e ambiguo. Un KG alimentare (FoodKG) può modellare "mela" come una specifica entità frutto con proprietà (ad esempio, "è\_frutto", "contiene\_zucchero") e relazioni (ad esempio, "è\_ingrediente\_in: torta di mele"), distinguendola da altri usi di "mela". Questa rappresentazione strutturata \cite{understanding_kg} è fondamentale per un recupero accurato e per il ragionamento in un sistema agentico.
 \begin{itemize}
     \item \textbf{Obiettivi del KG nel Dominio Culinario:}
@@ -191,7 +191,7 @@ Un knowledge graph (KG) è una struttura dati che collega entità tra loro attra
     \item \textbf{Strumenti e Framework Open-Source:} Esistono framework e toolkit per la costruzione di KG alimentari. \cite{foodkg} Blazegraph è raccomandato per l'archiviazione del KG integrato. \cite{foodkg}
 \end{itemize}
 
-\subsection{Entity Linking e Disambiguazione per Ingredienti e Ricette}
+\subsection{Entity Linking e disambiguazione per ingredienti e ricette}
 Il processo di Entity Linking (EL), noto anche come disambiguazione di entità nominate (NED), è il compito di assegnare un'identità unica alle entità menzionate nel testo. \cite{entity_linking_wiki} Data la ripetizione dei nomi degli ingredienti (ad esempio, "zucchero", "farina") in molte ricette, la semplice corrispondenza testuale o la somiglianza semantica potrebbero recuperare molti chunk irrilevanti. L'EL risolve questo problema mappando le menzioni di testo grezzo a entità uniche nel knowledge graph (ad esempio, "zucchero" -> FoodIngredient:Zucchero). Questo processo include la disambiguazione \cite{entity_linking_wiki} per garantire che l'entità corretta sia identificata, anche se la parola è ambigua.
 \begin{itemize}
     \item \textbf{Processo di Entity Linking:} L'EL si compone di tre fasi principali:
@@ -244,7 +244,7 @@ Arricchimento Semantico \cite{understanding_kg} & Aggiunge proprietà strutturat
 Ragionamento Esplicito (GraphRAG) \cite{graphrag_explained} & Consente al sistema di eseguire ragionamenti multi-hop sul grafo. & Risposte più accurate e spiegabili per query complesse (es. "ricette senza glutine per diabetici"). \\
 \end{longtable}
 
-\section{Fase 4: Recupero Migliorato - Ricerca Ibrida e Reranking per Precisione e Recall}
+\section{Fase 4: recupero migliorato - ricerca ibrida e reranking per precisione e recall}
 Il recupero delle informazioni è una fase critica in un sistema RAG, e per i documenti di ricette con vocabolario ripetitivo, le strategie di ricerca tradizionali presentano limitazioni. La ricerca vettoriale, pur eccellendo nel trovare contenuti concettualmente correlati (alto recall), è meno efficace nel individuare esattamente ciò che serve (bassa precisione). \cite{meilisearch_vector_dbs} D'altra parte, la ricerca basata su parole chiave (come BM25) privilegia la precisione, ma può perdere contenuti semanticamente simili che utilizzano terminologie diverse. \cite{hybrid_search_vectorchord} Inoltre, l'inclusione di documenti recuperati irrilevanti nel contesto di output può portare a "allucinazioni" da parte dell'LLM. \cite{mastering_rag_reranking}
 
 \subsection{Ricerca Ibrida (BM25 + Ricerca Vettoriale)}
@@ -268,7 +268,7 @@ Il reranking è un passaggio di filtraggio e ordinamento secondario che riordina
     \item \textbf{Strategie:} Possono utilizzare una strategia a finestra scorrevole (sliding window) per riordinare un sottoinsieme di documenti candidati alla volta, specialmente per documenti lunghi. \cite{mastering_rag_reranking}
 \end{itemize}
 
-\subsection{Tecniche di Recupero Contestuale}
+\subsection{Tecniche di recupero contestuale}
 Il recupero contestuale è una strategia proattiva per combattere il problema del "vocabolario ripetitivo" arricchendo i chunk con un contesto di livello superiore prima del recupero. \cite{contextual_retrieval_pluralsight} Il problema del vocabolario ripetitivo implica che i singoli chunk potrebbero non avere un contesto sufficiente per essere identificabili in modo univoco o semanticamente ricchi da soli. \cite{contextual_retrieval_mlexpert} Il recupero contestuale affronta questo problema arricchendo ogni chunk con metadati o riassunti generati dal suo contesto documentale più ampio (ad esempio, la ricetta completa, il suo titolo, il tipo di cucina). Quindi, un chunk su "farina" potrebbe essere aumentato con "Ricetta: Pancake Senza Glutine, Ingrediente: Farina di Mandorle". Ciò rende l'embedding del chunk più preciso e meno ambiguo, migliorando la precisione del recupero per query specifiche sulle ricette.
 \begin{itemize}
     \item \textbf{Funzionamento:} Migliora ogni chunk aggiungendo un contesto specifico ed esplicativo prima di incorporarlo o indicizzarlo. \cite{contextual_retrieval_pluralsight} Questo preserva la relazione tra il chunk e il suo documento più ampio, migliorando significativamente la capacità del sistema di recuperare e utilizzare le informazioni più pertinenti.
@@ -297,10 +297,10 @@ Reranking \cite{mastering_rag_reranking} & Riordina i documenti recuperati inizi
 Recupero Contestuale \cite{contextual_retrieval_pluralsight} & Arricchisce i chunk con metadati o riassunti del contesto più ampio del documento. & Rende i chunk più semanticamente ricchi e meno ambigui, anche con vocabolario ripetitivo. \cite{contextual_retrieval_mlexpert} & Aumenta la dimensione degli embedding, potenziale aumento dei costi di elaborazione. \cite{contextual_retrieval_somawansa} \\
 \end{longtable}
 
-\section{Fase 5: Orchestrazione Agentica - Progettazione del Sistema RAG Intelligente}
+\section{Fase 5: orchestrazione agentica - progettazione del sistema RAG intelligente}
 Il requisito di un "sistema agentico" (query dell'utente) implica la necessità di un ragionamento dinamico e multi-step che vada oltre la semplice relazione query-risposta. Gli agenti possono decidere in modo intelligente come elaborare una query di ricetta (ad esempio, prima estrarre gli ingredienti, poi verificare le sostituzioni, quindi generare i passaggi di cottura), sfruttando diversi strumenti (NER, KG, RAG) secondo necessità. Questo rappresenta un significativo passo avanti rispetto al RAG tradizionale.
 
-\subsection{Architettura del Sistema Agentico}
+\subsection{Architettura del sistema agentico}
 I sistemi RAG agentici introducono agenti di intelligenza artificiale nella pipeline per migliorare l'adattabilità e la precisione. \cite{what_is_agentic_rag_ibm} Questi agenti sono in grado di condurre il recupero di informazioni da più fonti, gestire workflow complessi e prendere decisioni autonome. Un sistema agentico per le ricette potrebbe, ad esempio, ricevere una query come "Come posso preparare una lasagna vegana usando gli ingredienti che ho?" L'agente utilizzerebbe prima il NER per identificare gli ingredienti disponibili, quindi interrogherebbe il KG per le sostituzioni vegane, recupererebbe i chunk di ricette pertinenti e infine sintetizzerebbe una risposta, adattando dinamicamente i suoi passaggi. Questo è un livello di intelligenza superiore rispetto a una pipeline RAG statica.
 \begin{itemize}
     \item \textbf{Capacità degli Agenti:}
@@ -319,7 +319,7 @@ Per query di ricette complesse (ad esempio, "Suggerisci un dessert per una perso
     \item \textbf{ReAct:} Questo framework combina il ragionamento (simile a CoT) con la capacità di intraprendere azioni accedendo a risorse esterne (strumenti). \cite{prompt_engineering_explained} L'LLM decide quando recuperare più dati e genera passaggi di "pensiero-azione-osservazione" (thought-action-observation). Ad esempio, un "Pensiero" potrebbe essere "Devo trovare dolcificanti alternativi per una ricetta diabetica". L'"Azione" sarebbe "Chiamare lo strumento KG per trovare sostituti dello zucchero". L'"Osservazione" sarebbero i sostituti recuperati, che poi informano il successivo "Pensiero". Questo processo dinamico e iterativo è ciò che rende l'agente veramente intelligente e capace di gestire query di ricette complesse e sfaccettate. La combinazione di CoT e ReAct è spesso considerata ottimale. \cite{prompt_engineering_explained}
 \end{itemize}
 
-\subsection{Gestione delle Informazioni Conflittuali e Mitigazione delle Allucinazioni}
+\subsection{Gestione delle informazioni conflittuali e mitigazione delle allucinazioni}
 In un dominio come le ricette, possono sorgere informazioni contrastanti (ad esempio, diverse versioni di una ricetta, consigli dietetici contrastanti). Il sistema agentico deve essere progettato per rilevare e gestire questi conflitti \cite{dragged_into_conflicts}, piuttosto che limitarsi a presentarli, mantenendo così la coerenza fattuale e l'affidabilità. Ciò è cruciale per la sicurezza dell'utente (ad esempio, informazioni sugli allergeni). Le allucinazioni sono un rischio. \cite{mastering_rag_reranking}
 \begin{itemize}
     \item \textbf{Rilevamento e Gestione dei Conflitti:} Quando una strategia di recupero restituisce informazioni contraddittorie, l'LLM deve prima riconoscere il conflitto ed evitare di presentare affermazioni contrastanti come ugualmente valide senza contesto. \cite{milvus_contradictory_info} Il modello dovrebbe dare priorità all'identificazione delle discrepanze, alla valutazione dell'affidabilità della fonte e alla fornitura di una spiegazione equilibrata che evidenzi il disaccordo. \cite{milvus_contradictory_info}
@@ -352,10 +352,10 @@ Utilizzo degli Strumenti (Tool Calling) \cite{what_is_agentic_rag_ibm} & Interag
 Gestione Conflitti \cite{dragged_into_conflicts} & Rileva e gestisce informazioni contraddittorie dalle fonti recuperate. & Identifica versioni contrastanti di ricette o consigli dietetici, fornisce risposte equilibrate. \\
 \end{longtable}
 
-\section{Scalabilità e Considerazioni sull'Implementazione}
+\section{Scalabilità e considerazioni sull'implementazione}
 L'implementazione di un sistema RAG agentico per documenti di ricette eterogenei richiede una solida infrastruttura sottostante, capace di gestire grandi volumi di dati e di evolvere con le esigenze del dominio.
 
-\subsection{Selezione del Vector Database e Strategie di Indicizzazione}
+\subsection{Selezione del vector database e strategie di indicizzazione}
 Per un sistema RAG scalabile, la selezione di un vector database e una strategia di indicizzazione sono fondamentali. Dato il potenziale di milioni di ricette, tecniche come lo sharding e l'indicizzazione cluster-first sono vitali per mantenere bassa la latenza e alta la precisione del recupero. \cite{scaling_rag_millions} Ciò garantisce che, anche con una vasta collezione di ricette, il componente di recupero rimanga veloce e reattivo, essenziale per un sistema agentico in tempo reale.
 \begin{itemize}
     \item \textbf{Gestione di Dati ad Alta Dimensionalità:} I vector database sono progettati per gestire in modo efficiente dati ad alta dimensionalità sotto forma di vettori, cruciali per i sistemi RAG su larga scala. \cite{vector_databases_tutorial}
@@ -367,7 +367,7 @@ Per un sistema RAG scalabile, la selezione di un vector database e una strategia
     \end{itemize}
 \end{itemize}
 
-\subsection{Flessibilità dello Schema per Dati di Ricette in Evoluzione}
+\subsection{Flessibilità dello schema per dati di ricette in evoluzione}
 I dati delle ricette sono intrinsecamente variabili (diversi formati, campi opzionali, nuove tendenze dietetiche). Un database con schema flessibile è altamente vantaggioso. Consente al sistema di acquisire diversi formati di ricette senza una rigida imposizione dello schema a priori, e di adattarsi man mano che emergono nuovi tipi di dati (ad esempio, nuove metriche nutrizionali, metodi di cottura), supportando il vincolo dei "documenti molto diversi".
 \begin{itemize}
     \item \textbf{Natura dei Dati Non Strutturati:} I dati non strutturati, come i PDF di ricette, mancano di un formato o uno schema rigido, rendendoli difficili da gestire per i database convenzionali. \cite{qdrant_vector_db} I vector database gestiscono questi dati rappresentandoli come vettori. \cite{qdrant_vector_db}
@@ -375,7 +375,7 @@ I dati delle ricette sono intrinsecamente variabili (diversi formati, campi opzi
     \item \textbf{Flessibilità dello Schema dei Database:} Database come MongoDB offrono flessibilità dello schema, non la sua assenza, consentendo di iniziare con un modello dati flessibile e di introdurre la convalida dello schema man mano che l'applicazione lo richiede. \cite{mongodb_flexible_schema} Questo approccio adattivo è ideale per la variabilità intrinseca dei dati delle ricette.
 \end{itemize}
 
-\subsection{Framework RAG Eterogenei}
+\subsection{Framework RAG eterogenei}
 Per documenti altamente diversi, un framework RAG eterogeneo è un'ottimizzazione sofisticata. Permette al sistema di utilizzare "viste" diverse dei dati per le diverse fasi della pipeline RAG (ad esempio, una vista riassunta per il recupero iniziale, una vista dettagliata per la generazione), il che può migliorare significativamente le prestazioni e l'efficienza, specialmente quando si tratta di granularità di contenuto variabile all'interno delle ricette. I documenti dell'utente sono "molto diversi". Ciò significa che ciò che è ottimale per il recupero (ad esempio, un chunk conciso e semanticamente ricco) potrebbe non essere ottimale per la generazione (che potrebbe richiedere un testo più dettagliato e grezzo). HeteRAG \cite{heterag} affronta direttamente questo problema disaccoppiando le rappresentazioni. Per le ricette, questo potrebbe significare che per il recupero, i chunk sono arricchiti con metadati di ricette di alto livello, ma per la generazione, all'LLM viene fornito il testo completo e non riassunto della ricetta, consentendo sia una ricerca efficiente che una generazione di risposte dettagliate.
 \begin{itemize}
     \item \textbf{Disaccoppiamento delle Rappresentazioni:} I framework RAG eterogenei (HeteRAG) disaccoppiano le rappresentazioni dei chunk di conoscenza per le fasi di recupero e generazione, ottimizzando sia l'efficacia che l'efficienza. \cite{heterag}
@@ -383,7 +383,7 @@ Per documenti altamente diversi, un framework RAG eterogeneo è un'ottimizzazion
     \item \textbf{Miglioramento delle Prestazioni:} HeteRAG facilita la specializzazione dei modelli di embedding off-the-shelf, consentendo loro di gestire efficacemente corpus di conoscenza diversi e strutturalmente complessi del mondo reale. \cite{heterag}
 \end{itemize}
 
-\subsection{Metriche di Valutazione e Miglioramento Continuo}
+\subsection{Metriche di valutazione e miglioramento continuo}
 Per un sistema RAG di produzione, specialmente uno che gestisce informazioni sensibili come le restrizioni dietetiche, la valutazione continua è fondamentale. Le sfide dei "documenti molto diversi" e delle "parole che si ripetono frequentemente" implicano che la precisione del recupero e i tassi di allucinazione \cite{avoiding_hallucinations} potrebbero essere problemi significativi. Stabilire gold standard, test automatizzati e monitorare il drift \cite{rag_evaluation_metrics} sono fondamentali per garantire che il sistema rimanga affidabile e accurato nel tempo, adattandosi a nuovi formati di ricette o variazioni di ingredienti.
 \begin{itemize}
     \item \textbf{Metriche di Valutazione RAG:} Le cinque metriche chiave per valutare le prestazioni del RAG includono la pertinenza del contesto, la sufficienza del contesto, la pertinenza della risposta, la correttezza della risposta e le allucinazioni della risposta. \cite{rag_evaluation_metrics}
@@ -396,13 +396,14 @@ Per un sistema RAG di produzione, specialmente uno che gestisce informazioni sen
     \end{itemize}
 \end{itemize}
 
-\section{Conclusioni e Raccomandazioni}
+\section{Conclusioni e raccomandazioni}
 L'implementazione di un sistema RAG agentico per documenti di ricette eterogenei, senza dipendenza dal layout e con vocabolario ripetitivo, è un'impresa complessa ma realizzabile attraverso un approccio sistematico e multifase. La strategia proposta affronta le sfide intrinseche del dominio culinario, trasformando dati non strutturati e potenzialmente ambigui in una conoscenza strutturata e azionabile.
 Il successo di un tale sistema si basa sulla sinergia tra i suoi componenti. Un'estrazione del testo robusta e indipendente dal layout, supportata da un preprocessing OCR avanzato e da LMM multimodali, costituisce la base affidabile. Il chunking intelligente, in particolare il chunking semantico e consapevole dei metadati, è fondamentale per creare unità di informazione coerenti e significative, superando le sfide del vocabolario ripetitivo. Il Riconoscimento di Entità Nominate (NER) specifico del dominio è il ponte essenziale che trasforma il testo in entità strutturate, alimentando la costruzione di un knowledge graph.
 Il knowledge graph è un componente indispensabile per la disambiguazione delle entità, la normalizzazione dei sinonimi e la modellazione di relazioni complesse (ad esempio, sostituzioni, allergeni). La sua integrazione con il RAG (GraphRAG) eleva la capacità del sistema di eseguire ragionamenti complessi e di fornire risposte accurate e spiegate. Il recupero è ulteriormente potenziato dalla ricerca ibrida, che combina la precisione di BM25 con la comprensione contestuale della ricerca vettoriale, e dal reranking, che affina i risultati per massimizzare la pertinenza.
 Infine, il livello di orchestrazione agentica, che incorpora framework di ragionamento come CoT e ReAct, consente al sistema di agire in modo autonomo, pianificare workflow complessi e utilizzare dinamicamente gli strumenti disponibili. Questa capacità di ragionamento e azione è cruciale per gestire query culinarie sfumate e per affrontare situazioni di informazione conflittuale, garantendo l'affidabilità e la sicurezza delle risposte.
 
-\subsection*{Raccomandazioni Azionabili:}
+\subsection*{Raccomandazioni:}
+Le principali raccomandazioni per l'implementazione di un sistema RAG agentico per documenti di ricette eterogenei sono:
 \begin{enumerate}[label=\arabic*.]
     \item \textbf{Priorità all'Ingestione Dati:} Investire risorse significative nella fase di estrazione del testo e preprocessing OCR. La qualità dell'input iniziale determina l'accuratezza di tutti i passaggi successivi. Si consiglia di esplorare l'uso di LMM multimodali per la loro capacità intrinseca di comprendere documenti visivamente ricchi senza dipendere da un layout fisso.
     \item \textbf{Sviluppo di un NER e KG Specifici del Dominio:} Dare priorità alla creazione di un modello NER highly accurate e di un knowledge graph culinario. Questi sono vitali per superare l'ambiguità del vocabolario ripetitivo e per abilitare il ragionamento complesso su ingredienti, ricette e proprietà nutrizionali.
