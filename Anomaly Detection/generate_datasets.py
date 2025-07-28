@@ -29,6 +29,13 @@ RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
 random.seed(RANDOM_SEED)
 
+def set_seed(seed):
+    """Imposta il seed per tutte le librerie rilevanti per la riproducibilità."""
+    np.random.seed(seed)
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+
+
 def ensure_datasets_dir():
     """Crea la directory datasets se non esiste"""
     datasets_dir = Path('datasets')
@@ -123,388 +130,395 @@ def create_synthetic_fma_data():
     return pd.DataFrame(tracks)
 
 def generate_track1_dataset(n_events=50000, music_data=None):
-    """Genera dataset Track 1: Live Events Anomaly Detection"""
-    print(f"🎪 Generando Track 1: {n_events} eventi live...")
+    """
+    Genera dataset Track 1 con ANOMALIE SOTTILI E MULTIVARIATE.
+    Queste anomalie richiedono modelli statistici o di ML per essere scovate.
+    """
+    set_seed(RANDOM_SEED)
+    print(f"🎪 Generando Track 1 (v2) con anomalie avanzate: {n_events} eventi live...")
     
-    # Reset seed per consistenza
-    np.random.seed(RANDOM_SEED)
-    random.seed(RANDOM_SEED)
-    
+    # --- 1. Generazione Dati di Base (Normali) ---
     venues = [f"Venue_{i}" for i in range(1, 501)]
     cities = ["Milano", "Roma", "Napoli", "Torino", "Bologna", "Firenze", 
               "Palermo", "Genova", "Bari", "Venezia"]
     
-    # Usa dati musicali FMA se disponibili
-    if music_data is not None:
-        if 'genre_top' in music_data.columns:
-            genres = music_data['genre_top'].dropna().unique().tolist()
-        else:
-            genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Classical']
-        
-        if 'artist_name' in music_data.columns:
-            artists = music_data['artist_name'].dropna().unique().tolist()[:500]
-        else:
-            artists = [f"Artist_{i}" for i in range(1, 100)]
-    else:
-        genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Classical']
-        artists = [f"Artist_{i}" for i in range(1, 100)]
+    # Artisti "famosi" per anomalie contestuali
+    famous_artists = [f"Superstar_Artist_{i}" for i in range(1, 11)]
+    other_artists = [f"Artist_{i}" for i in range(1, 1000)]
+    all_artists = famous_artists + other_artists
+    
+    genres = ['Rock', 'Pop', 'Jazz', 'Electronic', 'Classical', 'Indie', 'Hip-Hop']
     
     events = []
     start_date = datetime(2023, 1, 1)
     
     for i in range(n_events):
-        venue = random.choice(venues)
-        city = random.choice(cities)
+        capacity = random.randint(100, 5000)
+        attendance_ratio = random.uniform(0.6, 0.95) # Pubblico normalmente affollato
+        attendance = int(capacity * attendance_ratio)
         
-        # Genera evento normale
-        event_date = start_date + timedelta(days=random.randint(0, 730))
-        capacity = random.randint(50, 5000)
-        attendance = random.randint(int(capacity * 0.3), capacity)
+        # Prezzo del biglietto correlato al genere e alla capienza
+        ticket_price = random.uniform(15, 40) + (capacity / 500) * random.uniform(1, 5)
+        if random.choice(genres) in ['Rock', 'Pop']:
+            ticket_price *= 1.2
         
-        # Numero di brani eseguiti (normale: 10-30)
-        n_songs = random.randint(10, 30)
-        
-        # Revenue (normale: proporzionale all'attendance)
-        base_revenue = attendance * random.uniform(15, 50)
-        
-        # Genere musicale prevalente
-        genre = random.choice(genres)
+        base_revenue = attendance * ticket_price
         
         event = {
             'event_id': f"EVENT_{i+1:06d}",
-            'venue': venue,
-            'city': city,
-            'event_date': event_date,
+            'venue': random.choice(venues),
+            'city': random.choice(cities),
+            'event_date': start_date + timedelta(days=random.randint(0, 730)),
             'capacity': capacity,
             'attendance': attendance,
-            'n_songs_declared': n_songs,
-            'total_revenue': base_revenue,
-            'genre': genre,
-            'main_artist': random.choice(artists),
-            'event_duration_hours': random.uniform(2, 8),
-            'ticket_price_avg': base_revenue / attendance if attendance > 0 else 0,
-            'anomaly_type': None,
+            'n_songs_declared': random.randint(15, 25),
+            'total_revenue': base_revenue * random.uniform(0.9, 1.1), # Leggera variabilità
+            'genre': random.choice(genres),
+            'main_artist': random.choice(all_artists),
+            'event_duration_hours': random.uniform(2.5, 4.5),
+            'ticket_price_avg': ticket_price,
+            'anomaly_type': 'none',
             'is_anomaly': False
         }
-        
         events.append(event)
-    
+        
     df = pd.DataFrame(events)
+    print("✅ Dati di base generati. Ora inseriamo le anomalie sottili...")
+
+    # --- 2. Iniezione di Anomalie Sottili ---
+    # Usiamo indici non ancora usati per ogni tipo di anomalia
+    available_indices = df.index.tolist()
     
-    # Genera anomalie - STESSO METODO DELLE SOLUZIONI
-    print("🚨 Generando anomalie Track 1...")
+    # ANOMALIA 1: Combinazione Improbabile (Contestuale) - 1% degli eventi
+    n_anomaly1 = int(n_events * 0.01)
+    anomaly1_indices = np.random.choice(available_indices, size=n_anomaly1, replace=False)
+    df.loc[anomaly1_indices, 'main_artist'] = np.random.choice(famous_artists, size=n_anomaly1)
+    df.loc[anomaly1_indices, 'city'] = np.random.choice(["Milano", "Roma"], size=n_anomaly1)
+    df.loc[anomaly1_indices, 'capacity'] = np.random.randint(4000, 8000, size=n_anomaly1)
+    # Ora la parte anomala: ricavi e prezzi ridicoli per un evento del genere
+    df.loc[anomaly1_indices, 'total_revenue'] = np.random.uniform(100, 500, size=n_anomaly1)
+    df.loc[anomaly1_indices, 'ticket_price_avg'] = df.loc[anomaly1_indices, 'total_revenue'] / df.loc[anomaly1_indices, 'attendance']
+    df.loc[anomaly1_indices, 'anomaly_type'] = 'unlikely_combination'
+    df.loc[anomaly1_indices, 'is_anomaly'] = True
+    available_indices = list(set(available_indices) - set(anomaly1_indices))
+
+    # ANOMALIA 2: Comportamento Anomalo del Venue (Collettiva) - 3 venue anomali
+    anomalous_venues = np.random.choice(venues, size=3, replace=False)
+    anomaly2_indices = df[df['venue'].isin(anomalous_venues)].index
+    # Filtra indici già usati
+    anomaly2_indices = [idx for idx in anomaly2_indices if idx in available_indices]
+    df.loc[anomaly2_indices, 'n_songs_declared'] = np.random.randint(5, 10, size=len(anomaly2_indices))
+    df.loc[anomaly2_indices, 'event_duration_hours'] = np.random.uniform(7.0, 9.0, size=len(anomaly2_indices))
+    df.loc[anomaly2_indices, 'anomaly_type'] = 'anomalous_venue_behavior'
+    df.loc[anomaly2_indices, 'is_anomaly'] = True
+    available_indices = list(set(available_indices) - set(anomaly2_indices))
+
+    # ANOMALIA 3: Cluster Nascosto (Multivariata) - 0.8% degli eventi
+    n_anomaly3 = int(n_events * 0.008)
+    anomaly3_indices = np.random.choice(available_indices, size=n_anomaly3, replace=False)
+    # Questo cluster ha: durata breve, canzoni poche, affluenza molto bassa
+    df.loc[anomaly3_indices, 'event_duration_hours'] = np.random.uniform(1.0, 1.5, size=n_anomaly3)
+    df.loc[anomaly3_indices, 'n_songs_declared'] = np.random.randint(3, 7, size=n_anomaly3)
+    df.loc[anomaly3_indices, 'attendance'] = df.loc[anomaly3_indices, 'capacity'] * np.random.uniform(0.05, 0.15)
+    df.loc[anomaly3_indices, 'anomaly_type'] = 'hidden_cluster'
+    df.loc[anomaly3_indices, 'is_anomaly'] = True
+    available_indices = list(set(available_indices) - set(anomaly3_indices))
+
+    # ANOMALIA 4: Frode Sottile sui Ricavi (Statistica) - 1.2% degli eventi
+    n_anomaly4 = int(n_events * 0.012)
+    anomaly4_indices = np.random.choice(available_indices, size=n_anomaly4, replace=False)
+    # Il ricavo è solo leggermente e costantemente più basso del normale
+    normal_revenue = df.loc[anomaly4_indices, 'attendance'] * df.loc[anomaly4_indices, 'ticket_price_avg']
+    df.loc[anomaly4_indices, 'total_revenue'] = normal_revenue * np.random.uniform(0.4, 0.6) # Sospettosamente basso ma non zero
+    df.loc[anomaly4_indices, 'anomaly_type'] = 'subtle_revenue_fraud'
+    df.loc[anomaly4_indices, 'is_anomaly'] = True
+    available_indices = list(set(available_indices) - set(anomaly4_indices))
+
+    # ANOMALIA 5: Date di tour impossibili (Logica contestuale)
+    n_anomaly5 = int(n_events * 0.005)
+    anomaly5_artists = np.random.choice(other_artists, size=15, replace=False)
+    for artist in anomaly5_artists:
+        artist_events = df[df['main_artist'] == artist].index
+        if len(artist_events) > 2:
+            # Prendi due eventi a caso di questo artista
+            event_indices = np.random.choice(artist_events, size=2, replace=False)
+            if event_indices[0] in available_indices and event_indices[1] in available_indices:
+                # Imposta la stessa data ma città molto distanti
+                base_date = datetime(2024, 5, 20) + timedelta(days=random.randint(0,100))
+                df.loc[event_indices[0], 'event_date'] = base_date
+                df.loc[event_indices[0], 'city'] = 'Milano'
+                df.loc[event_indices[0], 'is_anomaly'] = True
+                df.loc[event_indices[0], 'anomaly_type'] = 'impossible_tour_date'
+                
+                df.loc[event_indices[1], 'event_date'] = base_date
+                df.loc[event_indices[1], 'city'] = 'Palermo'
+                df.loc[event_indices[1], 'is_anomaly'] = True
+                df.loc[event_indices[1], 'anomaly_type'] = 'impossible_tour_date'
+
+                available_indices = list(set(available_indices) - set(event_indices))
+
+    # Shuffle finale per mescolare le anomalie nel dataset
+    df = df.sample(frac=1, random_state=RANDOM_SEED).reset_index(drop=True)
     
-    # Tipo 1: Duplicate declaration (stesso venue+data)
-    duplicate_mask = np.random.random(len(df)) < 0.02
-    df.loc[duplicate_mask, 'anomaly_type'] = 'duplicate_declaration'
-    df.loc[duplicate_mask, 'is_anomaly'] = True
-    
-    # Tipo 2: Impossible attendance (>capacity)
-    impossible_mask = np.random.random(len(df)) < 0.03
-    df.loc[impossible_mask, 'anomaly_type'] = 'impossible_attendance'
-    df.loc[impossible_mask, 'is_anomaly'] = True
-    df.loc[impossible_mask, 'attendance'] = df.loc[impossible_mask, 'capacity'] * np.random.uniform(1.2, 2.0, sum(impossible_mask))
-    
-    # Tipo 3: Revenue mismatch
-    revenue_mask = np.random.random(len(df)) < 0.025
-    df.loc[revenue_mask, 'anomaly_type'] = 'revenue_mismatch'
-    df.loc[revenue_mask, 'is_anomaly'] = True
-    df.loc[revenue_mask, 'total_revenue'] *= np.random.uniform(0.1, 0.3, sum(revenue_mask))
-    
-    # Tipo 4: Excessive songs (>40)
-    songs_mask = np.random.random(len(df)) < 0.02
-    df.loc[songs_mask, 'anomaly_type'] = 'excessive_songs'
-    df.loc[songs_mask, 'is_anomaly'] = True
-    df.loc[songs_mask, 'n_songs_declared'] = np.random.randint(50, 100, sum(songs_mask))
-    
-    # Tipo 5: Suspicious timing (2-6 AM)
-    timing_mask = np.random.random(len(df)) < 0.015
-    df.loc[timing_mask, 'anomaly_type'] = 'suspicious_timing'
-    df.loc[timing_mask, 'is_anomaly'] = True
-    
-    print(f"✅ Track 1 generato: {len(df)} eventi, {df['is_anomaly'].sum()} anomalie ({df['is_anomaly'].mean():.2%})")
+    print(f"✅ Track 1 v2 generato: {len(df)} eventi, {df['is_anomaly'].sum()} anomalie ({df['is_anomaly'].mean():.2%})")
+    print("🔍 Tipi di anomalie inserite:", df[df['is_anomaly']]['anomaly_type'].value_counts().to_dict())
     return df
 
 def generate_track2_dataset(n_documents=5000):
-    """Genera dataset Track 2: Document Fraud Detection"""
-    print(f"📄 Generando Track 2: {n_documents} documenti...")
+    """Genera dataset Track 2 con frodi documentali SOFISTICATE."""
+    set_seed(RANDOM_SEED)
+    print(f"📄 Generando Track 2 (v2) con frodi avanzate: {n_documents} documenti...")
     
-    # Reset seed per consistenza
-    np.random.seed(RANDOM_SEED)
-    random.seed(RANDOM_SEED)
-    
+    # --- 1. Generazione Dati di Base (Normali) ---
     document_types = [
         'Contratto_Editore', 'Licenza_Esecuzione', 'Dichiarazione_Musica_Live',
-        'Cessione_Diritti', 'Registrazione_Opera', 'Richiesta_Risarcimento'
+        'Cessione_Diritti', 'Registrazione_Opera'
     ]
     
     documents = []
-    
     for i in range(n_documents):
-        doc_type = random.choice(document_types)
+        is_old_doc = random.random() < 0.3
+        creation_date = datetime(2023, 1, 1) - timedelta(days=random.randint(0, 365*10 if is_old_doc else 365))
         
         doc_data = {
             'document_id': f"SIAE_{i+1:06d}",
-            'document_type': doc_type,
-            'creation_date': datetime(2023, 1, 1) + timedelta(days=random.randint(0, 365)),
+            'document_type': random.choice(document_types),
+            'creation_date': creation_date,
             'page_count': random.randint(1, 20),
             'file_size_kb': np.random.exponential(500) + 50,
-            'resolution_dpi': np.random.choice([150, 200, 300, 600], p=[0.2, 0.3, 0.4, 0.1]),
-            'text_blocks_count': np.random.poisson(8) + 2,
-            'signature_regions': random.randint(1, 4),
-            'logo_elements': random.randint(0, 3),
-            'text_confidence_avg': random.uniform(0.7, 0.99),
-            'text_confidence_std': random.uniform(0.02, 0.15),
-            'word_count': np.random.poisson(200) + 50,
-            'siae_watermark_detected': np.random.choice([0, 1], p=[0.15, 0.85]),
-            'official_seal_detected': np.random.choice([0, 1], p=[0.25, 0.75]),
-            'pixel_noise_level': random.uniform(0.001, 0.05),
-            'edge_sharpness': random.uniform(0.6, 1.0),
-            'metadata_consistency': random.uniform(0.8, 1.0),
-            'fraud_type': None,
+            'resolution_dpi': random.choice([200, 300]) if is_old_doc else random.choice([300, 600]),
+            'text_confidence_avg': random.uniform(0.85, 0.98) if not is_old_doc else random.uniform(0.7, 0.9),
+            'pixel_noise_level': random.uniform(0.01, 0.08) if is_old_doc else random.uniform(0.001, 0.02),
+            'edge_sharpness': random.uniform(0.6, 0.8) if is_old_doc else random.uniform(0.8, 1.0),
+            'metadata_consistency': random.uniform(0.95, 1.0),
+            'submitter_id': f"User_{random.randint(1, 500)}",
+            'fraud_type': 'none',
             'is_fraudulent': False
         }
-        
         documents.append(doc_data)
-    
+        
     df = pd.DataFrame(documents)
+    print("✅ Dati di base generati. Ora inseriamo le frodi...")
+
+    # --- 2. Iniezione di Frodi Sottili ---
+    available_indices = df.index.tolist()
+
+    # ANOMALIA 1: Documento "Troppo Perfetto" (Contestuale) - 2% dei documenti
+    n_anomaly1 = int(n_documents * 0.02)
+    anomaly1_indices = np.random.choice(available_indices, size=n_anomaly1, replace=False)
+    # Facciamo finta che siano documenti vecchi, ma con qualità da "nati digitali"
+    df.loc[anomaly1_indices, 'creation_date'] = df.loc[anomaly1_indices, 'creation_date'].apply(lambda d: d - timedelta(days=365*15))
+    df.loc[anomaly1_indices, 'resolution_dpi'] = 600
+    df.loc[anomaly1_indices, 'pixel_noise_level'] = np.random.uniform(0.0001, 0.001, size=n_anomaly1)
+    df.loc[anomaly1_indices, 'text_confidence_avg'] = np.random.uniform(0.99, 0.999, size=n_anomaly1)
+    df.loc[anomaly1_indices, 'fraud_type'] = 'too_perfect_for_age'
+    df.loc[anomaly1_indices, 'is_fraudulent'] = True
+    available_indices = list(set(available_indices) - set(anomaly1_indices))
+
+    # ANOMALIA 2: Frode di Template Sofisticata (Collettiva) - 5 template fraudolenti
+    anomalous_submitters = np.random.choice(df['submitter_id'].unique(), size=5, replace=False)
+    anomaly2_indices = df[df['submitter_id'].isin(anomalous_submitters)].index
+    anomaly2_indices = [idx for idx in anomaly2_indices if idx in available_indices]
+    # Tutti i documenti da questi utenti hanno caratteristiche sospettosamente simili
+    df.loc[anomaly2_indices, 'resolution_dpi'] = 200
+    df.loc[anomaly2_indices, 'file_size_kb'] = np.random.normal(loc=250, scale=5, size=len(anomaly2_indices)) # Dimensione quasi identica
+    df.loc[anomaly2_indices, 'edge_sharpness'] = np.random.normal(loc=0.7, scale=0.02, size=len(anomaly2_indices))
+    df.loc[anomaly2_indices, 'fraud_type'] = 'sophisticated_template_fraud'
+    df.loc[anomaly2_indices, 'is_fraudulent'] = True
+    available_indices = list(set(available_indices) - set(anomaly2_indices))
     
-    # Genera frodi - STESSO METODO DELLE SOLUZIONI
-    print("🚨 Generando frodi Track 2...")
+    # ANOMALIA 3: Incoerenza Interna (Multivariata) - 2.5% dei documenti
+    n_anomaly3 = int(n_documents * 0.025)
+    anomaly3_indices = np.random.choice(available_indices, size=n_anomaly3, replace=False)
+    # Alta nitidezza ma basso riconoscimento testo -> sospetto
+    df.loc[anomaly3_indices, 'edge_sharpness'] = np.random.uniform(0.9, 1.0, size=n_anomaly3)
+    df.loc[anomaly3_indices, 'text_confidence_avg'] = np.random.uniform(0.5, 0.7, size=n_anomaly3)
+    df.loc[anomaly3_indices, 'fraud_type'] = 'internal_feature_inconsistency'
+    df.loc[anomaly3_indices, 'is_fraudulent'] = True
+    available_indices = list(set(available_indices) - set(anomaly3_indices))
+
+    # ANOMALIA 4: Manipolazione Sottile Metadati - 1.5%
+    n_anomaly4 = int(n_documents * 0.015)
+    anomaly4_indices = np.random.choice(available_indices, size=n_anomaly4, replace=False)
+    # La consistenza dei metadati è *quasi* perfetta, ma non del tutto. Un valore di 0.7 è facile da filtrare, ma 0.92?
+    df.loc[anomaly4_indices, 'metadata_consistency'] = np.random.uniform(0.90, 0.94, size=n_anomaly4)
+    df.loc[anomaly4_indices, 'fraud_type'] = 'subtle_metadata_manipulation'
+    df.loc[anomaly4_indices, 'is_fraudulent'] = True
     
-    # Tipo 1: Alterazioni digitali
-    digital_mask = np.random.random(len(df)) < 0.08
-    df.loc[digital_mask, 'fraud_type'] = 'digital_alteration'
-    df.loc[digital_mask, 'is_fraudulent'] = True
-    df.loc[digital_mask, 'pixel_noise_level'] *= np.random.uniform(2.0, 5.0, sum(digital_mask))
+    # Shuffle finale
+    df = df.sample(frac=1, random_state=RANDOM_SEED).reset_index(drop=True)
     
-    # Tipo 2: Firme contraffatte
-    signature_mask = np.random.random(len(df)) < 0.05
-    df.loc[signature_mask, 'fraud_type'] = 'signature_forgery'
-    df.loc[signature_mask, 'is_fraudulent'] = True
-    df.loc[signature_mask, 'signature_regions'] = 0
-    
-    # Tipo 3: Template fraud
-    template_mask = np.random.random(len(df)) < 0.04
-    df.loc[template_mask, 'fraud_type'] = 'template_fraud'
-    df.loc[template_mask, 'is_fraudulent'] = True
-    df.loc[template_mask, 'siae_watermark_detected'] = 0
-    df.loc[template_mask, 'official_seal_detected'] = 0
-    
-    # Tipo 4: Manipolazione metadati
-    metadata_mask = np.random.random(len(df)) < 0.03
-    df.loc[metadata_mask, 'fraud_type'] = 'metadata_manipulation'
-    df.loc[metadata_mask, 'is_fraudulent'] = True
-    df.loc[metadata_mask, 'metadata_consistency'] *= np.random.uniform(0.3, 0.6, sum(metadata_mask))
-    
-    # Tipo 5: Inconsistenza qualità
-    quality_mask = np.random.random(len(df)) < 0.02
-    df.loc[quality_mask, 'fraud_type'] = 'quality_inconsistency'
-    df.loc[quality_mask, 'is_fraudulent'] = True
-    df.loc[quality_mask, 'edge_sharpness'] *= np.random.uniform(0.3, 0.6, sum(quality_mask))
-    
-    print(f"✅ Track 2 generato: {len(df)} documenti, {df['is_fraudulent'].sum()} frodi ({df['is_fraudulent'].mean():.2%})")
+    print(f"✅ Track 2 v2 generato: {len(df)} documenti, {df['is_fraudulent'].sum()} frodi ({df['is_fraudulent'].mean():.2%})")
+    print("🔍 Tipi di frodi inserite:", df[df['is_fraudulent']]['fraud_type'].value_counts().to_dict())
     return df
 
 def generate_track3_dataset(n_tracks=25000):
-    """Genera dataset Track 3: Music Anomaly Detection"""
-    print(f"🎵 Generando Track 3: {n_tracks} tracce musicali...")
+    """Genera dataset Track 3 con anomalie musicali SOFISTICATE."""
+    set_seed(RANDOM_SEED)
+    print(f"🎵 Generando Track 3 (v2) con anomalie avanzate: {n_tracks} tracce...")
     
-    # Reset seed per consistenza
-    np.random.seed(RANDOM_SEED)
-    random.seed(RANDOM_SEED)
-    
-    genres = ['Electronic', 'Rock', 'Hip-Hop', 'Folk', 'Pop', 'Experimental', 
-              'Jazz', 'Classical', 'Country', 'Blues', 'International', 'Ambient',
-              'Metal', 'Punk', 'Reggae', 'Indie', 'Alternative', 'Techno']
-    
-    subgenres = {
-        'Electronic': ['House', 'Trance', 'Dubstep', 'Ambient', 'Drum & Bass'],
-        'Rock': ['Alternative Rock', 'Hard Rock', 'Progressive Rock', 'Indie Rock'],
-        'Hip-Hop': ['Rap', 'Trap', 'Old School', 'Conscious Hip-Hop'],
-        'Jazz': ['Smooth Jazz', 'Bebop', 'Jazz Fusion', 'Free Jazz'],
-        'Classical': ['Baroque', 'Romantic', 'Modern Classical', 'Chamber Music']
-    }
+    # --- 1. Generazione Dati di Base (Normali) ---
+    # ... (stessa generazione di base della funzione originale per brevità) ...
+    # Assumiamo di avere df, artists, genres ecc.
+    genres = ['Electronic', 'Rock', 'Hip-Hop', 'Folk', 'Pop', 'Experimental', 'Jazz', 'Classical']
+    artists = [{'name': f"Artist_{i:04d}", 'active_since': random.randint(2000, 2020)} for i in range(1, 2001)]
+    inactive_artists = [{'name': f"Inactive_Artist_{i:04d}", 'active_since': random.randint(1980, 1999)} for i in range(1, 51)]
+    all_artists = artists + inactive_artists
     
     tracks = []
-    artists = [f"Artist_{i:04d}" for i in range(1, 2001)]
-    
     for i in range(n_tracks):
-        genre = random.choice(genres)
-        subgenre = random.choice(subgenres.get(genre, [genre]))
-        artist = random.choice(artists)
+        artist_info = random.choice(all_artists)
+        # La qualità audio è coerente
+        bit_rate = random.choice([128, 192, 320])
+        spectral_bandwidth = (bit_rate / 320) * random.uniform(2000, 4000) + 5000
         
         track = {
             'track_id': i,
-            'artist_name': artist,
+            'artist_name': artist_info['name'],
             'track_title': f"Track_{i:05d}",
-            'album_title': f"Album_{i//10:04d}",
-            'genre_top': genre,
-            'genre_sub': subgenre,
-            'track_date_created': datetime(2010, 1, 1) + timedelta(days=random.randint(0, 5000)),
+            'genre_top': random.choice(genres),
             'track_duration': random.randint(120, 480),
             'track_listens': random.randint(100, 1000000),
-            'track_favorites': random.randint(0, 10000),
-            'track_comments': random.randint(0, 500),
-            'track_downloads': random.randint(0, 50000),
-            'tempo': random.uniform(60, 200),
-            'loudness': random.uniform(-60, 0),
-            'energy': random.uniform(0, 1),
-            'danceability': random.uniform(0, 1),
-            'valence': random.uniform(0, 1),
-            'acousticness': random.uniform(0, 1),
-            'instrumentalness': random.uniform(0, 1),
-            'speechiness': random.uniform(0, 1),
-            'liveness': random.uniform(0, 1),
-            'artist_active_year_begin': random.randint(1950, 2020),
-            'artist_latitude': random.uniform(-90, 90),
-            'artist_longitude': random.uniform(-180, 180),
-            'artist_location': random.choice(['US', 'UK', 'DE', 'FR', 'IT', 'ES', 'CA', 'AU']),
-            'bit_rate': random.choice([128, 192, 256, 320]),
-            'sample_rate': random.choice([22050, 44100, 48000]),
-            'file_size': random.randint(3000, 15000),
-            'anomaly_type': None,
+            'track_favorites': int(random.randint(100, 1000000) * 0.05), # Correlato agli ascolti
+            'track_comments': int(random.randint(100, 1000000) * 0.001),
+            'artist_active_year_begin': artist_info['active_since'],
+            'bit_rate': bit_rate,
+            'spectral_bandwidth': spectral_bandwidth, # Feature tecnica audio
+            'listener_country_entropy': random.uniform(2.5, 4.0), # Alta entropia = tanti paesi
+            'anomaly_type': 'none',
             'is_anomaly': False
         }
-        
         tracks.append(track)
-    
     df = pd.DataFrame(tracks)
-    
-    # Genera anomalie - STESSO METODO DELLE SOLUZIONI
-    print("🚨 Generando anomalie Track 3...")
-    
-    # Tipo 1: Plagio (similarità sospetta)
-    plagio_mask = np.random.random(len(df)) < 0.03
-    df.loc[plagio_mask, 'anomaly_type'] = 'plagio_similarity'
-    df.loc[plagio_mask, 'is_anomaly'] = True
-    df.loc[plagio_mask, 'tempo'] = 120 + np.random.normal(0, 5, sum(plagio_mask))
-    df.loc[plagio_mask, 'energy'] = 0.7 + np.random.normal(0, 0.1, sum(plagio_mask))
-    
-    # Tipo 2: Bot streaming
-    bot_mask = np.random.random(len(df)) < 0.025
-    df.loc[bot_mask, 'anomaly_type'] = 'bot_streaming'
-    df.loc[bot_mask, 'is_anomaly'] = True
-    df.loc[bot_mask, 'track_listens'] *= np.random.uniform(10, 100, sum(bot_mask))
-    df.loc[bot_mask, 'track_favorites'] *= np.random.uniform(0.1, 0.3, sum(bot_mask))
-    
-    # Tipo 3: Manipolazione metadati
-    metadata_mask = np.random.random(len(df)) < 0.02
-    df.loc[metadata_mask, 'anomaly_type'] = 'metadata_manipulation'
-    df.loc[metadata_mask, 'is_anomaly'] = True
-    df.loc[metadata_mask, 'track_date_created'] = datetime(2030, 1, 1)
-    
-    # Tipo 4: Genre mismatch
-    genre_mask = np.random.random(len(df)) < 0.015
-    df.loc[genre_mask, 'anomaly_type'] = 'genre_mismatch'
-    df.loc[genre_mask, 'is_anomaly'] = True
-    df.loc[genre_mask, 'genre_top'] = 'Classical'
-    df.loc[genre_mask, 'energy'] = np.random.uniform(0.8, 1.0, sum(genre_mask))
-    df.loc[genre_mask, 'danceability'] = np.random.uniform(0.8, 1.0, sum(genre_mask))
-    
-    # Tipo 5: Audio quality fraud
-    quality_mask = np.random.random(len(df)) < 0.01
-    df.loc[quality_mask, 'anomaly_type'] = 'audio_quality_fraud'
-    df.loc[quality_mask, 'is_anomaly'] = True
-    df.loc[quality_mask, 'bit_rate'] = 320
-    df.loc[quality_mask, 'file_size'] = np.random.randint(500, 1000, sum(quality_mask))
-    
-    print(f"✅ Track 3 generato: {len(df)} tracce, {df['is_anomaly'].sum()} anomalie ({df['is_anomaly'].mean():.2%})")
+    print("✅ Dati di base generati. Ora inseriamo le anomalie...")
+
+    # --- 2. Iniezione di Anomalie Sottili ---
+    available_indices = df.index.tolist()
+
+    # ANOMALIA 1: Bot Streaming Sofisticato (Comportamentale) - 2%
+    n_anomaly1 = int(n_tracks * 0.02)
+    anomaly1_indices = np.random.choice(available_indices, size=n_anomaly1, replace=False)
+    # Ascolti alti, ma zero commenti e tutti da una stessa area geografica (bassa entropia)
+    df.loc[anomaly1_indices, 'track_listens'] = np.random.randint(500000, 2000000, size=n_anomaly1)
+    df.loc[anomaly1_indices, 'track_favorites'] = df.loc[anomaly1_indices, 'track_listens'] * np.random.uniform(0.04, 0.06) # Rapporto normale
+    df.loc[anomaly1_indices, 'track_comments'] = 0
+    df.loc[anomaly1_indices, 'listener_country_entropy'] = np.random.uniform(0.1, 0.5, size=n_anomaly1)
+    df.loc[anomaly1_indices, 'anomaly_type'] = 'sophisticated_bot_streaming'
+    df.loc[anomaly1_indices, 'is_anomaly'] = True
+    available_indices = list(set(available_indices) - set(anomaly1_indices))
+
+    # ANOMALIA 2: Hijacking di Artista (Contestuale) - 1%
+    n_anomaly2 = int(n_tracks * 0.01)
+    anomaly2_indices = np.random.choice(available_indices, size=n_anomaly2, replace=False)
+    # Artisti inattivi da decenni pubblicano tracce "moderne"
+    df.loc[anomaly2_indices, 'artist_name'] = np.random.choice([a['name'] for a in inactive_artists], size=n_anomaly2)
+    df.loc[anomaly2_indices, 'artist_active_year_begin'] = np.random.randint(1980, 1999, size=n_anomaly2)
+    df.loc[anomaly2_indices, 'genre_top'] = np.random.choice(['Hip-Hop', 'Electronic'], size=n_anomaly2)
+    df.loc[anomaly2_indices, 'anomaly_type'] = 'artist_hijacking'
+    df.loc[anomaly2_indices, 'is_anomaly'] = True
+    available_indices = list(set(available_indices) - set(anomaly2_indices))
+
+    # ANOMALIA 3: Frode Qualità Audio (Incoerenza Tecnica) - 1.5%
+    n_anomaly3 = int(n_tracks * 0.015)
+    anomaly3_indices = np.random.choice(available_indices, size=n_anomaly3, replace=False)
+    # Alto bitrate dichiarato, ma caratteristiche audio da bassa qualità
+    df.loc[anomaly3_indices, 'bit_rate'] = 320
+    df.loc[anomaly3_indices, 'spectral_bandwidth'] = np.random.uniform(3000, 5000, size=n_anomaly3) # Tipico di MP3 a 96-128kbps
+    df.loc[anomaly3_indices, 'anomaly_type'] = 'audio_quality_fraud'
+    df.loc[anomaly3_indices, 'is_anomaly'] = True
+    available_indices = list(set(available_indices) - set(anomaly3_indices))
+
+    # Per ANOMALIA 4 (Micro-Plagio), la simulazione richiederebbe di aggiungere feature di fingerprinting (es. MFCCs),
+    # il che complicherebbe il generatore. Le 3 anomalie sopra sono già un ottimo passo avanti per la sfida.
+
+    # Shuffle finale
+    df = df.sample(frac=1, random_state=RANDOM_SEED).reset_index(drop=True)
+
+    print(f"✅ Track 3 v2 generato: {len(df)} tracce, {df['is_anomaly'].sum()} anomalie ({df['is_anomaly'].mean():.2%})")
+    print("🔍 Tipi di anomalie inserite:", df[df['is_anomaly']]['anomaly_type'].value_counts().to_dict())
     return df
 
 def generate_track4_dataset(n_works=15000):
-    """Genera dataset Track 4: Copyright Infringement Detection"""
-    print(f"🔒 Generando Track 4: {n_works} opere creative...")
-    
-    # Reset seed per consistenza
-    np.random.seed(RANDOM_SEED)
-    random.seed(RANDOM_SEED)
-    
-    work_types = ['Music_Track', 'Audio_Recording', 'Podcast_Episode', 'Commercial_Jingle']
-    genres = ['Pop', 'Rock', 'Hip-Hop', 'Electronic', 'Jazz', 'Classical']
-    platforms = ['Spotify', 'YouTube', 'SoundCloud', 'Apple_Music', 'TikTok', 'Instagram']
-    
+    """Genera dataset Track 4 con violazioni di copyright SOFISTICATE."""
+    set_seed(RANDOM_SEED)
+    print(f"🔒 Generando Track 4 (v2) con violazioni avanzate: {n_works} opere...")
+
+    # --- 1. Creiamo un "database" di opere protette fittizie ---
+    protected_works = []
+    for i in range(50):
+        protected_works.append({
+            'protected_id': f"PROTECTED_{i}",
+            'tempo': random.uniform(80, 160),
+            'spectral_centroid_mean': random.uniform(1500, 4000),
+            'original_hash': hashlib.md5(f"protected_{i}".encode()).hexdigest()[:16]
+        })
+
+    # --- 2. Generazione Dati di Base (Normali) ---
     works = []
     for i in range(n_works):
         work = {
             'work_id': f"SIAE_CP_{i+1:06d}",
-            'work_type': random.choice(work_types),
-            'genre': random.choice(genres),
-            'platform': random.choice(platforms),
-            'release_date': datetime(2010, 1, 1) + timedelta(days=random.randint(0, 5000)),
-            'duration_seconds': random.randint(30, 600),
-            'tempo': random.uniform(60, 200),
-            'spectral_centroid': random.uniform(1000, 8000),
-            'mfcc_1': random.uniform(-50, 50),
-            'mfcc_2': random.uniform(-30, 30),
+            'release_date': datetime(2022, 1, 1) + timedelta(days=random.randint(0, 730)),
+            'days_since_release': (datetime.now() - (datetime(2022, 1, 1) + timedelta(days=random.randint(0, 730)))).days,
+            'tempo': random.uniform(70, 180),
+            'spectral_centroid_mean': random.uniform(1000, 8000),
             'play_count': random.randint(1000, 1000000),
-            'like_count': random.randint(10, 10000),
-            'share_count': random.randint(0, 5000),
-            'revenue_generated': random.uniform(0, 50000),
-            'compression_ratio': random.uniform(0.1, 0.9),
+            'audio_similarity_to_db': random.uniform(0.1, 0.4), # Bassa similarità per opere normali
+            'noise_floor_db': random.uniform(-80, -60),
             'file_hash': hashlib.md5(f"work_{i}".encode()).hexdigest()[:16],
-            'infringement_type': None,
+            'infringement_type': 'none',
             'is_infringement': False
         }
         works.append(work)
-    
     df = pd.DataFrame(works)
+    print("✅ Dati di base generati. Ora inseriamo le violazioni...")
+
+    # --- 3. Iniezione di Violazioni Sottili ---
+    available_indices = df.index.tolist()
+
+    # ANOMALIA 1: Evasione Time-Stretch/Pitch-Shift (Similarità vs Hash) - 2.5%
+    n_anomaly1 = int(n_works * 0.025)
+    anomaly1_indices = np.random.choice(available_indices, size=n_anomaly1, replace=False)
+    # Copiamo le caratteristiche di un'opera protetta, ma le alteriamo leggermente
+    for idx in anomaly1_indices:
+        source_work = random.choice(protected_works)
+        df.loc[idx, 'tempo'] = source_work['tempo'] * random.uniform(0.95, 1.05) # +/- 5% tempo
+        df.loc[idx, 'spectral_centroid_mean'] = source_work['spectral_centroid_mean'] * random.uniform(0.98, 1.02)
+        # La similarità è altissima, ma l'hash è diverso
+        df.loc[idx, 'audio_similarity_to_db'] = random.uniform(0.95, 0.99)
+        df.loc[idx, 'file_hash'] = hashlib.md5(f"stolen_work_{idx}".encode()).hexdigest()[:16] # Nuovo hash
+    df.loc[anomaly1_indices, 'infringement_type'] = 'evasion_by_modification'
+    df.loc[anomaly1_indices, 'is_infringement'] = True
+    available_indices = list(set(available_indices) - set(anomaly1_indices))
+
+    # ANOMALIA 2: Violazione "Sleeper" (Comportamentale/Temporale) - 1.5%
+    n_anomaly2 = int(n_works * 0.015)
+    anomaly2_indices = np.random.choice(available_indices, size=n_anomaly2, replace=False)
+    # Opere vecchie con un picco di ascolti recentissimo
+    df.loc[anomaly2_indices, 'days_since_release'] = np.random.randint(300, 700, size=n_anomaly2)
+    # Il 99% degli ascolti è avvenuto nell'ultimo giorno (calcoliamo un ratio)
+    df.loc[anomaly2_indices, 'play_count_last_24h'] = df.loc[anomaly2_indices, 'play_count'] * np.random.uniform(0.95, 0.99)
+    df.loc[anomaly2_indices, 'infringement_type'] = 'sleeper_infringement'
+    df.loc[anomaly2_indices, 'is_infringement'] = True
+    available_indices = list(set(available_indices) - set(anomaly2_indices))
+
+    # ANOMALIA 3: Mascheramento con Rumore (Incoerenza Tecnica) - 1%
+    n_anomaly3 = int(n_works * 0.01)
+    anomaly3_indices = np.random.choice(available_indices, size=n_anomaly3, replace=False)
+    # Alta similarità audio ma anche un rumore di fondo sospetto
+    df.loc[anomaly3_indices, 'audio_similarity_to_db'] = random.uniform(0.92, 0.98)
+    df.loc[anomaly3_indices, 'noise_floor_db'] = np.random.uniform(-55, -45) # Rumore più alto del normale
+    df.loc[anomaly3_indices, 'infringement_type'] = 'evasion_by_noise_masking'
+    df.loc[anomaly3_indices, 'is_infringement'] = True
     
-    # Genera violazioni - STESSO METODO DELLE SOLUZIONI
-    print("🚨 Generando violazioni Track 4...")
+    # Riempiamo i NaN per le colonne aggiunte
+    df.fillna({'play_count_last_24h': 0}, inplace=True)
     
-    # Tipo 1-3: Unauthorized Sampling (3 cluster per tempo)
-    # Cluster 1: Tempo Lento (70-90 BPM)
-    sampling_slow_indices = np.random.choice(df.index, size=250, replace=False)
-    df.loc[sampling_slow_indices, 'infringement_type'] = 'unauthorized_sampling'
-    df.loc[sampling_slow_indices, 'is_infringement'] = True
-    df.loc[sampling_slow_indices, 'tempo'] = 80 + np.random.normal(0, 5, 250)
-    
-    # Cluster 2: Tempo Medio (120-140 BPM)
-    remaining_indices = df[~df['is_infringement']].index
-    sampling_med_indices = np.random.choice(remaining_indices, size=200, replace=False)
-    df.loc[sampling_med_indices, 'infringement_type'] = 'unauthorized_sampling'
-    df.loc[sampling_med_indices, 'is_infringement'] = True
-    df.loc[sampling_med_indices, 'tempo'] = 130 + np.random.normal(0, 5, 200)
-    
-    # Cluster 3: Tempo Veloce (160-180 BPM)
-    remaining_indices = df[~df['is_infringement']].index
-    sampling_fast_indices = np.random.choice(remaining_indices, size=180, replace=False)
-    df.loc[sampling_fast_indices, 'infringement_type'] = 'unauthorized_sampling'
-    df.loc[sampling_fast_indices, 'is_infringement'] = True
-    df.loc[sampling_fast_indices, 'tempo'] = 170 + np.random.normal(0, 5, 180)
-    
-    # Tipo 4: Derivative Work - High Engagement
-    remaining_indices = df[~df['is_infringement']].index
-    derivative_high_indices = np.random.choice(remaining_indices, size=150, replace=False)
-    df.loc[derivative_high_indices, 'infringement_type'] = 'derivative_work'
-    df.loc[derivative_high_indices, 'is_infringement'] = True
-    df.loc[derivative_high_indices, 'like_count'] *= np.random.uniform(5, 15, 150)
-    df.loc[derivative_high_indices, 'share_count'] *= np.random.uniform(8, 20, 150)
-    
-    # Tipo 5: Metadata Manipulation
-    remaining_indices = df[~df['is_infringement']].index
-    metadata_indices = np.random.choice(remaining_indices, size=100, replace=False)
-    df.loc[metadata_indices, 'infringement_type'] = 'metadata_manipulation'
-    df.loc[metadata_indices, 'is_infringement'] = True
-    df.loc[metadata_indices, 'revenue_generated'] *= np.random.uniform(10, 30, 100)
-    
-    # Tipo 6: Cross-Platform Violation
-    remaining_indices = df[~df['is_infringement']].index
-    cross_platform_indices = np.random.choice(remaining_indices, size=80, replace=False)
-    df.loc[cross_platform_indices, 'infringement_type'] = 'cross_platform_violation'
-    df.loc[cross_platform_indices, 'is_infringement'] = True
-    df.loc[cross_platform_indices, 'revenue_generated'] *= np.random.uniform(3, 8, 80)
-    
-    # Tipo 7: Content ID Manipulation
-    remaining_indices = df[~df['is_infringement']].index
-    content_id_indices = np.random.choice(remaining_indices, size=70, replace=False)
-    df.loc[content_id_indices, 'infringement_type'] = 'content_id_manipulation'
-    df.loc[content_id_indices, 'is_infringement'] = True
-    df.loc[content_id_indices, 'compression_ratio'] *= np.random.uniform(0.3, 0.7, 70)
-    
-    total_violations = df['is_infringement'].sum()
-    print(f"✅ Track 4 generato: {len(df)} opere, {total_violations} violazioni ({total_violations/len(df)*100:.1f}%)")
+    # Shuffle finale
+    df = df.sample(frac=1, random_state=RANDOM_SEED).reset_index(drop=True)
+
+    print(f"✅ Track 4 v2 generato: {len(df)} opere, {df['is_infringement'].sum()} violazioni ({df['is_infringement'].mean():.2%})")
+    print("🔍 Tipi di violazioni inserite:", df[df['is_infringement']]['infringement_type'].value_counts().to_dict())
     return df
 
 def main():

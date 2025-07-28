@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missione: Cacciatori di Anomalie SIAE</title>
+    <title>🎵 SIAE Anomaly Detection Hackathon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,6 +87,24 @@
             color: #00f2ff;
             transform: scale(1.05);
         }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 999px;
+            margin: 0.125rem;
+        }
+        .badge-success { background-color: #10b981; color: white; }
+        .badge-info { background-color: #3b82f6; color: white; }
+        .badge-warning { background-color: #f59e0b; color: white; }
+        .badge-purple { background-color: #8b5cf6; color: white; }
+        .dataset-size {
+            font-size: 0.875rem;
+            color: #10b981;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -95,90 +113,334 @@
         <div class="container mx-auto p-4 md:p-8">
             
             <header class="text-center my-8 md:my-12">
-                <h1 class="text-4xl md:text-6xl font-bold mb-4">Missione: Cacciatori di Anomalie SIAE</h1>
-                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">Benvenuti alla nostra prossima sfida. Il nostro obiettivo: diventare i migliori detective digitali scovando le "interferenze" nascoste nei dati musicali della SIAE.</p>
+                <div class="flex justify-center mb-4">
+                    <span class="badge badge-success">Status: Active</span>
+                    <span class="badge badge-info">Python 3.8+</span>
+                    <span class="badge badge-purple">4 Tracks</span>
+                    <span class="badge badge-warning">95K Samples</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">🎵 SIAE Anomaly Detection Hackathon</h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto">
+                    <strong>Sviluppa algoritmi di Machine Learning per rilevare anomalie nei diritti d'autore musicali.</strong><br>
+                    Ogni track ha dataset di training e test. Il tuo modello deve imparare dai dati di training e predire le anomalie nel test set.
+                    <span class="text-yellow-400">🏆 Vince chi ottiene il miglior F1-Score sui dati di test nascosti!</span>
+                </p>
             </header>
 
-            <section id="battlefields" class="my-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">I nostri campi di battaglia: le 4 track</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Track 1 -->
-                    <div class="card p-6 rounded-lg text-center">
-                        <div class="icon mb-4">🕵️‍♂️</div>
-                        <h3 class="text-xl font-bold mb-2 text-white">Track 1: Live Events</h3>
-                        <p class="text-gray-400">Dichiarazioni duplicate, presenze impossibili, ricavi sospetti. Un vero caos da mettere in ordine.</p>
-                    </div>
-                    <!-- Track 2 -->
-                    <div class="card p-6 rounded-lg text-center">
-                        <div class="icon mb-4">✍️</div>
-                        <h3 class="text-xl font-bold mb-2 text-white">Track 2: Document Fraud</h3>
-                        <p class="text-gray-400">Firme contraffatte, metadati manipolati, documenti alterati. Siamo i periti forensi del digitale.</p>
-                    </div>
-                    <!-- Track 3 -->
-                    <div class="card p-6 rounded-lg text-center">
-                        <div class="icon mb-4">🎧</div>
-                        <h3 class="text-xl font-bold mb-2 text-white">Track 3: Music Anomaly</h3>
-                        <p class="text-gray-400">Streaming da bot, plagi, generi incoerenti. Dobbiamo fidarci solo del nostro codice.</p>
-                    </div>
-                    <!-- Track 4 -->
-                    <div class="card p-6 rounded-lg text-center">
-                        <div class="icon mb-4">⚖️</div>
-                        <h3 class="text-xl font-bold mb-2 text-white">Track 4: Copyright</h3>
-                        <p class="text-gray-400">Campionamenti non autorizzati, opere derivate illegali, elusione di Content ID. Facciamo rispettare la legge.</p>
-                    </div>
-                </div>
-            </section>
+            <section id="quick-start" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">🚀 Quick Start</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div class="card p-6 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-4">Setup (2 minuti)</h3>
+                                <pre><code># 1. Clona e installa
+git clone &lt;repository-url&gt;
+cd "Anomaly Detection"
+pip install pandas numpy matplotlib seaborn scikit-learn
 
-            <section id="action-plan" class="my-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">Il nostro piano d'azione</h2>
-                <div class="max-w-4xl mx-auto space-y-6">
-                    <div class="card p-6 rounded-lg">
-                        <h3 class="text-xl font-bold text-white mb-2">1. Setup del laboratorio (5 min)</h3>
-                        <p class="text-gray-300 mb-4">Cloniamo il repo, installiamo le dipendenze e, <span class="text-red-400 font-bold">OBBLIGATORIO</span>, lanciamo lo script per generare i dataset. Tutti sulla stessa barca.</p>
-                        <pre><code>python generate_datasets.py</code></pre>
-                    </div>
-                    <div class="card p-6 rounded-lg">
-                        <h3 class="text-xl font-bold text-white mb-2">2. Definire la nostra identità (1 min)</h3>
-                        <p class="text-gray-300 mb-4">Apriamo lo script <code>.py</code> della track scelta e inseriamo il nostro <code>team_name</code> e <code>members</code>. <span class="text-red-400 font-bold">Non dimentichiamolo!</span></p>
-                    </div>
-                    <div class="card p-6 rounded-lg">
-                        <h3 class="text-xl font-bold text-white mb-2">3. L'algoritmo all'opera (iterativo)</h3>
-                        <p class="text-gray-300">Lanciamo lo script base per avere una baseline. Poi inizia il divertimento: feature engineering, sperimentazione con algoritmi, validazione incrociata.</p>
-                    </div>
-                    <div class="card p-6 rounded-lg">
-                        <h3 class="text-xl font-bold text-white mb-2">4. Lancio verso la leaderboard</h3>
-                        <p class="text-gray-300 mb-4">Verifichiamo il file di submission e lanciamo i comandi per scalare la classifica.</p>
-                        <pre><code>git add submissions/submission_*.json
-git commit -m "Submission Team [NOME] - Track X"
+# 2. 🚨 OBBLIGATORIO: Genera dataset
+python generate_datasets.py</code></pre>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-4">Partecipa (1 minuto)</h3>
+                                <pre><code># 3. Scegli una track
+cd Track1_Solution  # o Track2/3/4
+
+# 4. Personalizza team (nel file .py)
+team_name = "IL_TUO_NOME"
+members = ["Nome1", "Nome2"]
+
+# 5. Esegui e submitta
+python track1_anomaly_detection.py
+git add submissions/
+git commit -m "Team [NOME] submission"
 git push origin main</code></pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section id="victory-formula" class="my-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">La formula della vittoria</h2>
-                <div class="card max-w-3xl mx-auto p-8 rounded-lg text-center">
-                    <p class="text-lg md:text-2xl font-bold text-white mb-4">
-                        Punteggio = (F1-Score × 40%) + (AUC-ROC × 25%) + (Precision × 20%) + (Innovazione × 15%)
+            <section id="datasets" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">📊 I Dataset</h2>
+                <div class="card max-w-4xl mx-auto p-6 rounded-lg">
+                    <p class="text-gray-300 mb-6 text-center">
+                        <strong>Tutti i partecipanti usano gli stessi dataset identici</strong> generati da <code>generate_datasets.py</code><br>
+                        <span class="text-red-400">🔒 Ground truth del test set è NASCOSTA</span> - usata solo per valutazione automatica
                     </p>
-                    <p class="text-gray-300">La nostra priorità è l'<code>F1-Score</code>, ma ogni componente è cruciale. L'innovazione nel feature engineering ci darà il vantaggio decisivo.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">🎪</div>
+                            <div class="dataset-size">Track 1: 50K eventi</div>
+                            <div class="text-gray-400">Live Events</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">📄</div>
+                            <div class="dataset-size">Track 2: 5K documenti</div>
+                            <div class="text-gray-400">Document Fraud</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">🎵</div>
+                            <div class="dataset-size">Track 3: 25K tracce</div>
+                            <div class="text-gray-400">Music Anomaly</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">⚖️</div>
+                            <div class="dataset-size">Track 4: 15K opere</div>
+                            <div class="text-gray-400">Copyright</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tracks" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">🎯 Le 4 Track del Hackathon</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Track 1 -->
+                    <div class="card p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <div class="icon mr-4">🎪</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Track 1: Live Events</h3>
+                                <p class="text-sm text-gray-400">40K training + 10K test</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-sm mb-3">
+                            Eventi musicali live (concerti, festival). Rileva anomalie sottili in combinazioni di dati.
+                        </p>
+                        <div class="text-xs space-y-1">
+                            <div><span class="text-red-400">•</span> unlikely_combination: Superstar con ricavi irrisori</div>
+                            <div><span class="text-red-400">•</span> anomalous_venue_behavior: Comportamenti aggregati anomali</div>
+                            <div><span class="text-red-400">•</span> hidden_cluster: Gruppi multivariate anomali</div>
+                            <div><span class="text-red-400">•</span> impossible_tour_date: Pattern temporali impossibili</div>
+                        </div>
+                    </div>
+
+                    <!-- Track 2 -->
+                    <div class="card p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <div class="icon mr-4">📄</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Track 2: Document Fraud</h3>
+                                <p class="text-sm text-gray-400">4K training + 1K test</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-sm mb-3">
+                            Metadati di documenti SIAE. Frodi nascoste in incoerenze tra caratteristiche tecniche.
+                        </p>
+                        <div class="text-xs space-y-1">
+                            <div><span class="text-red-400">•</span> too_perfect_for_age: Documenti vecchi troppo perfetti</div>
+                            <div><span class="text-red-400">•</span> template_fraud: Template fraudolenti condivisi</div>
+                            <div><span class="text-red-400">•</span> feature_inconsistency: Incoerenze tecniche interne</div>
+                            <div><span class="text-red-400">•</span> metadata_manipulation: Metadati manipolati</div>
+                        </div>
+                    </div>
+
+                    <!-- Track 3 -->
+                    <div class="card p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <div class="icon mr-4">🎧</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Track 3: Music Anomaly</h3>
+                                <p class="text-sm text-gray-400">20K training + 5K test</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-sm mb-3">
+                            Tracce musicali con feature audio. Pattern di comportamento e tecniche anomale.
+                        </p>
+                        <div class="text-xs space-y-1">
+                            <div><span class="text-red-400">•</span> bot_streaming: Bot sofisticati con pattern innaturali</div>
+                            <div><span class="text-red-400">•</span> artist_hijacking: Account artisti storici compromessi</div>
+                            <div><span class="text-red-400">•</span> audio_quality_fraud: Qualità audio manipolata</div>
+                            <div><span class="text-red-400">•</span> geographic_anomalies: Pattern geografici sospetti</div>
+                        </div>
+                    </div>
+
+                    <!-- Track 4 -->
+                    <div class="card p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <div class="icon mr-4">⚖️</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Track 4: Copyright</h3>
+                                <p class="text-sm text-gray-400">12K training + 3K test</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 text-sm mb-3">
+                            Opere creative e utilizzo. Violazioni nascoste tramite tecniche di evasione.
+                        </p>
+                        <div class="text-xs space-y-1">
+                            <div><span class="text-red-400">•</span> evasion_by_modification: Modifiche audio per eludere Content ID</div>
+                            <div><span class="text-red-400">•</span> sleeper_infringement: Opere "dormienti" poi attivate</div>
+                            <div><span class="text-red-400">•</span> noise_masking: Mascheramento con rumore</div>
+                            <div><span class="text-red-400">•</span> hash_manipulation: Manipolazione hash file</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="scoring" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">🏆 Sistema di Valutazione</h2>
+                <div class="max-w-4xl mx-auto space-y-6">
+                    <div class="card p-8 rounded-lg text-center">
+                        <h3 class="text-2xl font-bold text-white mb-4">Formula del Punteggio</h3>
+                        <p class="text-lg md:text-2xl font-bold mb-4 text-yellow-400">
+                            Score = (F1-Score × 40%) + (AUC-ROC × 25%) + (Precision × 20%) + (Innovation × 15%)
+                        </p>
+                        <p class="text-gray-300">
+                            Il <strong>F1-Score</strong> è la metrica principale, ma ogni componente conta. 
+                            L'<strong>Innovation</strong> premia feature engineering creative e complessità algoritmica.
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="card p-4 rounded-lg text-center">
+                            <div class="text-3xl mb-2">🥇</div>
+                            <h4 class="font-bold text-white">Vincitore Overall</h4>
+                            <p class="text-sm text-gray-400">Miglior score complessivo</p>
+                        </div>
+                        <div class="card p-4 rounded-lg text-center">
+                            <div class="text-3xl mb-2">🏅</div>
+                            <h4 class="font-bold text-white">Vincitore per Track</h4>
+                            <p class="text-sm text-gray-400">Migliore in ogni track</p>
+                        </div>
+                        <div class="card p-4 rounded-lg text-center">
+                            <div class="text-3xl mb-2">🌟</div>
+                            <h4 class="font-bold text-white">Most Innovative</h4>
+                            <p class="text-sm text-gray-400">Approccio più creativo</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="submission" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">📤 Come Funziona la Submission</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div class="card p-6 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-4">🤖 Processo Automatico</h3>
+                                <ol class="text-sm text-gray-300 space-y-2">
+                                    <li><span class="text-yellow-400">1.</span> Il tuo script genera file JSON con predizioni</li>
+                                    <li><span class="text-yellow-400">2.</span> Fai git push del file submission</li>
+                                    <li><span class="text-yellow-400">3.</span> Sistema carica le tue predizioni</li>
+                                    <li><span class="text-yellow-400">4.</span> Confronta con ground truth nascosta</li>
+                                    <li><span class="text-yellow-400">5.</span> Calcola metriche reali (F1, AUC, Precision)</li>
+                                    <li><span class="text-yellow-400">6.</span> Aggiorna leaderboard in tempo reale</li>
+                                </ol>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-4">📋 Formato JSON Richiesto</h3>
+                                <pre class="text-xs"><code>{
+  "team_info": {
+    "team_name": "TUO_TEAM",
+    "members": ["Nome1", "Nome2"],
+    "track": "Track1"
+  },
+  "results": {
+    "predictions": [0,1,0,1,0...],
+    "scores": [-0.1,0.8,-0.2...]
+  },
+  "metrics": {
+    "f1_score": 0.85,
+    "precision": 0.82,
+    "recall": 0.88
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tips" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">💡 Strategie Vincenti</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-lg font-bold text-white mb-3">🔍 Analisi Esplorativa</h3>
+                        <p class="text-sm text-gray-300">Usa <code>pairplot</code> e <code>boxplot</code> per visualizzare differenze tra dati normali e anomali nel training set.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-lg font-bold text-white mb-3">⚙️ Feature Engineering</h3>
+                        <p class="text-sm text-gray-300">Le anomalie sono contestuali. Crea feature che catturino rapporti, aggregazioni per gruppo, deviazioni dalla norma.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-lg font-bold text-white mb-3">🤖 Algoritmi Multipli</h3>
+                        <p class="text-sm text-gray-300">Prova <code>IsolationForest</code>, <code>OneClassSVM</code>, <code>RandomForest</code>, <code>XGBoost</code> e confronta le performance.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-lg font-bold text-white mb-3">✅ Validazione Robusta</h3>
+                        <p class="text-sm text-gray-300">Usa <code>StratifiedKFold</code> sul training set per stimare le performance reali prima della submission.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-lg font-bold text-white mb-3">🎯 Bilanciamento Classi</h3>
+                        <p class="text-sm text-gray-300">Le anomalie sono rare (~5-10%). Usa tecniche come SMOTE o calibra <code>contamination</code> appropriatamente.</p>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-lg font-bold text-white mb-3">🔄 Iterazione Rapida</h3>
+                        <p class="text-sm text-gray-300">Inizia semplice, testa rapidamente, poi aumenta la complessità. Ogni submission ti dà feedback immediato!</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="warnings" class="my-12">
+                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">⚠️ Errori Fatali da Evitare</h2>
+                 <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="card p-4 rounded-lg border-red-500">
+                        <span class="text-red-500 mr-2 text-xl">❌</span>
+                        <strong class="text-white">CHEATING:</strong> 
+                        <span class="text-gray-300">Non usare <code>pd.concat([df_train, df_test])</code>. È barare e sarai squalificato.</span>
+                    </div>
+                    <div class="card p-4 rounded-lg border-yellow-500">
+                        <span class="text-yellow-500 mr-2 text-xl">⚠️</span>
+                        <strong class="text-white">SUBMISSION INCOMPLETA:</strong> 
+                        <span class="text-gray-300">Assicurati che <code>len(predictions) == len(df_test)</code> e <code>set(predictions) <= {0, 1}</code>.</span>
+                    </div>
+                    <div class="card p-4 rounded-lg border-blue-500">
+                        <span class="text-blue-500 mr-2 text-xl">🔧</span>
+                        <strong class="text-white">JSON MALFORMATO:</strong> 
+                        <span class="text-gray-300">Testa sempre con <code>python -m json.tool submission.json</code> prima del push.</span>
+                    </div>
+                    <div class="card p-4 rounded-lg border-purple-500">
+                        <span class="text-purple-500 mr-2 text-xl">👥</span>
+                        <strong class="text-white">TEAM INFO MANCANTE:</strong> 
+                        <span class="text-gray-300">Cambia <code>team_name</code> e <code>members</code> nel codice, altrimenti non appari in leaderboard!</span>
+                    </div>
                 </div>
             </section>
             
-            <section id="rules" class="my-12">
-                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">⚠️ Regole d'ingaggio fondamentali</h2>
-                 <div class="max-w-3xl mx-auto space-y-4 text-lg">
-                    <p class="card p-4 rounded-lg"><span class="text-red-500 mr-2">❌</span> <strong>NON</strong> usare i dati di test per l'addestramento. È barare.</p>
-                    <p class="card p-4 rounded-lg"><span class="text-yellow-500 mr-2">❗</span> <strong>ASSICURARSI</strong> che le predizioni coprano tutto il test set.</p>
-                    <p class="card p-4 rounded-lg"><span class="text-green-500 mr-2">✅</span> <strong>TESTARE</strong> sempre il file JSON prima di ogni submission.</p>
+            <section id="leaderboard-info" class="my-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">📊 Leaderboard Live</h2>
+                <div class="card max-w-3xl mx-auto p-6 rounded-lg text-center">
+                    <p class="text-lg text-gray-300 mb-4">
+                        La leaderboard si aggiorna automaticamente ad ogni submission. 
+                        Controlla la tua posizione e quella dei competitor in tempo reale!
+                    </p>
+                    <pre class="text-left"><code># Visualizza la leaderboard aggiornata
+cat leaderboard.md</code></pre>
+                    <p class="text-sm text-gray-400 mt-4">
+                        🏆 Vince chi ha il punteggio più alto quando chiude l'hackathon!
+                    </p>
                  </div>
             </section>
 
             <footer class="text-center mt-16 pb-8">
-                <p class="text-2xl font-bold text-white mb-4">È tutto, team. La sfida è lanciata.</p>
-                <a href="https://github.com/Rkomi98/SIAE/tree/main/Anomaly%20Detection" target="_blank" rel="noopener noreferrer">
-                    <button class="btn">Andiamo a Prenderci quella Leaderboard!</button>
+                <p class="text-2xl font-bold text-white mb-4">🎯 La Sfida è Iniziata!</p>
+                <p class="text-gray-300 mb-6">
+                    Sviluppa il miglior algoritmo di anomaly detection per i diritti d'autore musicali.<br>
+                    <strong>95.000 campioni</strong> ti aspettano. <strong>4 track</strong> da conquistare. <strong>1 leaderboard</strong> da scalare.
+                </p>
+                <div class="space-x-4">
+                    <a href="README.md" target="_blank" rel="noopener noreferrer">
+                        <button class="btn">📚 Documentazione Completa</button>
+                    </a>
+                    <a href="leaderboard.md" target="_blank" rel="noopener noreferrer">
+                        <button class="btn">🏆 Leaderboard Live</button>
                 </a>
+                </div>
+                <p class="text-sm text-gray-500 mt-8">
+                    🎵 SIAE Anomaly Detection Hackathon • Luglio 2025 • Powered by ML & ❤️
+                </p>
             </footer>
 
         </div>
@@ -192,8 +454,8 @@ git push origin main</code></pre>
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Characters to draw
-        const chars = "01♫§©%#?*+=-<>{}[]()";
+        // Characters to draw - musical and tech themed
+        const chars = "01♫♪♬♩§©%#?*+=-<>{}[]()🎵🎶🎼🎤🎧⚡🔒🔍";
         const fontSize = 16;
         const columns = canvas.width / fontSize;
 
@@ -231,6 +493,18 @@ git push origin main</code></pre>
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             // Recalculate columns and reset drops if needed
+        });
+
+        // Add some interactivity - click to create a burst
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / fontSize);
+            const y = Math.floor((e.clientY - rect.top) / fontSize);
+            
+            // Create a small burst effect
+            for (let i = Math.max(0, x-2); i < Math.min(columns, x+3); i++) {
+                drops[i] = Math.max(0, y - Math.random() * 10);
+            }
         });
     </script>
 </body>

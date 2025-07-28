@@ -61,115 +61,113 @@ datasets/
 
 ### 🎪 **Track 1: Live Events Anomaly Detection**
 
-**Dati**: Eventi musicali live (concerti, festival, locali)
+**Dati**: Eventi musicali live (concerti, festival, locali). Le anomalie sono combinazioni sospette di dati.
 
 **File Training**: `datasets/track1_live_events_train.csv`
 **File Test**: `datasets/track1_live_events_test.csv`
 
 **Colonne principali**:
 ```python
-event_id          # ID univoco evento
-venue             # Nome del locale/venue  
-city              # Città dell'evento
-event_date        # Data dell'evento
-attendance        # Numero partecipanti
-capacity          # Capacità massima venue
-n_songs           # Numero brani eseguiti
-total_revenue     # Ricavi totali evento
-is_anomaly        # 🎯 TARGET: 0=normale, 1=anomalo (solo in train)
-anomaly_type      # Tipo di anomalia (solo in train)
+event_id              # ID univoco evento
+venue                 # Nome del locale/venue  
+city                  # Città dell'evento
+event_date            # Data dell'evento
+attendance            # Numero partecipanti
+capacity              # Capacità massima venue
+n_songs_declared      # Numero brani dichiarati
+total_revenue         # Ricavi totali evento
+event_duration_hours  # Durata in ore
+main_artist           # Artista principale
+is_anomaly            # 🎯 TARGET: 0=normale, 1=anomalo (solo in train)
+anomaly_type          # Tipo di anomalia (solo in train)
 ```
 
-**🚨 Anomalie da rilevare**:
-- **duplicate_declaration**: Eventi dichiarati più volte
-- **impossible_attendance**: Partecipanti > capacità venue  
-- **revenue_mismatch**: Ricavi impossibili per quel pubblico
-- **excessive_songs**: Troppi brani eseguiti (>40)
-- **suspicious_timing**: Eventi in orari strani (2-6 AM)
+**🚨 Anomalie Sottili da rilevare**:
+- **unlikely_combination**: Combinazioni di feature improbabili (es. superstar in un grande evento con ricavi irrisori).
+- **anomalous_venue_behavior**: Comportamento anomalo aggregato per un `venue` (es. eventi sempre lunghissimi con pochissime canzoni).
+- **hidden_cluster**: Piccoli gruppi di eventi con caratteristiche multivariate anomale (es. bassa affluenza, durata e ricavi).
+- **subtle_revenue_fraud**: Ricavi leggermente ma costantemente inferiori alla norma attesa per quel tipo di evento.
+- **impossible_tour_date**: Pattern temporali e geografici impossibili per il tour di un artista (es. stesso artista, stesso giorno, città distanti).
 
 ### 📄 **Track 2: Document Fraud Detection**
 
-**Dati**: Documenti SIAE (contratti, licenze, certificati)
+**Dati**: Metadati estratti da documenti SIAE. La frode risiede nell'incoerenza tra le caratteristiche.
 
 **File Training**: `datasets/track2_documents_train.csv`
 **File Test**: `datasets/track2_documents_test.csv`
 
 **Colonne principali**:
 ```python
-doc_id               # ID univoco documento
-num_pages            # Numero pagine
-num_images           # Numero immagini
-signature_similarity # Similarità firma (0-1)
-metadata_validity    # Validità metadati (0-1)
-quality_score        # Qualità documento (0-1)
-is_fraudulent        # 🎯 TARGET: 0=autentico, 1=fraudolento (solo in train)
-fraud_type           # Tipo di frode (solo in train)
+document_id           # ID univoco documento
+creation_date         # Data di creazione
+file_size_kb          # Dimensione del file in KB
+resolution_dpi        # Risoluzione della scansione
+text_confidence_avg   # Livello medio di confidenza OCR
+pixel_noise_level     # Livello di rumore nell'immagine
+edge_sharpness        # Nitidezza dei bordi del testo/immagini
+metadata_consistency  # Coerenza dei metadati interni
+submitter_id          # ID dell'utente che ha caricato il documento
+is_fraudulent         # 🎯 TARGET: 0=autentico, 1=fraudolento (solo in train)
+fraud_type            # Tipo di frode (solo in train)
 ```
 
-**🚨 Frodi da rilevare**:
-- **digital_alteration**: Documenti alterati digitalmente
-- **signature_forgery**: Firme contraffatte
-- **template_fraud**: Template fraudolenti  
-- **metadata_manipulation**: Metadati manipolati
-- **quality_inconsistency**: Qualità inconsistente
+**🚨 Frodi Sottili da rilevare**:
+- **too_perfect_for_age**: Documenti dichiarati come molto vecchi ma con qualità digitale perfetta (zero rumore, alta risoluzione).
+- **sophisticated_template_fraud**: Gruppi di documenti, da mittenti diversi, con caratteristiche di file quasi identiche (indizio di un template fraudolento condiviso).
+- **internal_feature_inconsistency**: Incoerenza tra feature tecniche (es. alta nitidezza ma bassa confidenza del testo).
+- **subtle_metadata_manipulation**: Discrepanze minime ma sospette nei metadati che richiedono un'analisi attenta.
 
 ### 🎵 **Track 3: Music Anomaly Detection**
 
-**Dati**: Tracce musicali con metadati e features audio
+**Dati**: Tracce musicali con metadati e feature audio. Le anomalie sono pattern di comportamento o tecniche.
 
 **File Training**: `datasets/track3_music_train.csv`
 **File Test**: `datasets/track3_music_test.csv`
 
 **Colonne principali**:
 ```python
-track_id         # ID univoco traccia
-artist_name      # Nome artista
-genre_top        # Genere principale
-track_duration   # Durata in secondi
-track_listens    # Numero ascolti
-track_favorites  # Numero preferiti
-energy           # Energia audio (0-1)
-tempo            # Tempo in BPM
-bit_rate         # Bit rate audio
-file_size        # Dimensione file
-is_anomaly       # 🎯 TARGET: 0=normale, 1=anomalo (solo in train)
-anomaly_type     # Tipo di anomalia (solo in train)
+track_id                  # ID univoco traccia
+artist_name               # Nome artista
+track_listens             # Numero ascolti
+track_favorites           # Numero preferiti
+track_comments            # Numero commenti
+artist_active_year_begin  # Anno inizio attività artista
+bit_rate                  # Bit rate audio
+spectral_bandwidth        # Larghezza di banda spettrale (feature audio)
+listener_country_entropy  # Entropia geografica degli ascoltatori
+is_anomaly                # 🎯 TARGET: 0=normale, 1=anomalo (solo in train)
+anomaly_type              # Tipo di anomalia (solo in train)
 ```
 
-**🚨 Anomalie da rilevare**:
-- **plagio_similarity**: Tracce troppo simili (plagio)
-- **bot_streaming**: Streaming artificiale (bot)
-- **metadata_manipulation**: Metadati falsi
-- **genre_mismatch**: Genere non corrispondente
-- **audio_quality_fraud**: Qualità audio fraudolenta
+**🚨 Anomalie Sottili da rilevare**:
+- **sophisticated_bot_streaming**: Attività di bot con un rapporto ascolti/preferiti normale, ma con pattern geografici e di commenti innaturali.
+- **artist_hijacking**: Artisti storicamente inattivi che pubblicano improvvisamente tracce di generi moderni (possibile furto di account o frode).
+- **audio_quality_fraud**: Incoerenza tra la qualità dichiarata (`bit_rate`) e le reali caratteristiche spettrali del file (es. un file di bassa qualità "gonfiato").
 
 ### 🔒 **Track 4: Copyright Infringement Detection**
 
-**Dati**: Opere creative e violazioni copyright
+**Dati**: Opere creative e loro utilizzo. Le violazioni sono nascoste tramite tecniche di evasione.
 
 **File Training**: `datasets/track4_copyright_train.csv`
 **File Test**: `datasets/track4_copyright_test.csv`
 
 **Colonne principali**:
 ```python
-work_id                # ID univoco opera
-title                  # Titolo opera
-author                 # Autore
-creation_year          # Anno creazione
-license_type           # Tipo licenza
-total_royalties        # Royalties totali
-fingerprint_similarity # Similarità fingerprint (0-1)
-platform               # Piattaforma distribuzione
-is_infringement        # 🎯 TARGET: 0=legale, 1=violazione (solo in train)
-violation_type         # Tipo violazione (solo in train)
+work_id                   # ID univoco opera
+days_since_release        # Giorni dalla pubblicazione
+play_count                # Conteggio totale ascolti
+play_count_last_24h       # Conteggio ascolti nelle ultime 24h
+audio_similarity_to_db    # Similarità audio con un database di opere protette
+noise_floor_db            # Livello di rumore di fondo
+file_hash                 # Hash univoco del file
+is_infringement           # 🎯 TARGET: 0=legale, 1=violazione (solo in train)
+infringement_type         # Tipo di violazione (solo in train)
 ```
 
-**🚨 Violazioni da rilevare**:
-- **unauthorized_sampling**: Campionamenti non autorizzati
-- **derivative_work**: Opere derivate illegali
-- **metadata_manipulation**: Metadati copyright falsi
-- **cross_platform_violation**: Violazioni multi-piattaforma
-- **content_id_manipulation**: Elusione Content ID
+**🚨 Violazioni Sottili da rilevare**:
+- **evasion_by_modification**: Elusione del Content ID tramite lievi modifiche audio (velocità, intonazione) che cambiano l'hash ma non la similarità audio.
+- **sleeper_infringement**: Opere caricate e tenute "dormienti", seguite da un picco di attività improvviso e innaturale per monetizzare rapidamente.
+- **evasion_by_noise_masking**: Mascheramento di una traccia protetta tramite la sovrapposizione di un leggero rumore, che altera le feature tecniche.
 
 ---
 
@@ -484,46 +482,47 @@ cat leaderboard.md
 ## 💡 **CONSIGLI STRATEGICI**
 
 ### **1. Inizia Semplice**
+Prima di costruire modelli complessi, fai un'analisi esplorativa dei dati (EDA). Usa `pairplot` e `boxplot` per visualizzare le differenze tra dati normali e anomali nel set di training.
+
+### **2. Feature Engineering è la Chiave**
+Le anomalie sono contestuali. Crea feature che catturino questo contesto.
+
+**Esempi per Track 1 (Live Events):**
 ```python
-# Primo modello: usa le features base
-features = ['attendance', 'capacity', 'total_revenue']
-iso_forest = IsolationForest(contamination=0.08, random_state=42)
+# Analisi aggregata per venue o artista (aiuta a trovare comportamenti anomali)
+df['avg_revenue_per_venue'] = df.groupby('venue')['total_revenue'].transform('mean')
+df['artist_event_count'] = df.groupby('main_artist')['event_id'].transform('count')
 ```
 
-### **2. Feature Engineering Avanzato**
+**Esempi per Track 2 (Document Fraud):**
 ```python
-# Crea features più informative
-df['revenue_per_person'] = df['total_revenue'] / df['attendance']
-df['occupancy_rate'] = df['attendance'] / df['capacity']
-df['revenue_efficiency'] = df['total_revenue'] / df['capacity']
-df['is_weekend'] = df['event_date'].dt.dayofweek.isin([5, 6])
+# Feature di interazione
+df['file_density'] = df['file_size_kb'] / df['page_count']
+# Analisi aggregata per mittente (aiuta a trovare frodi di template)
+df['submitter_doc_count'] = df.groupby('submitter_id')['document_id'].transform('count')
+```
+
+**Esempi per Track 3 (Music Anomaly):**
+```python
+# Feature di rapporto e comportamento
+df['favorites_per_listen'] = df['track_favorites'] / (df['track_listens'] + 1)
+df['artist_age'] = datetime.now().year - df['artist_active_year_begin']
+```
+
+**Esempi per Track 4 (Copyright):**
+```python
+# Feature che catturano pattern temporali
+df['is_sleeper'] = (df['days_since_release'] > 180) & (df['play_count_last_24h'] > 1000)
+# Rapporto tra similarità e rumore
+df['similarity_to_noise_ratio'] = df['audio_similarity_to_db'] / (abs(df['noise_floor_db']) + 1)
 ```
 
 ### **3. Prova Algoritmi Diversi**
-```python
-from sklearn.ensemble import IsolationForest, RandomForestClassifier
-from sklearn.svm import OneClassSVM
-from sklearn.cluster import DBSCAN
-
-# Confronta diversi approcci
-iso_forest = IsolationForest(contamination=0.08)
-one_class_svm = OneClassSVM(nu=0.08)
-```
+- **Non supervisionati (se non avessi le etichette):** `IsolationForest`, `LocalOutlierFactor`, `OneClassSVM`. Utili per trovare anomalie "sconosciute".
+- **Supervisionati (approccio consigliato qui):** `RandomForestClassifier`, `GradientBoostingClassifier`, `XGBoost`. Sfruttano le etichette nel training set per imparare a distinguere le anomalie note. Sono generalmente più potenti per questo tipo di problema.
 
 ### **4. Validazione Robusta**
-```python
-from sklearn.model_selection import StratifiedKFold
-
-# Valida il tuo modello sui dati di training
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-scores = cross_val_score(model, X_train, y_train, cv=cv, scoring='f1')
-print(f"CV F1-Score: {scores.mean():.3f} ± {scores.std():.3f}")
-```
-
-### **5. Multi-Track Strategy**
-- Partecipa a **più track** per massimizzare le opportunità di vincita
-- Ogni track ha caratteristiche diverse: alcuni team sono più forti in alcuni track
-- **Specializzati** in 1-2 track piuttosto che fare tutto superficialmente
+Usa la validazione incrociata (`StratifiedKFold`) sul set di training per stimare le performance del tuo modello in modo affidabile prima di creare la submission.
 
 ---
 

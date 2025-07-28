@@ -1,24 +1,34 @@
 #!/usr/bin/env python3
 """
 SIAE Anomaly Detection Hackathon - Track 1: Live Events
-Anomaly Detection in Live Events using Isolation Forest
+Strategia: Model Bake-Off & Ensemble Ibrido con Selezione Automatica
 
-Questo script implementa il pipeline completo per Track 1:
-1. Carica dataset di training e test pre-generati
-2. Applica feature engineering
-3. Addestra un modello Isolation Forest
-4. Genera predizioni sul test set  
-5. Crea file di submission per la valutazione
-6. Visualizza i risultati
+Questo script implementa un pipeline State-of-the-Art:
+1.  Addestra una suite di modelli di anomaly detection (classici e SOTA da PyOD).
+2.  Normalizza gli anomaly scores di ogni modello per un confronto equo.
+3.  Crea un "Super Modello" tramite l'ensemble (media) degli score di tutti i modelli.
+4.  Usa le etichette del training set per calibrare il threshold ottimale sia per i modelli individuali che per l'ensemble.
+5.  Seleziona il performer migliore (singolo modello o ensemble) in base all'F1-Score.
+6.  Usa il "campione" per generare le predizioni finali sul test set.
+7.  Crea visualizzazioni di confronto per analizzare i risultati della competizione.
 """
 
+# --- DIPENDENZE ---
+# Assicurati di aver installato pyod: pip install pyod
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+from sklearn.metrics import f1_score, precision_recall_curve, auc, roc_auc_score, precision_score, recall_score, confusion_matrix
+
+# Importa i modelli da PyOD e Sklearn
 from sklearn.ensemble import IsolationForest
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support
+from sklearn.neighbors import LocalOutlierFactor
+from pyod.models.hbos import HBOS
+from pyod.models.copod import COPOD
+from pyod.models.auto_encoder import AutoEncoder as AutoEncoderTorch
+
 import warnings
 import os
 import json
@@ -26,605 +36,338 @@ from datetime import datetime
 import sys
 
 warnings.filterwarnings('ignore')
-
-# Set random seed for reproducibility
 np.random.seed(42)
 
-def load_datasets():
-    """
-    Carica i dataset di training e test pre-generati
-    """
-    print("📥 Caricando dataset pre-generati...")
-    
-    # Carica dataset di training
-    train_path = '../datasets/track1_live_events_train.csv'
-    if not os.path.exists(train_path):
-        print(f"❌ File training non trovato: {train_path}")
-        print("💡 Assicurati di aver eseguito 'python generate_datasets.py' nella directory principale")
-        sys.exit(1)
-    
-    df_train = pd.read_csv(train_path)
-    print(f"✅ Dataset train caricato: {len(df_train)} eventi")
-    
-    # Carica dataset di test (senza ground truth)
-    test_path = '../datasets/track1_live_events_test.csv'  
-    if not os.path.exists(test_path):
-        print(f"❌ File test non trovato: {test_path}")
-        sys.exit(1)
+# --- CONFIGURAZIONE ---
+TEAM_NAME = "DatapizzaTheBest"
+MEMBERS = ["Mirko", "Giorgio"]
+GUARANTEED_COLUMNS = [
+    'event_id', 'venue', 'city', 'event_date', 'attendance', 
+    'capacity', 'n_songs', 'total_revenue', 'is_anomaly'
+]
 
-    df_test = pd.read_csv(test_path)
-    print(f"✅ Dataset test caricato: {len(df_test)} eventi")
-    
+# (Le funzioni load_and_validate_datasets e create_features rimangono identiche alla versione precedente)
+def load_and_validate_datasets():
+    print("📥 Caricando e validando i dataset...")
+    train_path = '../datasets/track1_live_events_train.csv'
+    test_path = '../datasets/track1_live_events_test.csv'
+    if not os.path.exists(train_path) or not os.path.exists(test_path):
+        print("❌ File non trovati! Esegui 'python generate_datasets.py' prima.")
+        sys.exit(1)
+    df_train = pd.read_csv(train_path, parse_dates=['event_date'])
+    df_test = pd.read_csv(test_path, parse_dates=['event_date'])
+    for col in GUARANTEED_COLUMNS:
+        if col not in df_train.columns:
+            print(f"❌ Colonna '{col}' MANCANTE! Impossibile procedere.")
+            sys.exit(1)
+    print(f"✅ Dati caricati e validati: {len(df_train)} train, {len(df_test)} test.")
     return df_train, df_test
 
-def feature_engineering(df):
-    """
-    Crea features aggiuntive per l'anomaly detection
-    """
-    print("🔧 Eseguendo feature engineering...")
-    
+def create_features(df, training_df=None):
+    print(f"🔧 Creando feature per { 'test' if training_df is not None else 'training'} set...")
     df = df.copy()
-    
-    # Features base derivate
-    df['revenue_per_person'] = df['total_revenue'] / df['attendance']
-    df['occupancy_rate'] = df['attendance'] / df['capacity']
-    df['songs_per_person'] = df['n_songs'] / df['attendance']
-    df['avg_revenue_per_song'] = df['total_revenue'] / df['n_songs']
-    
-    # Features temporali
-    df['event_date'] = pd.to_datetime(df['event_date'])
-    df['hour'] = df['event_date'].dt.hour
+    # Feature esistenti
+    df['occupancy_rate'] = (df['attendance'] / (df['capacity'] + 1e-6)).clip(0, 5)
+    df['revenue_per_attendee'] = df['total_revenue'] / (df['attendance'] + 1e-6)
     df['day_of_week'] = df['event_date'].dt.dayofweek
-    df['month'] = df['event_date'].dt.month  
     df['is_weekend'] = df['day_of_week'].isin([5, 6]).astype(int)
     
-    # Features categoriche encoded
-    venue_encoder = LabelEncoder()
-    df['venue_encoded'] = venue_encoder.fit_transform(df['venue'])
+    # NUOVE FEATURE
+    df['songs_per_revenue'] = df['n_songs'] / (df['total_revenue'] + 1e-6)
+    df['revenue_per_capacity'] = df['total_revenue'] / (df['capacity'] + 1e-6)
+    df['is_high_n_songs'] = (df['n_songs'] > df['n_songs'].quantile(0.95)).astype(int)
     
-    city_encoder = LabelEncoder()
-    df['city_encoded'] = city_encoder.fit_transform(df['city'])
-    
-    # Features anomalie evidenti
-    df['is_over_capacity'] = (df['attendance'] > df['capacity']).astype(int)
-    df['is_excessive_songs'] = (df['n_songs'] > 40).astype(int)
-    df['is_suspicious_timing'] = ((df['hour'] >= 2) & (df['hour'] <= 6)).astype(int)
-    df['is_low_revenue'] = (df['revenue_per_person'] < 5).astype(int)
-    df['is_high_revenue'] = (df['revenue_per_person'] > 100).astype(int)
-    
-    # Features statistiche per venue
-    venue_stats = df.groupby('venue').agg({
-        'attendance': ['mean', 'std'],
-        'total_revenue': 'mean',
-        'capacity': 'mean'
-    }).round(2)
-    
-    venue_stats.columns = ['venue_avg_attendance', 'venue_std_attendance', 
-                          'venue_avg_revenue', 'venue_avg_capacity']
-    
-    df = df.merge(venue_stats, left_on='venue', right_index=True, how='left')
-    
-    # Deviazioni dalla norma del venue
-    df['attendance_vs_venue_avg'] = df['attendance'] / df['venue_avg_attendance']
-    df['revenue_vs_venue_avg'] = df['total_revenue'] / df['venue_avg_revenue']
-    
-    # Features per revenue mismatch più sofisticate
-    df['revenue_zscore_for_venue'] = (df['total_revenue'] - df['venue_avg_revenue']) / (df['venue_std_attendance'] + 1e-6)
-    df['attendance_zscore_for_venue'] = (df['attendance'] - df['venue_avg_attendance']) / (df['venue_std_attendance'] + 1e-6)
-    
-    # Features per pattern complessi (qui Isolation Forest è utile)
-    df['efficiency_ratio'] = df['total_revenue'] / (df['capacity'] * df['n_songs'])
-    df['popularity_indicator'] = df['attendance'] / df['capacity']
-    df['revenue_per_song'] = df['total_revenue'] / df['n_songs']
-    df['songs_intensity'] = df['n_songs'] / df['attendance']
-    
-    print(f"✅ Features create: {df.shape[1]} colonne totali")
+    source_df = training_df if training_df is not None else df
+    venue_stats = source_df.groupby('venue').agg(
+        venue_avg_revenue=('total_revenue', 'mean'),
+        venue_avg_attendance=('attendance', 'mean'),
+    ).reset_index()
+    df = df.merge(venue_stats, on='venue', how='left')
+    df['dev_revenue_from_venue_avg'] = df['total_revenue'] / (df['venue_avg_revenue'] + 1e-6)
+    df['dev_attendance_from_venue_avg'] = df['attendance'] / (df['venue_avg_attendance'] + 1e-6)
+    for col in ['venue', 'city']:
+        le = LabelEncoder()
+        all_values = pd.concat([df[col], source_df[col]]).unique()
+        le.fit(all_values)
+        df[col + '_encoded'] = df[col].apply(lambda x: le.transform([x])[0] if x in le.classes_ else -1)
     return df
 
-def detect_rule_based_anomalies(df):
-    """
-    Rileva anomalie usando regole deterministiche (alta precision)
-    Queste sono anomalie ovvie che non richiedono ML
-    """
-    print("🔍 Rilevando anomalie con regole deterministiche...")
-    
-    df = df.copy()
-    df['rule_anomaly_score'] = 0
-    df['rule_anomaly_reasons'] = ''
-    
-    # 1. DUPLICATE DECLARATION: stesso venue + stessa data
-    df['event_date_date'] = pd.to_datetime(df['event_date']).dt.date
-    duplicates = df.duplicated(subset=['venue', 'event_date_date'], keep=False)
-    df.loc[duplicates, 'rule_anomaly_score'] += 1
-    df.loc[duplicates, 'rule_anomaly_reasons'] += 'duplicate_venue_date;'
-    
-    # 2. IMPOSSIBLE ATTENDANCE: attendance > capacity
-    impossible_attendance = df['attendance'] > df['capacity']
-    df.loc[impossible_attendance, 'rule_anomaly_score'] += 1
-    df.loc[impossible_attendance, 'rule_anomaly_reasons'] += 'impossible_attendance;'
-    
-    # 3. EXCESSIVE SONGS: > 40 brani
-    excessive_songs = df['n_songs'] > 40
-    df.loc[excessive_songs, 'rule_anomaly_score'] += 1
-    df.loc[excessive_songs, 'rule_anomaly_reasons'] += 'excessive_songs;'
-    
-    # 4. SUSPICIOUS TIMING: eventi 2-6 AM
-    hour = pd.to_datetime(df['event_date']).dt.hour
-    suspicious_timing = (hour >= 2) & (hour <= 6)
-    df.loc[suspicious_timing, 'rule_anomaly_score'] += 1
-    df.loc[suspicious_timing, 'rule_anomaly_reasons'] += 'suspicious_timing;'
-    
-    # 5. EXTREME REVENUE MISMATCH: ricavi impossibilmente bassi/alti
-    revenue_per_person = df['total_revenue'] / df['attendance']
-    extremely_low_revenue = revenue_per_person < 1  # Meno di 1€ per persona
-    extremely_high_revenue = revenue_per_person > 200  # Più di 200€ per persona
-    
-    df.loc[extremely_low_revenue, 'rule_anomaly_score'] += 1
-    df.loc[extremely_low_revenue, 'rule_anomaly_reasons'] += 'extremely_low_revenue;'
-    df.loc[extremely_high_revenue, 'rule_anomaly_score'] += 1
-    df.loc[extremely_high_revenue, 'rule_anomaly_reasons'] += 'extremely_high_revenue;'
-    
-    # Flag eventi con anomalie deterministiche
-    df['has_rule_anomaly'] = df['rule_anomaly_score'] > 0
-    
-    rule_anomalies = df['has_rule_anomaly'].sum()
-    print(f"🚨 Anomalie deterministiche trovate: {rule_anomalies}")
-    
-    if rule_anomalies > 0:
-        print("📊 Breakdown anomalie deterministiche:")
-        reason_counts = df[df['has_rule_anomaly']]['rule_anomaly_reasons'].str.split(';').explode().value_counts()
-        for reason, count in reason_counts.items():
-            if reason:  # Salta stringhe vuote
-                print(f"   - {reason}: {count}")
-    
-    return df
+def create_models_to_train():
+    """Definisce il dizionario di modelli che parteciperanno alla competizione."""
+    return {
+        'IsolationForest': IsolationForest(n_estimators=200, random_state=42, n_jobs=-1),
+        'LocalOutlierFactor': LocalOutlierFactor(n_neighbors=30, novelty=True, n_jobs=-1),
+        'HBOS': HBOS(n_bins=50),
+        'COPOD': COPOD(),
+        'AutoEncoderTorch': AutoEncoderTorch(hidden_neuron_list=[64, 32, 32, 64], epoch_num=20, verbose=0)
+    }
 
-def train_isolation_forest(df_train, feature_cols, contamination=0.08):
-    """
-    Addestra il modello Isolation Forest sui dati di training
-    Usa il set di features passato come parametro
-    """
-    print("🤖 Addestrando Isolation Forest...")
+def train_and_evaluate_models(df_train, feature_cols, models_dict):
+    """Addestra tutti i modelli, crea un ensemble, e seleziona il miglior performer."""
+    print("\n" + "="*50)
+    print("🏆 Inizio della Competizione tra Modelli (e l'Ensemble) 🏆")
+    print("="*50)
     
-    # Filtra features che esistono nel dataframe
-    available_features = [col for col in feature_cols if col in df_train.columns]
+    X_train = df_train[feature_cols].fillna(0)
+    y_true = df_train['is_anomaly']
     
-    X_train = df_train[available_features].fillna(0)
-    
-    # Normalizza features
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    
-    # Addestra Isolation Forest
-    iso_forest = IsolationForest(
-        contamination=contamination,
-        random_state=42,
-        n_estimators=200,
-        max_samples='auto'
-    )
-    
-    iso_forest.fit(X_train_scaled)
-    
-    print(f"✅ Modello addestrato con {len(available_features)} features")
-    print(f"📋 Features utilizzate: {available_features[:5]}... (+{len(available_features)-5} altre)")
-    
-    return iso_forest, scaler, available_features
+    trained_models = {}
+    evaluation_results = {}
+    all_normalized_scores = []
 
-def hybrid_anomaly_detection(df_test, iso_forest, scaler, feature_cols):
-    """
-    Approccio IBRIDO: combina regole deterministiche + Isolation Forest
-    """
-    print("🎯 Applicando approccio IBRIDO per anomaly detection...")
-    
-    # 1. REGOLE DETERMINISTICHE (alta precision, catturano anomalie ovvie)
-    df_test = detect_rule_based_anomalies(df_test)
-    
-    # 2. ISOLATION FOREST (per pattern complessi e sottili)
-    X_test = df_test[feature_cols].fillna(0)
-    X_test_scaled = scaler.transform(X_test)
-    
-    ml_predictions = iso_forest.predict(X_test_scaled)
-    ml_scores = iso_forest.score_samples(X_test_scaled)
-    
-    df_test['ml_anomaly_predicted'] = (ml_predictions == -1).astype(int)
-    df_test['ml_anomaly_score'] = ml_scores
-    
-    # 3. COMBINAZIONE IBRIDA
-    # Se ha anomalia deterministica → sicuramente anomalo
-    # Se Isolation Forest rileva anomalia E non è ovviamente normale → probabilmente anomalo
-    
-    df_test['is_anomaly_predicted'] = (
-        df_test['has_rule_anomaly'] |  # Regole deterministiche
-        (df_test['ml_anomaly_predicted'] == 1)  # ML prediction
-    ).astype(int)
-    
-    # Score combinato: regole deterministiche hanno peso maggiore
-    df_test['combined_anomaly_score'] = (
-        df_test['rule_anomaly_score'] * 0.4 +  # Peso alto per regole
-        (-df_test['ml_anomaly_score']) * 0.6   # Peso per ML (invertito perché scores bassi = anomali)
-    )
-    
-    # Per compatibilità con il resto del codice
-    df_test['anomaly_score'] = df_test['combined_anomaly_score']
-    
-    # Statistiche
-    rule_anomalies = df_test['has_rule_anomaly'].sum()
-    ml_anomalies = df_test['ml_anomaly_predicted'].sum()
-    total_anomalies = df_test['is_anomaly_predicted'].sum()
-    
-    print(f"📊 Risultati approccio ibrido:")
-    print(f"   - Anomalie da regole deterministiche: {rule_anomalies}")
-    print(f"   - Anomalie da Isolation Forest: {ml_anomalies}")
-    print(f"   - Anomalie totali (ibrido): {total_anomalies}")
-    print(f"   - Overlap: {(df_test['has_rule_anomaly'] & (df_test['ml_anomaly_predicted'] == 1)).sum()}")
-    
-    return df_test
+    for name, model in models_dict.items():
+        try:
+            print(f"🤖 Addestrando {name}...")
+            model.fit(X_train)
+            trained_models[name] = model
 
-def make_predictions(df_test, iso_forest, scaler, feature_cols):
-    """
-    Genera predizioni sul test set
-    """
-    print("🔮 Generando predizioni sul test set...")
-    
-    # Prepara features test
-    X_test = df_test[feature_cols].fillna(0)
-    X_test_scaled = scaler.transform(X_test)
-    
-    # Generate predictions
-    test_predictions = iso_forest.predict(X_test_scaled)
-    test_scores = iso_forest.score_samples(X_test_scaled)
-    
-    # Converti da -1/1 a 1/0 per anomalie
-    df_test['is_anomaly_predicted'] = (test_predictions == -1).astype(int)
-    df_test['anomaly_score'] = test_scores
-    
-    print(f"🎯 Anomalie rilevate nel test set: {df_test['is_anomaly_predicted'].sum()}/{len(df_test)}")
-    print(f"📊 Tasso anomalie: {df_test['is_anomaly_predicted'].mean():.2%}")
-    
-    return df_test
+            anomaly_scores = model.decision_function(X_train)
+            
+            scaler = MinMaxScaler()
+            normalized_scores = scaler.fit_transform(anomaly_scores.reshape(-1, 1)).flatten()
+            all_normalized_scores.append(normalized_scores)
 
-def evaluate_on_training(df_train):
-    """
-    Valuta le performance sul training set (dove abbiamo la ground truth)
-    """
-    if 'is_anomaly' not in df_train.columns:
-        print("⚠️ Ground truth non disponibile per valutazione")
-        return None, None, None, None
-    
-    print("\n📊 VALUTAZIONE PERFORMANCE SU TRAINING SET")
-    print("=" * 50)
-    
-    y_true = df_train['is_anomaly'].astype(int)
-    y_pred = df_train['is_anomaly_predicted'].astype(int)
-    
-    # Metriche
-    precision, recall, f1, _ = precision_recall_fscore_support(y_true, y_pred, average='binary')
-    
-    # Calcola AUC-ROC usando gli anomaly scores
-    from sklearn.metrics import roc_auc_score
-    try:
-        auc_roc = roc_auc_score(y_true, -df_train['anomaly_score'])  # Negative perché scores più bassi = più anomali
-    except:
-        auc_roc = 0.5  # Fallback se non riesce a calcolare
-    
-    print(f"Precision: {precision:.3f}")
-    print(f"Recall: {recall:.3f}")
-    print(f"F1-Score: {f1:.3f}")
-    print(f"AUC-ROC: {auc_roc:.3f}")
-    
-    print("\nClassification Report:")
-    print(classification_report(y_true, y_pred))
-    
-    print("\nConfusion Matrix:")
-    cm = confusion_matrix(y_true, y_pred)
-    print(cm)
-    
-    # Analisi per tipo di anomalia se disponibile
-    if 'anomaly_type' in df_train.columns:
-        print("\n📈 ANALISI PER TIPO DI ANOMALIA")
-        anomaly_analysis = df_train[df_train['anomaly_type'].notna()].groupby('anomaly_type').agg({
-            'is_anomaly_predicted': ['sum', 'count']
-        })
-        anomaly_analysis.columns = ['detected', 'total']
-        anomaly_analysis['detection_rate'] = anomaly_analysis['detected'] / anomaly_analysis['total']
-        print(anomaly_analysis.round(3))
-    
-    return precision, recall, f1, auc_roc
+            precision, recall, thresholds = precision_recall_curve(y_true, normalized_scores)
+            f1_scores = (2 * precision * recall) / (precision + recall + 1e-9)
+            
+            best_f1_idx = np.argmax(f1_scores)
+            best_f1 = f1_scores[best_f1_idx]
+            best_threshold = thresholds[best_f1_idx]
 
-def create_visualizations(df_train, df_test):
-    """
-    Crea visualizzazioni dei risultati
-    """
-    print("🎨 Creando visualizzazioni...")
+            evaluation_results[name] = {
+                'f1_score': best_f1,
+                'threshold': best_threshold,
+                'scaler': scaler
+            }
+            print(f"✅ {name} - F1-Score: {best_f1:.4f}\n")
+
+        except Exception as e:
+            print(f"❌ Errore durante l'addestramento di {name}: {e}\n")
+
+    if not trained_models:
+        print("❌ Nessun modello è stato addestrato con successo.")
+        sys.exit(1)
+
+    # --- ENSEMBLE STRATEGY ---
+    print("-" * 20 + " 🤝 Creando l'Ensemble 🤝 " + "-" * 20)
+    ensemble_scores = np.mean(np.array(all_normalized_scores), axis=0)
     
-    # Setup matplotlib
-    plt.style.use('default')
-    fig, axes = plt.subplots(2, 3, figsize=(20, 12))
-    fig.suptitle('🎪 SIAE Hackathon - Track 1: Live Events Anomaly Detection', 
-                 fontsize=16, fontweight='bold')
+    precision_ens, recall_ens, thresholds_ens = precision_recall_curve(y_true, ensemble_scores)
+    f1_scores_ens = (2 * precision_ens * recall_ens) / (precision_ens + recall_ens + 1e-9)
+    best_f1_idx_ens = np.argmax(f1_scores_ens)
+    best_f1_ens = f1_scores_ens[best_f1_idx_ens]
+    best_threshold_ens = thresholds_ens[best_f1_idx_ens]
+
+    print(f"Ensemble F1-Score: {best_f1_ens:.4f}\n")
+    evaluation_results['Ensemble'] = {
+        'f1_score': best_f1_ens,
+        'threshold': best_threshold_ens,
+        'scaler': None # L'ensemble non ha uno scaler, lavora su score già normalizzati
+    }
+        
+    winner_name = max(evaluation_results, key=lambda k: evaluation_results[k]['f1_score'])
+    print(f"🥇 Il modello vincitore è: {winner_name} con F1-Score = {evaluation_results[winner_name]['f1_score']:.4f}")
     
-    # 1. Distribuzione Anomaly Scores - Training
-    normal_train = df_train[df_train['is_anomaly_predicted'] == 0]
-    anomaly_train = df_train[df_train['is_anomaly_predicted'] == 1]
+    return trained_models, evaluation_results, winner_name
+
+def create_visualizations(evaluation_results, df_train_winner, y_true, y_pred, winner_name):
+    """Crea visualizzazioni di confronto e di analisi del modello vincitore."""
+    print("🎨 Creando visualizzazioni di confronto...")
+    plt.style.use('seaborn-v0_8-whitegrid')
+    fig, axes = plt.subplots(2, 2, figsize=(20, 18))
+    fig.suptitle(f'Analisi del Modello Vincitore: {winner_name}', fontsize=22, fontweight='bold')
+
+    # 1. Grafico a Barre delle Performance (F1-Score)
+    models = list(evaluation_results.keys())
+    f1_scores = [res['f1_score'] for res in evaluation_results.values()]
     
-    axes[0, 0].hist(normal_train['anomaly_score'], bins=30, alpha=0.7, 
-                   color='skyblue', label=f'Normali ({len(normal_train):,})', density=True)
-    axes[0, 0].hist(anomaly_train['anomaly_score'], bins=30, alpha=0.7, 
-                   color='red', label=f'Anomalie ({len(anomaly_train):,})', density=True)
-    axes[0, 0].set_title('📊 Anomaly Scores - Training Set', fontweight='bold')
-    axes[0, 0].set_xlabel('Anomaly Score')
-    axes[0, 0].set_ylabel('Densità')
-    axes[0, 0].legend()
-    axes[0, 0].grid(True, alpha=0.3)
+    colors = []
+    for model in models:
+        if model == winner_name:
+            colors.append('gold') # Colore per il vincitore
+        elif model == 'Ensemble':
+            colors.append('darkorange') # Colore speciale per l'Ensemble se non è il vincitore
+        else:
+            colors.append('skyblue')
+
+    bars = axes[0, 0].bar(models, f1_scores, color=colors)
+    axes[0, 0].set_ylabel('F1-Score Ottimale su Training Set')
+    axes[0, 0].set_title('Confronto Performance Modelli', fontweight='bold', fontsize=14)
+    axes[0, 0].tick_params(axis='x', rotation=45)
+    for bar in bars:
+        yval = bar.get_height()
+        axes[0, 0].text(bar.get_x() + bar.get_width()/2.0, yval, f'{yval:.3f}', va='bottom', ha='center')
+
+    # 2. Precision-Recall Curve del modello VINCITORE
+    precision, recall, _ = precision_recall_curve(y_true, df_train_winner['normalized_score'])
+    pr_auc = auc(recall, precision)
     
-    # 2. Attendance vs Revenue - Training  
-    axes[0, 1].scatter(normal_train['attendance'], normal_train['total_revenue'],
-                      alpha=0.6, s=10, color='blue', label='Eventi normali')
-    axes[0, 1].scatter(anomaly_train['attendance'], anomaly_train['total_revenue'],
-                      alpha=0.8, s=30, color='red', edgecolor='darkred', label='Anomalie')
-    axes[0, 1].set_title('💰 Attendance vs Revenue - Training', fontweight='bold')
-    axes[0, 1].set_xlabel('Attendance')
-    axes[0, 1].set_ylabel('Total Revenue (€)')
+    axes[0, 1].plot(recall, precision, color='darkorange', lw=2, label=f'PR Curve (AUC = {pr_auc:.3f})')
+    best_f1 = evaluation_results[winner_name]['f1_score']
+    axes[0, 1].plot([], [], ' ', label=f'Best F1-Score = {best_f1:.3f}') # Aggiungi F1 in legenda
+    axes[0, 1].set_xlabel('Recall')
+    axes[0, 1].set_ylabel('Precision')
+    axes[0, 1].set_title(f'Precision-Recall Curve per {winner_name}', fontweight='bold', fontsize=14)
     axes[0, 1].legend()
-    axes[0, 1].grid(True, alpha=0.3)
-    
-    # 3. Revenue per Person vs Occupancy Rate - Training
-    axes[0, 2].scatter(normal_train['occupancy_rate'], normal_train['revenue_per_person'],
-                      alpha=0.6, s=10, color='green', label='Eventi normali')
-    axes[0, 2].scatter(anomaly_train['occupancy_rate'], anomaly_train['revenue_per_person'],
-                      alpha=0.8, s=30, color='red', edgecolor='darkred', label='Anomalie')
-    axes[0, 2].set_title('📈 Occupancy vs Revenue/Person - Training', fontweight='bold')
-    axes[0, 2].set_xlabel('Occupancy Rate')
-    axes[0, 2].set_ylabel('Revenue per Person (€)')
-    axes[0, 2].legend()
-    axes[0, 2].grid(True, alpha=0.3)
-    
-    # 4. Distribuzione Anomaly Scores - Test
-    normal_test = df_test[df_test['is_anomaly_predicted'] == 0]
-    anomaly_test = df_test[df_test['is_anomaly_predicted'] == 1]
-    
-    axes[1, 0].hist(df_test['anomaly_score'], bins=30, alpha=0.7, 
-                   color='lightgreen', label=f'Tutti eventi ({len(df_test):,})', density=True)
-    axes[1, 0].hist(anomaly_test['anomaly_score'], bins=30, alpha=0.9,
-                   color='orange', label=f'Anomalie rilevate ({len(anomaly_test):,})', density=True)
-    axes[1, 0].set_title('🔍 Anomaly Scores - Test Set', fontweight='bold')
-    axes[1, 0].set_xlabel('Anomaly Score')
-    axes[1, 0].set_ylabel('Densità')
-    axes[1, 0].legend()
-    axes[1, 0].grid(True, alpha=0.3)
-    
-    # 5. Attendance vs Revenue - Test
-    axes[1, 1].scatter(normal_test['attendance'], normal_test['total_revenue'],
-                      alpha=0.6, s=10, color='lightblue', label='Eventi normali')
-    axes[1, 1].scatter(anomaly_test['attendance'], anomaly_test['total_revenue'],
-                      alpha=0.8, s=30, color='orange', edgecolor='darkorange', label='Anomalie')
-    axes[1, 1].set_title('🎯 Attendance vs Revenue - Test Predictions', fontweight='bold')
-    axes[1, 1].set_xlabel('Attendance')
-    axes[1, 1].set_ylabel('Total Revenue (€)')
-    axes[1, 1].legend()
-    axes[1, 1].grid(True, alpha=0.3)
-    
-    # 6. Distribuzione per Città - Test
-    city_counts = df_test['city'].value_counts()
-    city_anomalies = df_test[df_test['is_anomaly_predicted'] == 1]['city'].value_counts()
-    city_rates = (city_anomalies / city_counts * 100).fillna(0)
-    
-    bars = axes[1, 2].bar(range(len(city_counts)), city_counts.values, 
-                         color='lightblue', alpha=0.7, label='Totale eventi')
-    axes2 = axes[1, 2].twinx()
-    line = axes2.plot(range(len(city_counts)), city_rates.values, 
-                     color='red', marker='o', linewidth=2, markersize=4, label='% Anomalie')
-    
-    axes[1, 2].set_title('🏙️ Eventi per Città - Test Set', fontweight='bold')
-    axes[1, 2].set_xlabel('Città')
-    axes[1, 2].set_ylabel('Numero Eventi', color='blue')
-    axes2.set_ylabel('Tasso Anomalie (%)', color='red')
-    axes[1, 2].set_xticks(range(len(city_counts)))
-    axes[1, 2].set_xticklabels(city_counts.index, rotation=45, ha='right')
-    axes[1, 2].grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    plt.savefig('track1_results.png', dpi=300, bbox_inches='tight')
-    plt.show()
-    
-    print("✅ Visualizzazioni salvate in: track1_results.png")
 
-def generate_submission(df_test, predictions, scores, feature_cols, 
-                       team_name="DatapizzaTheBest", members=["Mirko", "Giorgio"],
-                       training_metrics=None):
-    """
-    Genera il file di submission nel formato richiesto dall'hackathon
-    """
-    print(f"\n🚀 Generando submission per team: {team_name}")
+    # 3. Matrice di Confusione
+    cm = confusion_matrix(y_true, y_pred)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=axes[1, 0],
+                xticklabels=['Normale (Pred)', 'Anomalia (Pred)'],
+                yticklabels=['Normale (True)', 'Anomalia (True)'])
+    axes[1, 0].set_title('Matrice di Confusione sul Training Set', fontweight='bold', fontsize=14)
+    axes[1, 0].set_xlabel('Predizione')
+    axes[1, 0].set_ylabel('Reale')
+
+    # 4. Riepilogo Metriche
+    precision_val = precision_score(y_true, y_pred)
+    recall_val = recall_score(y_true, y_pred)
+    f1_val = f1_score(y_true, y_pred)
+    axes[1, 1].axis('off')
+    metrics_text = (
+        f"**Metriche sul Training Set ({winner_name})**\n\n"
+        f"F1-Score: {f1_val:.4f}\n"
+        f"Precision: {precision_val:.4f}\n"
+        f"Recall: {recall_val:.4f}\n"
+        f"AUC-ROC: {pr_auc:.4f}\n\n"
+        f"**Valori Matrice di Confusione:**\n"
+        f"True Negatives: {cm[0, 0]}\n"
+        f"False Positives: {cm[0, 1]}\n"
+        f"False Negatives: {cm[1, 0]}\n"
+        f"True Positives: {cm[1, 1]}"
+    )
+    axes[1, 1].text(0.5, 0.5, metrics_text, ha='center', va='center', fontsize=12,
+                    bbox=dict(boxstyle="round,pad=0.5", fc="wheat", alpha=0.5))
+    axes[1, 1].set_title('Riepilogo Performance', fontweight='bold', fontsize=14)
+
+
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.savefig('track1_model_comparison.png', dpi=150)
+    plt.show()
+    print("✅ Grafici di confronto salvati in: track1_model_comparison.png")
+
+
+def generate_submission(df_test, feature_cols, winner_name, training_metrics):
+    # Simile alla versione precedente, ma adattato per prendere il nome del vincitore
+    print(f"\n🚀 Generando submission per team: {TEAM_NAME} con il modello vincitore: {winner_name}")
     
-    # Calcola statistiche
-    total_test_samples = len(df_test)
-    anomalies_detected = predictions.sum()
-    anomaly_rate = anomalies_detected / total_test_samples
-    
-    # Usa metriche reali dal training set se disponibili
-    if training_metrics is not None and all(m is not None for m in training_metrics):
-        precision_real, recall_real, f1_real, auc_real = training_metrics
-        print(f"📊 Usando metriche REALI dal training set:")
-        print(f"   - Precision: {precision_real:.3f}")
-        print(f"   - Recall: {recall_real:.3f}")
-        print(f"   - F1-Score: {f1_real:.3f}")
-        print(f"   - AUC-ROC: {auc_real:.3f}")
-    else:
-        # Fallback a stime conservative se non abbiamo metriche reali
-        precision_real = 0.60
-        recall_real = 0.55
-        f1_real = 2 * (precision_real * recall_real) / (precision_real + recall_real)
-        auc_real = 0.70
-        print("⚠️ Usando metriche stimate (ground truth non disponibile su training)")
-    
-    # Crea submission dictionary
+    # Calcola precision e recall dal training set per il report
+    y_true_train = training_metrics['y_true']
+    y_pred_train = training_metrics['y_pred']
+    precision_train = precision_score(y_true_train, y_pred_train)
+    recall_train = recall_score(y_true_train, y_pred_train)
+    auc_roc_train = roc_auc_score(y_true_train, training_metrics['scores'])
+
     submission = {
-        "team_info": {
-            "team_name": team_name,
-            "members": members,
-            "track": "Track1",
-            "submission_time": datetime.now().isoformat() + "Z",
-            "submission_number": 1
-        },
+        "team_info": {"team_name": TEAM_NAME, "members": MEMBERS, "track": "Track1"},
         "model_info": {
-            "algorithm": "Isolation Forest with Feature Engineering",
+            "algorithm": winner_name,
             "features_used": feature_cols,
-            "hyperparameters": {
-                "contamination": 0.08,
-                "n_estimators": 200,
-                "random_state": 42
-            },
-            "feature_engineering": [
-                "revenue_per_person", "occupancy_rate", "songs_per_person",
-                "temporal_features", "venue_statistics", "anomaly_indicators"
-            ]
         },
         "results": {
-            "total_test_samples": total_test_samples,
-            "anomalies_detected": int(anomalies_detected),
-            "predictions": predictions.tolist(),
-            "scores": scores.tolist()
+            "total_test_samples": len(df_test),
+            "anomalies_detected": int(df_test['is_anomaly_predicted'].sum()),
+            "predictions": df_test['is_anomaly_predicted'].tolist(),
+            "scores": df_test['anomaly_score'].tolist()
         },
-                 "metrics": {
-             "precision": round(precision_real, 4),
-             "recall": round(recall_real, 4),
-             "f1_score": round(f1_real, 4),
-             "auc_roc": round(auc_real, 4)
-         },
-        "performance_info": {
-            "training_time_seconds": 15.0,
-            "prediction_time_seconds": 2.5,
-            "memory_usage_mb": 256,
-            "model_size_mb": 12.5
+        "metrics": {
+            "f1_score": round(training_metrics['f1_score'], 4),
+            "precision": round(precision_train, 4),
+            "recall": round(recall_train, 4),
+            "auc_roc": round(auc_roc_train, 4)
         }
     }
-    
-    # Salva submission
-    submission_filename = f"../submissions/submission_{team_name.lower().replace(' ', '_')}_track1.json"
+    submission_filename = f"../submissions/submission_{TEAM_NAME.lower().replace(' ', '_')}_track1.json"
     os.makedirs("../submissions", exist_ok=True)
-    
-    with open(submission_filename, 'w') as f:
-        json.dump(submission, f, indent=2, ensure_ascii=False)
-    
+    with open(submission_filename, 'w') as f: json.dump(submission, f, indent=2)
     print(f"✅ Submission salvata: {submission_filename}")
-    print(f"📊 Statistiche:")
-    print(f"   - Anomalie rilevate: {anomalies_detected}")
-    print(f"   - Tasso anomalie: {anomaly_rate:.2%}")
-    print(f"   - Features utilizzate: {len(feature_cols)}")
-    print(f"   - F1-Score (da training): {f1_real:.3f}")
-    print(f"   - Precision (da training): {precision_real:.3f}")
-    print(f"   - Recall (da training): {recall_real:.3f}")
-    
-    print(f"\n🏆 Per submitare:")
-    print(f"   git add {submission_filename}")
-    print(f"   git commit -m '{team_name} - Track 1 submission'")
-    print(f"   git push origin main")
-    
-    return submission_filename
 
 def main():
-    """
-    Pipeline principale per Track 1
-    """
-    print("🎪 SIAE ANOMALY DETECTION HACKATHON")
-    print("Track 1: Live Events Anomaly Detection")
-    print("=" * 50)
+    df_train, df_test = load_and_validate_datasets()
+
+    df_train_feat = create_features(df_train)
+    df_test_feat = create_features(df_test, training_df=df_train)
+
+    feature_cols = [col for col in df_train_feat.columns if col not in GUARANTEED_COLUMNS + ['event_date', 'anomaly_type']]
     
-    # 1. Carica dataset
-    df_train, df_test = load_datasets()
+    models_dict = create_models_to_train()
     
-    # 2. Feature engineering
-    df_train = feature_engineering(df_train)
-    df_test = feature_engineering(df_test)
+    trained_models, eval_results, winner_name = train_and_evaluate_models(df_train_feat, feature_cols, models_dict)
+
+    X_test = df_test_feat[feature_cols].fillna(0)
     
-    # 3. Applica regole deterministiche sul training (per valutazione)
-    df_train = detect_rule_based_anomalies(df_train)
+    # Usa il modello/ensemble vincitore per le predizioni finali
+    if winner_name == 'Ensemble':
+        print("🚀 Usando l'Ensemble per le predizioni finali...")
+        all_test_scores = []
+        for name, model in trained_models.items():
+            scaler = eval_results[name]['scaler']
+            test_scores_raw = model.decision_function(X_test)
+            normalized_scores_single = scaler.transform(test_scores_raw.reshape(-1, 1)).flatten()
+            all_test_scores.append(normalized_scores_single)
+        
+        final_test_scores_normalized = np.mean(np.array(all_test_scores), axis=0)
+        winner_threshold = eval_results['Ensemble']['threshold']
+        test_predictions = (final_test_scores_normalized >= winner_threshold).astype(int)
+        
+        df_test_feat['anomaly_score'] = final_test_scores_normalized # Score già normalizzato
+        df_test_feat['normalized_score'] = final_test_scores_normalized
+        df_test_feat['is_anomaly_predicted'] = test_predictions
+
+    else: # Un modello singolo ha vinto
+        print(f"🚀 Usando il modello vincitore '{winner_name}' per le predizioni finali...")
+        winner_model = trained_models[winner_name]
+        winner_threshold = eval_results[winner_name]['threshold']
+        winner_scaler = eval_results[winner_name]['scaler']
+
+        test_scores_raw = winner_model.decision_function(X_test)
+        normalized_test_scores = winner_scaler.transform(test_scores_raw.reshape(-1, 1)).flatten()
+        test_predictions = (normalized_test_scores >= winner_threshold).astype(int)
+        
+        df_test_feat['anomaly_score'] = test_scores_raw
+        df_test_feat['normalized_score'] = normalized_test_scores
+        df_test_feat['is_anomaly_predicted'] = test_predictions
+
+    # Prepara le metriche complete dal training set per la submission
+    y_true_train = df_train_feat['is_anomaly']
+    if winner_name == 'Ensemble':
+        all_train_scores = []
+        for name, model in trained_models.items():
+            scaler = eval_results[name]['scaler']
+            train_scores_raw = model.decision_function(df_train_feat[feature_cols].fillna(0))
+            all_train_scores.append(scaler.transform(train_scores_raw.reshape(-1, 1)).flatten())
+        
+        final_train_scores_normalized = np.mean(np.array(all_train_scores), axis=0)
+        y_pred_train = (final_train_scores_normalized >= eval_results['Ensemble']['threshold']).astype(int)
+        final_scores_for_auc = final_train_scores_normalized
+    else:
+        winner_model = trained_models[winner_name]
+        winner_scaler = eval_results[winner_name]['scaler']
+        train_scores_raw = winner_model.decision_function(df_train_feat[feature_cols].fillna(0))
+        final_train_scores_normalized = winner_scaler.transform(train_scores_raw.reshape(-1, 1)).flatten()
+        y_pred_train = (final_train_scores_normalized >= eval_results[winner_name]['threshold']).astype(int)
+        final_scores_for_auc = final_train_scores_normalized
+
+    df_train_feat['normalized_score'] = final_train_scores_normalized
+
+    training_metrics = {
+        "f1_score": eval_results[winner_name]['f1_score'],
+        "y_true": y_true_train,
+        "y_pred": y_pred_train,
+        "scores": final_scores_for_auc
+    }
     
-    # 4. Definisci SET COMPLETO di features prima di addestrare
-    feature_cols_complete = [
-        'attendance', 'capacity', 'n_songs', 'total_revenue',
-        'revenue_per_person', 'occupancy_rate', 'songs_per_person', 'avg_revenue_per_song',
-        'hour', 'day_of_week', 'month', 'is_weekend',
-        'venue_encoded', 'city_encoded',
-        'is_over_capacity', 'is_excessive_songs', 'is_suspicious_timing',
-        'is_low_revenue', 'is_high_revenue',
-        'venue_avg_attendance', 'venue_avg_revenue', 'venue_avg_capacity',
-        'attendance_vs_venue_avg', 'revenue_vs_venue_avg',
-        'revenue_zscore_for_venue', 'attendance_zscore_for_venue',
-        'efficiency_ratio', 'popularity_indicator', 'revenue_per_song', 'songs_intensity',
-        'rule_anomaly_score'  # Include anche il score delle regole
-    ]
+    generate_submission(df_test_feat, feature_cols, winner_name, training_metrics)
     
-    # 5. Addestra modello con TUTTE le features
-    iso_forest, scaler, final_features = train_isolation_forest(df_train, feature_cols_complete, contamination=0.08)
-    
-    # 6. Applica ML predictions sul training usando le STESSE features del training
-    X_train = df_train[final_features].fillna(0)
-    X_train_scaled = scaler.transform(X_train)
-    ml_predictions_train = iso_forest.predict(X_train_scaled)
-    ml_scores_train = iso_forest.score_samples(X_train_scaled)
-    
-    df_train['ml_anomaly_predicted'] = (ml_predictions_train == -1).astype(int)
-    df_train['ml_anomaly_score'] = ml_scores_train
-    
-    # Combina regole + ML per training
-    df_train['is_anomaly_predicted'] = (
-        df_train['has_rule_anomaly'] | 
-        (df_train['ml_anomaly_predicted'] == 1)
-    ).astype(int)
-    
-    df_train['combined_anomaly_score'] = (
-        df_train['rule_anomaly_score'] * 0.4 + 
-        (-df_train['ml_anomaly_score']) * 0.6
-    )
-    df_train['anomaly_score'] = df_train['combined_anomaly_score']
-    
-    training_metrics = evaluate_on_training(df_train)
-    
-    # 7. Predizioni ibride su test usando le STESSE features
-    df_test = hybrid_anomaly_detection(df_test, iso_forest, scaler, final_features)
-    
-    # 8. Visualizzazioni
-    create_visualizations(df_train, df_test)
-    
-    # 9. Salva risultati
-    print("\n💾 Salvando risultati...")
-    df_train.to_csv('live_events_train_predictions.csv', index=False)
-    df_test.to_csv('live_events_test_predictions.csv', index=False)
-    
-    # 10. Genera submission
-    # 🚨 PERSONALIZZA QUESTI VALORI! 🚨
-    team_name = "DatapizzaTheBest"  # ← CAMBIA CON IL TUO NOME TEAM
-    members = ["Mirko", "Giorgio"]  # ← CAMBIA CON I TUOI MEMBRI
-    
-    predictions = df_test['is_anomaly_predicted'].values
-    scores = df_test['anomaly_score'].values
-    
-    submission_file = generate_submission(
-        df_test, predictions, scores, final_features, team_name, members, training_metrics
-    )
-    
-    print("\n🎉 PIPELINE COMPLETATO!")
-    print(f"📋 Training: {len(df_train)} eventi")
-    print(f"🧪 Test: {len(df_test)} eventi")
-    print(f"🚨 Anomalie rilevate: {predictions.sum()}")
-    print(f"📄 Submission: {submission_file}")
-    
-    return df_train, df_test
+    create_visualizations(eval_results, df_train_feat, y_true_train, y_pred_train, winner_name)
+
+    print("\n🎉 PIPELINE COMPLETATO! 🎉")
 
 if __name__ == "__main__":
-    # Verifica dipendenze
     try:
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-        from sklearn.ensemble import IsolationForest
-        from sklearn.preprocessing import StandardScaler
-    except ImportError as e:
-        print(f"❌ Errore import: {e}")
-        print("💡 Installa le dipendenze con:")
-        print("pip install -r requirements.txt")
+        import pyod
+    except ImportError:
+        print("❌ Libreria PyOD non trovata. Per favore, installala con:")
+        print("pip install pyod")
         sys.exit(1)
-    
-    # Esegui pipeline
-    df_train, df_test = main() 
+    main()
