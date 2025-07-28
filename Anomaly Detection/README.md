@@ -78,8 +78,8 @@ n_songs_declared      # Numero brani dichiarati
 total_revenue         # Ricavi totali evento
 event_duration_hours  # Durata in ore
 main_artist           # Artista principale
-is_anomaly            # 🎯 TARGET: 0=normale, 1=anomalo (solo in train)
-anomaly_type          # Tipo di anomalia (solo in train)
+is_anomaly            # 🎯 TARGET: 0=normale, 1=anomalo (solo per valutare i modelli)
+anomaly_type          # Tipo di anomalia (solo per valutare i modelli)
 ```
 
 **🚨 Anomalie Sottili da rilevare**:
@@ -107,8 +107,8 @@ pixel_noise_level     # Livello di rumore nell'immagine
 edge_sharpness        # Nitidezza dei bordi del testo/immagini
 metadata_consistency  # Coerenza dei metadati interni
 submitter_id          # ID dell'utente che ha caricato il documento
-is_fraudulent         # 🎯 TARGET: 0=autentico, 1=fraudolento (solo in train)
-fraud_type            # Tipo di frode (solo in train)
+is_fraudulent         # 🎯 TARGET: 0=autentico, 1=fraudolento (solo per valutare i modelli)
+fraud_type            # Tipo di frode (solo per valutare i modelli)
 ```
 
 **🚨 Frodi Sottili da rilevare**:
@@ -135,8 +135,8 @@ artist_active_year_begin  # Anno inizio attività artista
 bit_rate                  # Bit rate audio
 spectral_bandwidth        # Larghezza di banda spettrale (feature audio)
 listener_country_entropy  # Entropia geografica degli ascoltatori
-is_anomaly                # 🎯 TARGET: 0=normale, 1=anomalo (solo in train)
-anomaly_type              # Tipo di anomalia (solo in train)
+is_anomaly                # 🎯 TARGET: 0=normale, 1=anomalo (solo per valutare i modelli)
+anomaly_type              # Tipo di anomalia (solo per valutare i modelli)
 ```
 
 **🚨 Anomalie Sottili da rilevare**:
@@ -160,8 +160,8 @@ play_count_last_24h       # Conteggio ascolti nelle ultime 24h
 audio_similarity_to_db    # Similarità audio con un database di opere protette
 noise_floor_db            # Livello di rumore di fondo
 file_hash                 # Hash univoco del file
-is_infringement           # 🎯 TARGET: 0=legale, 1=violazione (solo in train)
-infringement_type         # Tipo di violazione (solo in train)
+is_infringement           # 🎯 TARGET: 0=legale, 1=violazione (solo per valutare i modelli)
+infringement_type         # Tipo di violazione (solo per valutare i modelli)
 ```
 
 **🚨 Violazioni Sottili da rilevare**:
