@@ -3,150 +3,381 @@
 ## Descrizione
 Questo script implementa la Track 1 dell'hackathon SIAE, integrando i metadati FMA (Free Music Archive) per migliorare l'anomaly detection negli eventi live.
 
-## Caratteristiche
-- **Dataset sintetico eventi live** con anomalie inserite
-- **Integrazione metadati FMA** per informazioni musicali (generi, artisti, durata)
-- **Isolation Forest** per anomaly detection
-- **DBSCAN** per clustering venues
-- **Visualizzazioni avanzate** con analisi dei generi musicali
-- **Metriche di performance** dettagliate
+## 📊 Dataset
+Il modello utilizza i dataset standardizzati dell'hackathon:
+- **Training**: `../datasets/track1_live_events_train.csv` (40,000 eventi con ground truth)
+- **Test**: `../datasets/track1_live_events_test.csv` (10,000 eventi senza ground truth)
 
-## Installazione
-
-### 1. Clona il repository e naviga nella directory
-```bash
-cd "Anomaly Detection/Track1_Solution"
+### Dati degli Eventi
+```python
+event_id          # ID univoco evento
+venue             # Nome del venue/locale
+city              # Città dell'evento  
+event_date        # Data e ora dell'evento
+attendance        # Numero partecipanti effettivi
+capacity          # Capacità massima del venue
+n_songs           # Numero di brani eseguiti
+total_revenue     # Ricavi totali dell'evento
+is_anomaly        # 🎯 TARGET: 0=normale, 1=anomalo (solo training)
+anomaly_type      # Tipo di anomalia specifica (solo training)
 ```
 
-### 2. Installa le dipendenze
+### 🚨 Anomalie da Rilevare
+- **impossible_attendance**: Partecipanti > capacità venue
+- **revenue_mismatch**: Ricavi impossibili per quel pubblico  
+- **excessive_songs**: Troppi brani eseguiti (>40)
+- **suspicious_timing**: Eventi in orari strani (2-6 AM)
+- **duplicate_declaration**: Eventi dichiarati più volte
+
+## 🚀 Come Usare
+
+### STEP 1: Preparazione Dataset
 ```bash
-pip install -r requirements.txt
+# Dalla directory principale, genera i dataset (se non fatto già)
+cd ..
+python generate_datasets.py
+cd Track1_Solution
 ```
 
-### 3. Esegui lo script
+### STEP 2: Personalizza Team
+**🚨 IMPORTANTE**: Prima di eseguire, apri `track1_anomaly_detection.py` e modifica:
+
+```python
+# Cerca queste righe nel file e CAMBIA I VALORI:
+team_name = "YourTeam"           # ← INSERISCI IL TUO NOME TEAM
+members = ["Member1", "Member2"] # ← INSERISCI I MEMBRI DEL TEAM
+```
+
+### STEP 3: Esegui la pipeline
 ```bash
 python track1_anomaly_detection.py
 ```
 
-## Funzionalità principali
+**Il sistema automaticamente**:
+1. ✅ Carica dataset di training e test
+2. ✅ Applica feature engineering avanzato
+3. ✅ Addestra modello Isolation Forest
+4. ✅ Genera predizioni sul test set
+5. ✅ Crea visualizzazioni dettagliate
+6. ✅ Salva file di submission JSON
 
-### Dataset Generation
-- Genera eventi live sintetici con informazioni realistiche
-- Integra metadati FMA per generi musicali, artisti e durata
-- Inserisce anomalie di vari tipi:
-  - `impossible_attendance`: Attendance > capacity
-  - `revenue_mismatch`: Revenue non proporzionale all'attendance
-  - `excessive_songs`: Numero anomalo di brani
-  - `suspicious_timing`: Eventi in orari sospetti
-  - `genre_mismatch`: Generi poco popolari con revenue alta
-  - `artist_overload`: Troppi artisti per piccoli eventi
+### STEP 4: Verifica Risultati
+```bash
+# Controlla che sia stato generato il file di submission
+ls ../submissions/submission_*_track1.json
+
+# Dovresti vedere qualcosa come:
+# submission_yourteam_track1.json
+```
+
+### STEP 5: Submit
+```bash
+git add ../submissions/submission_*.json
+git commit -m "Team [TUO_NOME] - Track 1 submission"
+git push origin main
+```
+
+## 🔧 Architettura del Modello
 
 ### Feature Engineering
-- Features tradizionali: revenue_per_person, occupancy_rate, etc.
-- Features musicali FMA:
-  - Encoding dei generi musicali
-  - Popolarità di generi e artisti
-  - Durata stimata degli eventi
-  - Numero di artisti per evento
-  - Specializzazione dei venues
+Il modello crea **features avanzate** dai dati base:
 
-### Anomaly Detection
-- **Isolation Forest** con features integrate FMA
-- **DBSCAN** per clustering venues
-- Valutazione performance con precision, recall, F1-score
+**Features Base Derivate**:
+```python
+revenue_per_person = total_revenue / attendance
+occupancy_rate = attendance / capacity  
+songs_per_person = n_songs / attendance
+avg_revenue_per_song = total_revenue / n_songs
+```
+
+**Features Temporali**:
+```python
+hour, day_of_week, month, is_weekend
+```
+
+**Features Categoriche**:
+```python
+venue_encoded, city_encoded  # Label encoding
+```
+
+**Indicatori di Anomalie**:
+```python
+is_over_capacity      # attendance > capacity
+is_excessive_songs    # n_songs > 40
+is_suspicious_timing  # ora 2-6 AM
+is_low_revenue       # revenue_per_person < 5€
+is_high_revenue      # revenue_per_person > 100€
+```
+
+**Statistiche per Venue**:
+```python
+venue_avg_attendance, venue_avg_revenue
+attendance_vs_venue_avg, revenue_vs_venue_avg
+```
+
+### 🎯 Algoritmo: Approccio IBRIDO
+
+Il modello usa una **strategia ibrida** che combina:
+
+#### 1. **Regole Deterministiche** (Alta Precision)
+```python
+# ✅ Anomalie OVVIE con regole deterministiche:
+attendance > capacity           # impossible_attendance  
+n_songs > 40                   # excessive_songs
+hour >= 2 AND hour <= 6        # suspicious_timing
+stesso venue + stessa data     # duplicate_declaration
+revenue_per_person < 1€        # extremely_low_revenue
+```
+
+**Vantaggi**: Precision = 100%, veloce, interpretabile
+
+#### 2. **Isolation Forest** (Pattern Complessi)
+```python
+IsolationForest(
+    contamination=0.08,    # 8% anomalie attese  
+    n_estimators=200,      # 200 alberi per robustezza
+    random_state=42        # Riproducibilità
+)
+```
+
+**Vantaggi**: Rileva pattern multidimensionali sottili che le regole non catturano
+
+#### 3. **Combinazione Ibrida**
+```python
+# Anomalia se:
+has_rule_anomaly OR ml_prediction_anomaly
+
+# Score combinato:
+score = rule_score * 0.4 + ml_score * 0.6
+```
+
+**Perché questo approccio è migliore?**
+- ✅ **Regole** catturano anomalie ovvie con 100% precision
+- ✅ **ML** trova pattern complessi che sfuggono alle regole  
+- ✅ **Combinazione** massimizza sia precision che recall
+- ✅ **Interpretabile**: sappiamo sempre perché qualcosa è anomalo
+- ✅ **Robusto**: non perde mai anomalie ovvie
+
+## 📈 Output e Risultati
+
+### File Generati
+```bash
+track1_results.png                    # Dashboard visualizzazioni
+live_events_train_predictions.csv     # Predizioni su training
+live_events_test_predictions.csv      # Predizioni su test
+../submissions/submission_team_track1.json  # File di submission 
+```
 
 ### Visualizzazioni
-- Distribuzione anomaly scores
-- Scatter plots multi-dimensionali
-- Analisi per genere musicale
-- Clustering venues
-- Confusion matrix
-- Distribuzione generi musicali
+Il sistema genera **6 grafici informativi**:
 
-## Output Files
+1. **Anomaly Scores Training**: Distribuzione scores su training set
+2. **Attendance vs Revenue Training**: Scatter plot eventi normali vs anomalie  
+3. **Occupancy vs Revenue/Person Training**: Pattern di occupazione
+4. **Anomaly Scores Test**: Distribuzione scores su test set
+5. **Attendance vs Revenue Test**: Predizioni su test set
+6. **Eventi per Città**: Distribuzione geografica anomalie
 
-Lo script genera i seguenti file:
+### Metriche di Performance
+**Su Training Set** (dove abbiamo ground truth):
+- Precision, Recall, F1-Score, AUC-ROC **REALI**
+- Confusion Matrix per approccio ibrido
+- Analisi per tipo di anomalia
+- **Breakdown**: anomalie da regole vs ML
 
-1. **live_events_with_anomalies.csv**: Dataset completo con anomalie rilevate
-2. **venue_clustering_results.csv**: Risultati clustering venues
-3. **genre_analysis.csv**: Analisi anomalie per genere musicale
-4. **anomaly_detection_results.png**: Dashboard visualizzazioni principali
-5. **genre_distribution.png**: Distribuzione generi musicali
+**Su Test Set** (per submission):
+- Numero anomalie rilevate per categoria
+- Breakdown: deterministiche vs ML
+- Distribuzione scores combinati
+- **Metriche REALI dal training** (usate nel file JSON)
 
-## Esempi di Utilizzo
-
-### Eseguire con parametri personalizzati
-```python
-# Modifica la funzione main() per personalizzare
-def main():
-    # Genera più eventi
-    df = generate_live_events_dataset(n_events=20000, music_data=music_data)
-    
-    # Cambia soglia contaminazione
-    df, iso_forest, scaler, feature_cols = apply_isolation_forest(df, contamination=0.15)
+**Output Dettagliato**:
+```
+📊 Risultati approccio ibrido:
+   - Anomalie da regole deterministiche: 234
+   - Anomalie da Isolation Forest: 187  
+   - Anomalie totali (ibrido): 367
+   - Overlap: 54
 ```
 
-### Analizzare specifici generi musicali
-```python
-# Filtra per genere specifico
-rock_events = df[df['event_genre'] == 'Rock']
-anomaly_rate = rock_events['is_anomaly_detected'].mean()
-print(f"Tasso anomalie Rock: {anomaly_rate:.2%}")
+## 📄 Formato Submission
+
+Il file JSON generato contiene:
+
+```json
+{
+  "team_info": {
+    "team_name": "YourTeam",
+    "members": ["Member1", "Member2"],
+    "track": "Track1"
+  },
+  "model_info": {
+    "algorithm": "Isolation Forest with Feature Engineering",
+    "features_used": [...],
+    "hyperparameters": {...}
+  },
+  "results": {
+    "total_test_samples": 10000,
+    "anomalies_detected": 950,
+    "predictions": [0,1,0,1,...],  // Array completo predizioni
+    "scores": [-0.1,0.8,...]       // Array completo anomaly scores
+  },
+  "metrics": {
+    "precision": 0.7234,    // ✅ REALE dal training set
+    "recall": 0.6891,       // ✅ REALE dal training set  
+    "f1_score": 0.7058,     // ✅ REALE dal training set
+    "auc_roc": 0.8123       // ✅ REALE dal training set
+  }
+}
 ```
 
-## Metriche Performance
+### 🎯 **Importante: Metriche Reali + Approccio Ibrido**
+Il sistema ora implementa una **soluzione completa**:
 
-Il script fornisce metriche dettagliate:
-- **Precision**: Percentuale di anomalie rilevate corrette
-- **Recall**: Percentuale di anomalie vere identificate
-- **F1-Score**: Media armonica di precision e recall
-- **Analisi per tipo di anomalia**: Performance per ogni categoria
-- **Analisi per genere musicale**: Tasso anomalie per genere
+#### ✅ **Risolve i Problemi Originali**:
+- **Rileva duplicati**: controllo venue + data
+- **Non solo matematica**: regole specifiche per ogni tipo di anomalia  
+- **Combina regole + ML**: massimizza precision e recall
+- **Metriche reali**: performance effettive dal training set
 
-## Personalizzazione
+#### ✅ **Vantaggi dell'Approccio Ibrido**:
+- **Regole deterministiche**: 100% precision su anomalie ovvie
+- **Isolation Forest**: trova pattern multidimensionali complessi
+- **Interpretabile**: sempre sappiamo perché qualcosa è anomalo  
+- **Robusto**: non perde mai anomalie evidenti
 
-### Aggiungere nuovi tipi di anomalie
+#### ✅ **Quando Usare Cosa**:
+- **Regole**: anomalie deterministiche (attendance > capacity)
+- **ML**: pattern sottili (venue con pattern di revenue strani)
+- **Ibrido**: combinazione per massimizzare F1-Score
+
+## 🎛️ Personalizzazioni Avanzate
+
+### Modificare Soglia Contamination
 ```python
-# Nel generate_live_events_dataset()
-elif anomaly_type == "new_anomaly_type":
-    # Implementa logica anomalia personalizzata
-    pass
+# Nel train_isolation_forest(), cambia:
+iso_forest = IsolationForest(contamination=0.05)  # Più strict
+iso_forest = IsolationForest(contamination=0.12)  # Più permissivo
 ```
 
-### Modificare features per anomaly detection
+### Aggiungere Features Custom
 ```python
-# Nel apply_isolation_forest()
-custom_features = ['feature1', 'feature2', 'feature3']
-feature_cols.extend(custom_features)
+# Nel feature_engineering(), aggiungi:
+df['custom_feature'] = df['total_revenue'] / df['capacity']
+df['venue_efficiency'] = df['n_songs'] / df['capacity']
+
+# Nel train_isolation_forest(), includi:
+feature_cols.extend(['custom_feature', 'venue_efficiency'])
 ```
 
-## Problemi Comuni
+### Provare Altri Algoritmi
+```python
+from sklearn.svm import OneClassSVM
+from sklearn.ensemble import RandomForestClassifier
 
-### Download FMA fallisce
-Se il download dei metadati FMA fallisce, lo script automaticamente:
-- Crea un dataset FMA sintetico
-- Continua l'analisi con dati simulati
-- Mantiene la stessa struttura di output
+# Sostituisci Isolation Forest con:
+model = OneClassSVM(nu=0.08)  # Support Vector Machine
+# oppure usa ensemble
+```
 
-### Errori di importazione
-Assicurati di avere installato tutte le dipendenze:
+## 📊 Strategia di Ottimizzazione
+
+### 1. Analizza i Risultati di Training
+```python
+# Dopo aver eseguito, controlla i tipi di anomalie meglio rilevati
+anomaly_analysis = df_train[df_train['anomaly_type'].notna()].groupby('anomaly_type').agg({
+    'is_anomaly_predicted': ['sum', 'count']
+})
+print(anomaly_analysis)
+```
+
+### 2. Ottimizza per Anomalie Specifiche
+```python
+# Crea features mirate per anomalie poco rilevate
+df['revenue_capacity_ratio'] = df['total_revenue'] / df['capacity']
+df['songs_attendance_ratio'] = df['n_songs'] / df['attendance']
+```
+
+### 3. Tuning Hyperparameters
+```python
+# Prova diversi valori:
+contamination_values = [0.05, 0.08, 0.10, 0.12]
+n_estimators_values = [100, 200, 300]
+
+# Valuta con cross-validation sul training set
+```
+
+## ❗ Errori Comuni
+
+### ❌ Non personalizzare team_name
+```python
+# SBAGLIATO - lascerà "YourTeam"
+team_name = "YourTeam"  
+
+# GIUSTO - inserisci il tuo nome
+team_name = "TeamRossi"
+```
+
+### ❌ Dataset non trovati
 ```bash
-pip install --upgrade pandas numpy matplotlib seaborn scikit-learn
+# Se vedi errore "file non trovato", rigenera:
+cd ..
+python generate_datasets.py
+cd Track1_Solution
 ```
 
-### Problemi di memoria
-Per dataset grandi, riduci il numero di eventi:
+### ❌ JSON malformato
 ```python
-df = generate_live_events_dataset(n_events=5000)  # Invece di 50000
+# Testa sempre il tuo JSON:
+import json
+with open('../submissions/submission_team_track1.json') as f:
+    data = json.load(f)  # Deve funzionare senza errori
 ```
 
-## Prossimi Sviluppi
+## 🏆 Tips per Vincere
 
-- Integrazione con dati reali SIAE
-- Algoritmi di ensemble per migliorare performance
-- Analisi time series per pattern temporali
-- API REST per deployment in produzione
+### 1. **L'Approccio Ibrido è Vincente** 🎯
+La combinazione regole + ML batte entrambi singolarmente:
+- **Regole deterministiche**: garantiscono 100% precision su anomalie ovvie
+- **Isolation Forest**: trova pattern complessi che sfuggono alle regole
+- **Risultato**: massimi precision E recall
 
-## Contatti
+### 2. **Focus su F1-Score**
+Il sistema valuta principalmente su F1-Score:
+```python
+# L'approccio ibrido bilancia automaticamente:
+precision ↑  (regole deterministiche)
+recall ↑     (ML trova pattern sottili)
+→ F1-Score ↑
+```
 
-Per domande o supporto sull'implementazione della Track 1. 
+### 3. **Ottimizza i Pesi della Combinazione**
+```python
+# Esperimenta con diversi pesi:
+score = rule_score * 0.3 + ml_score * 0.7  # Più peso al ML
+score = rule_score * 0.5 + ml_score * 0.5  # Pesi uguali
+```
+
+### 4. **Aggiungi Regole Specifiche**
+```python
+# Crea regole per anomalie che ML sbaglia:
+df['suspicious_revenue_pattern'] = (
+    (df['revenue_per_person'] > 150) & 
+    (df['n_songs'] < 5)
+)
+```
+
+### 5. **Feature Engineering Avanzato**
+```python
+# Features che aiutano l'ML a trovare pattern sottili:
+df['revenue_zscore_for_venue'] = ...
+df['efficiency_ratio'] = df['total_revenue'] / (df['capacity'] * df['n_songs'])
+```
+
+---
+
+**🎯 Buona fortuna! Che vinca il miglior algoritmo! 🚀**
+
+---
+
+*Ultimo aggiornamento: Luglio 2025* 
