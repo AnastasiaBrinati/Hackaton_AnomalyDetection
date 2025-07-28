@@ -51,7 +51,7 @@ def load_datasets():
     if not os.path.exists(test_path):
         print(f"❌ File test non trovato: {test_path}")
         sys.exit(1)
-    
+
     df_test = pd.read_csv(test_path)
     print(f"✅ Dataset test caricato: {len(df_test)} eventi")
     
