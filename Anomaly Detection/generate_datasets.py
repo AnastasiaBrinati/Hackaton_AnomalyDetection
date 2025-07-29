@@ -528,66 +528,117 @@ def main():
     print("Generando dataset identici per tutti i partecipanti...")
     print(f"🔑 Random seed: {RANDOM_SEED}")
     print()
-    
+
     # Crea directory datasets
     datasets_dir = ensure_datasets_dir()
-    
+
     # Scarica/genera dati FMA per Track 1 e 3
     print("📥 Preparazione dati FMA...")
     fma_data = download_fma_metadata()
     print()
-    
-    # Genera tutti i dataset
-    datasets = {}
-    
-    # Track 1: Live Events
-    datasets['track1'] = generate_track1_dataset(n_events=50000, music_data=fma_data)
-    datasets['track1'].to_csv(datasets_dir / 'track1_live_events.csv', index=False)
-    print(f"💾 Salvato: {datasets_dir / 'track1_live_events.csv'}")
+
+    # Dizionario per tenere traccia dei dataset generati e delle loro stats
+    datasets_info = {}
+
+    # --- Track 1: Live Events ---
+    print("\n--- Generando Track 1: Live Events ---")
+    df_track1 = generate_track1_dataset(n_events=50000, music_data=fma_data)
+    train_size_t1 = 40000
+    df_train_t1 = df_track1.iloc[:train_size_t1]
+    df_test_t1 = df_track1.iloc[train_size_t1:]
+    ground_truth_cols_t1 = ['event_id', 'is_anomaly', 'anomaly_type']
+    df_test_ground_truth_t1 = df_test_t1[ground_truth_cols_t1].copy()
+    df_test_public_t1 = df_test_t1.drop(columns=['is_anomaly', 'anomaly_type'])
+    df_train_t1.to_csv(datasets_dir / 'track1_live_events_train.csv', index=False)
+    df_test_public_t1.to_csv(datasets_dir / 'track1_live_events_test.csv', index=False)
+    df_test_ground_truth_t1.to_csv(datasets_dir / 'track1_live_events_test_ground_truth.csv', index=False)
+    print(f"💾 Salvato: {datasets_dir / 'track1_live_events_train.csv'} ({len(df_train_t1)} righe)")
+    print(f"💾 Salvato: {datasets_dir / 'track1_live_events_test.csv'} ({len(df_test_public_t1)} righe)")
+    print(f"🔒 Salvato: {datasets_dir / 'track1_live_events_test_ground_truth.csv'} (Nascosto)")
+    datasets_info['track1'] = {'train': df_train_t1, 'test': df_test_public_t1, 'anomaly_col': 'is_anomaly'}
     print()
-    
-    # Track 2: Document Fraud
-    datasets['track2'] = generate_track2_dataset(n_documents=5000)
-    datasets['track2'].to_csv(datasets_dir / 'track2_documents.csv', index=False)
-    print(f"💾 Salvato: {datasets_dir / 'track2_documents.csv'}")
+
+    # --- Track 2: Document Fraud ---
+    print("\n--- Generando Track 2: Document Fraud ---")
+    df_track2 = generate_track2_dataset(n_documents=5000)
+    train_size_t2 = 4000
+    df_train_t2 = df_track2.iloc[:train_size_t2]
+    df_test_t2 = df_track2.iloc[train_size_t2:]
+    ground_truth_cols_t2 = ['document_id', 'is_fraudulent', 'fraud_type']
+    df_test_ground_truth_t2 = df_test_t2[ground_truth_cols_t2].copy()
+    df_test_public_t2 = df_test_t2.drop(columns=['is_fraudulent', 'fraud_type'])
+    df_train_t2.to_csv(datasets_dir / 'track2_documents_train.csv', index=False)
+    df_test_public_t2.to_csv(datasets_dir / 'track2_documents_test.csv', index=False)
+    df_test_ground_truth_t2.to_csv(datasets_dir / 'track2_documents_test_ground_truth.csv', index=False)
+    print(f"💾 Salvato: {datasets_dir / 'track2_documents_train.csv'} ({len(df_train_t2)} righe)")
+    print(f"💾 Salvato: {datasets_dir / 'track2_documents_test.csv'} ({len(df_test_public_t2)} righe)")
+    print(f"🔒 Salvato: {datasets_dir / 'track2_documents_test_ground_truth.csv'} (Nascosto)")
+    datasets_info['track2'] = {'train': df_train_t2, 'test': df_test_public_t2, 'anomaly_col': 'is_fraudulent'}
     print()
-    
-    # Track 3: Music Anomaly
-    datasets['track3'] = generate_track3_dataset(n_tracks=25000)
-    datasets['track3'].to_csv(datasets_dir / 'track3_music.csv', index=False)
-    print(f"💾 Salvato: {datasets_dir / 'track3_music.csv'}")
+
+    # --- Track 3: Music Anomaly ---
+    print("\n--- Generando Track 3: Music Anomaly ---")
+    df_track3 = generate_track3_dataset(n_tracks=25000)
+    train_size_t3 = 20000
+    df_train_t3 = df_track3.iloc[:train_size_t3]
+    df_test_t3 = df_track3.iloc[train_size_t3:]
+    ground_truth_cols_t3 = ['track_id', 'is_anomaly', 'anomaly_type']
+    df_test_ground_truth_t3 = df_test_t3[ground_truth_cols_t3].copy()
+    df_test_public_t3 = df_test_t3.drop(columns=['is_anomaly', 'anomaly_type'])
+    df_train_t3.to_csv(datasets_dir / 'track3_music_train.csv', index=False)
+    df_test_public_t3.to_csv(datasets_dir / 'track3_music_test.csv', index=False)
+    df_test_ground_truth_t3.to_csv(datasets_dir / 'track3_music_test_ground_truth.csv', index=False)
+    print(f"💾 Salvato: {datasets_dir / 'track3_music_train.csv'} ({len(df_train_t3)} righe)")
+    print(f"💾 Salvato: {datasets_dir / 'track3_music_test.csv'} ({len(df_test_public_t3)} righe)")
+    print(f"🔒 Salvato: {datasets_dir / 'track3_music_test_ground_truth.csv'} (Nascosto)")
+    datasets_info['track3'] = {'train': df_train_t3, 'test': df_test_public_t3, 'anomaly_col': 'is_anomaly'}
     print()
-    
-    # Track 4: Copyright Infringement
-    datasets['track4'] = generate_track4_dataset(n_works=15000)
-    datasets['track4'].to_csv(datasets_dir / 'track4_copyright.csv', index=False)
-    print(f"💾 Salvato: {datasets_dir / 'track4_copyright.csv'}")
+
+    # --- Track 4: Copyright Infringement ---
+    print("\n--- Generando Track 4: Copyright Infringement ---")
+    df_track4 = generate_track4_dataset(n_works=15000)
+    train_size_t4 = 12000
+    df_train_t4 = df_track4.iloc[:train_size_t4]
+    df_test_t4 = df_track4.iloc[train_size_t4:]
+    ground_truth_cols_t4 = ['work_id', 'is_infringement', 'infringement_type']
+    df_test_ground_truth_t4 = df_test_t4[ground_truth_cols_t4].copy()
+    df_test_public_t4 = df_test_t4.drop(columns=['is_infringement', 'infringement_type'])
+    df_train_t4.to_csv(datasets_dir / 'track4_copyright_train.csv', index=False)
+    df_test_public_t4.to_csv(datasets_dir / 'track4_copyright_test.csv', index=False)
+    df_test_ground_truth_t4.to_csv(datasets_dir / 'track4_copyright_test_ground_truth.csv', index=False)
+    print(f"💾 Salvato: {datasets_dir / 'track4_copyright_train.csv'} ({len(df_train_t4)} righe)")
+    print(f"💾 Salvato: {datasets_dir / 'track4_copyright_test.csv'} ({len(df_test_public_t4)} righe)")
+    print(f"🔒 Salvato: {datasets_dir / 'track4_copyright_test_ground_truth.csv'} (Nascosto)")
+    datasets_info['track4'] = {'train': df_train_t4, 'test': df_test_public_t4, 'anomaly_col': 'is_infringement'}
     print()
-    
+
     # Statistiche finali
-    print("📊 STATISTICHE FINALI")
+    print("\n📊 STATISTICHE FINALI")
     print("=" * 50)
-    total_samples = sum(len(df) for df in datasets.values())
-    print(f"📋 Totale campioni: {total_samples:,}")
+    total_train = sum(len(info['train']) for info in datasets_info.values())
+    total_test = sum(len(info['test']) for info in datasets_info.values())
+    print(f"📋 Totale campioni generati: {total_train + total_test:,}")
+    print(f"  - Dati di Training: {total_train:,}")
+    print(f"  - Dati di Test: {total_test:,}")
     print()
     
-    for track, df in datasets.items():
-        anomaly_col = 'is_anomaly' if 'is_anomaly' in df.columns else 'is_fraudulent' if 'is_fraudulent' in df.columns else 'is_infringement'
-        if anomaly_col in df.columns:
-            anomaly_count = df[anomaly_col].sum()
-            anomaly_rate = anomaly_count / len(df) * 100
-            print(f"🎯 {track.upper()}: {len(df):,} campioni, {anomaly_count:,} anomalie ({anomaly_rate:.1f}%)")
-    
+    for track, info in datasets_info.items():
+        df_train = info['train']
+        anomaly_col = info['anomaly_col']
+        if anomaly_col in df_train.columns:
+            anomaly_count = df_train[anomaly_col].sum()
+            anomaly_rate = anomaly_count / len(df_train) * 100
+            print(f"🎯 {track.upper()} (Training): {len(df_train):,} campioni, {anomaly_count:,} anomalie ({anomaly_rate:.1f}%)")
+
     print()
     print("✅ GENERAZIONE COMPLETATA!")
-    print("📁 Tutti i dataset sono salvati in: datasets/")
+    print(f"📁 Tutti i dataset (training, test e ground truth) sono salvati in: {datasets_dir}/")
     print("🎉 I dataset sono identici per tutti i partecipanti!")
     print()
     print("💡 Per usare i dataset nei tuoi script:")
-    print("   df = pd.read_csv('datasets/track1_live_events.csv')")
-    print("   df = pd.read_csv('datasets/track2_documents.csv')")
-    print("   df = pd.read_csv('datasets/track3_music.csv')")
-    print("   df = pd.read_csv('datasets/track4_copyright.csv')")
+    print("   df_train = pd.read_csv('datasets/track1_live_events_train.csv')")
+    print("   df_test = pd.read_csv('datasets/track1_live_events_test.csv')")
+    print("   # E così via per gli altri track...")
 
 if __name__ == "__main__":
     main() 
